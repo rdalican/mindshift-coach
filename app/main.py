@@ -89,9 +89,9 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 async def serve_home(request: Request):
     roadmap_data = roadmap_tracker.get_roadmap_summary()
     return templates.TemplateResponse(
-        "index.html",
-        {
-            "request": request,
+        request=request,
+        name="index.html",
+        context={
             "app_name": settings.APP_NAME,
             "roadmap": roadmap_data,
             "gemini_active": bool(settings.GEMINI_API_KEY and settings.GEMINI_API_KEY.strip()),
