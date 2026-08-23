@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="it" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>{{ app_name }} - PNL Master Coaching & Google Gemini AI</title>
+  
+  <!-- PWA & Mobile Meta Tags -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0A7E8C">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="App di Coaching e Reframing Cognitivo di Livello Master potenziata da PNL e Google Gemini AI.">
+  
+  <!-- Tailwind CSS & Google Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Custom CSS with Cache Buster -->
+  <link rel="stylesheet" href="/static/css/style.css?v=4.2">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              navy: '#0F2942',
+              teal: '#0A7E8C',
+              amber: '#C2410C',
+              dark: '#0B192C'
+            }
+          },
+          animation: {
+            'breathe': 'breathe 8s ease-in-out infinite',
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          },
+          keyframes: {
+            breathe: {
+              '0%, 100%': { transform: 'scale(1)', opacity: '0.4' },
+              '50%': { transform: 'scale(1.35)', opacity: '0.9' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @media print {
+      body { background: white !important; color: black !important; }
+      header, footer, nav, button, #mindshift-form, .no-print { display: none !important; }
+      #results-container { display: block !important; }
+      .glass-panel { border: 1px solid #ccc !important; background: white !important; color: black !important; box-shadow: none !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 flex flex-col min-h-screen">
+
+  <!-- TOP HEADER & BRANDING -->
+  <header class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 shadow-lg shadow-black/20 no-print">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-600 via-cyan-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-teal-500/25 text-white font-black text-xl">
+          🧠
+        </div>
+        <div>
+          <h1 class="text-lg md:text-xl font-black tracking-tight text-white flex items-center gap-2">
+            MindShift <span class="text-teal-400 font-bold">Coach</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40">Master PNL Pro</span>
+          </h1>
+          <p class="text-xs text-slate-400 font-medium">Sessione di Riprogrammazione Mentale • Valore Valutato 120€/sessione</p>
+        </div>
+      </div>
+
+      <!-- Actions: Onboarding, Cloud Sync, Pro Badge, PWA Install -->
+      <div class="flex flex-wrap items-center gap-2">
+        
+        <!-- Onboarding Quick Start Button -->
+        <button onclick="openOnboardingModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-teal-950 hover:bg-teal-900 text-teal-300 border border-teal-700/60 shadow-sm transition">
+          <span>🧙‍♂️</span> Guida 2 Min
+        </button>
+
+        <!-- Cloud Sync Pill -->
+        <button id="sync-status-btn" onclick="openSyncModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-teal-300 border border-teal-700/60 shadow-sm transition">
+          <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
+          <span id="sync-status-text">☁️ Cloud Attivo</span>
+        </button>
+
+        <!-- Pro / Upgrade Button -->
+        <button onclick="openPricingModal()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-400 text-white shadow-md shadow-orange-500/25 transition">
+          ⭐ Pro 9,99€/m
+        </button>
+
+        <!-- PWA Install Button -->
+        <button id="pwa-install-btn" class="hidden items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-teal-600 hover:bg-teal-500 text-white transition shadow-sm">
+          📱 Installa
+        </button>
+      </div>
+
+    </div>
+
+    <!-- NAVIGATION TABS -->
+    <div class="max-w-6xl mx-auto px-4 flex space-x-1 overflow-x-auto py-1 border-t border-slate-800/60 scrollbar-none">
+      <button data-target="live-shift-section" class="nav-tab-btn px-4 py-2 text-xs md:text-sm font-bold rounded-lg bg-teal-700 text-white transition whitespace-nowrap">
+        ⚡ Sessione Master PNL
+      </button>
+      <button data-target="saved-shifts-section" class="nav-tab-btn px-4 py-2 text-xs md:text-sm font-semibold rounded-lg text-slate-300 hover:bg-slate-800 transition whitespace-nowrap">
+        📖 Diario Sessioni (<span id="saved-shifts-count">0</span>)
+      </button>
+      <button data-target="analytics-section" class="nav-tab-btn px-4 py-2 text-xs md:text-sm font-semibold rounded-lg text-slate-300 hover:bg-slate-800 transition whitespace-nowrap">
+        📊 Analytics & Mappa VAK
+      </button>
+      <button data-target="roadmap-section" class="nav-tab-btn px-4 py-2 text-xs md:text-sm font-semibold rounded-lg text-slate-300 hover:bg-slate-800 transition whitespace-nowrap">
+        🚀 Roadmap Micro-SaaS
+      </button>
+      <button data-target="cloud-sync-section" class="nav-tab-btn px-4 py-2 text-xs md:text-sm font-semibold rounded-lg text-slate-300 hover:bg-slate-800 transition whitespace-nowrap">
+        ☁️ Sync Windows ↔ Android
+      </button>
+      <button data-target="pnl-guide-section" class="nav-tab-btn px-4 py-2 text-xs md:text-sm font-semibold rounded-lg text-slate-300 hover:bg-slate-800 transition whitespace-nowrap">
+        🎯 Metodo PNL & Dilts
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-6">
+
+    <!-- ========================================== -->
+    <!-- SECTION 1: LIVE MINDSHIFT MASTER SESSION   -->
+    <!-- ========================================== -->
+    <section id="live-shift-section" class="app-section">
+      
+      <!-- HERO BANNER -->
+      <div class="text-center max-w-3xl mx-auto mb-6 no-print">
+        <h2 class="text-2xl md:text-4xl font-black text-white tracking-tight">
+          Sessione di Coaching <span class="bg-clip-text text-transparent bg-gradient-to-r from-teal-400 via-cyan-300 to-emerald-300">Master PNL</span>
+        </h2>
+        <p class="text-xs md:text-sm text-slate-300 mt-2">
+          Protocollo Clinico di Trasformazione Cognitiva a 5 Dimensioni: Diagnosi Submodalità, 4 Ristrutturazioni di Livello Dilts, Sessione Vocale Guidata, Ancoraggio Corporeo 90s e Piano di Azione in 3 Fasi.
+        </p>
+      </div>
+
+      <!-- INPUT CARD -->
+      <div class="glass-panel rounded-2xl p-5 md:p-7 mb-8 border border-slate-700/80 shadow-2xl no-print">
+        
+        <!-- QUICK CHIPS -->
+        <div class="mb-4">
+          <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block mb-2">Esempi di Blocchi Frequenti:</span>
+          <div class="flex flex-wrap gap-2">
+            <button class="quick-thought-pill text-xs px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition" data-text="Non riesco a trovare il coraggio di chiedere ai clienti il giusto prezzo per la mia consulenza.">
+              💶 "Chiedere il giusto prezzo"
+            </button>
+            <button class="quick-thought-pill text-xs px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition" data-text="Non ho abbastanza tempo per lanciare questo progetto e stare dietro a tutto.">
+              ⏱️ "Non ho abbastanza tempo"
+            </button>
+            <button class="quick-thought-pill text-xs px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition" data-text="Non riesco a mantenere la concentrazione e mi perdo quando devo analizzare dati complessi.">
+              🎯 "Perdita di focus & concentrazione"
+            </button>
+            <button class="quick-thought-pill text-xs px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition" data-text="Non sono abbastanza bravo rispetto ai concorrenti più famosi sul mercato.">
+              🏆 "Sindrome dell'impostore"
+            </button>
+          </div>
+        </div>
+
+        <!-- FORM -->
+        <form id="mindshift-form" class="space-y-4">
+          <div>
+            <label for="thought-input" class="block text-xs font-bold uppercase tracking-wider text-teal-300 mb-1.5">
+              Esprimi il pensiero limitante o il blocco da trasformare:
+            </label>
+            <textarea 
+              id="thought-input" 
+              rows="3" 
+              required 
+              placeholder="Scrivi qui con le tue parole (es. 'Non riesco a mantenere la concentrazione durante le analisi e mi sento sopraffatto')..."
+              class="w-full bg-slate-900/90 text-white rounded-xl p-4 text-sm md:text-base border border-slate-700 focus:border-teal-400 focus:ring-2 focus:ring-teal-500/20 outline-none transition placeholder:text-slate-500 shadow-inner"
+            ></textarea>
+          </div>
+
+          <!-- CONTEXT & VAK PREFERENCE -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div>
+              <label for="context-select" class="block text-xs font-semibold text-slate-400 mb-1">
+                Ambito di Vita o Obiettivo:
+              </label>
+              <select id="context-select" class="w-full bg-slate-900 text-slate-200 rounded-lg p-2.5 text-xs border border-slate-700 focus:border-teal-500 outline-none font-medium">
+                <option value="">Generale / Personale</option>
+                <option value="Business & Micro-SaaS">Business & Progetti Digitali</option>
+                <option value="Lavoro & Carriera">Lavoro & Carriera Professionale</option>
+                <option value="Denaro & Tariffe">Denaro, Vendite & Tariffe</option>
+                <option value="Autostima & Performance">Autostima & Performance Personale</option>
+                <option value="Relazioni & Comunicazione">Relazioni & Comunicazione</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="channel-select" class="block text-xs font-semibold text-slate-400 mb-1">
+                Calibrazione Stile Sensoriale (VAK):
+              </label>
+              <select id="channel-select" class="w-full bg-slate-900 text-slate-200 rounded-lg p-2.5 text-xs border border-slate-700 focus:border-teal-500 outline-none font-medium">
+                <option value="">Rilevamento Automatico con IA (Consigliato)</option>
+                <option value="Visivo (V)">Forza Canale Visivo (Immagini, Prospettive, Luce)</option>
+                <option value="Uditivo (A)">Forza Canale Uditivo (Dialogo interno, Suoni, Tono)</option>
+                <option value="Cinestesico (K)">Forza Canale Cinestesico (Sensazioni, Corpo, Pressione)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- SUBMIT BUTTON -->
+          <div class="pt-2 flex justify-end">
+            <button 
+              type="submit" 
+              class="w-full sm:w-auto px-8 py-3.5 rounded-xl font-black text-sm bg-gradient-to-r from-teal-500 via-cyan-500 to-emerald-400 hover:from-teal-400 hover:to-cyan-300 text-slate-950 shadow-lg shadow-teal-500/25 transition transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span>⚡</span> Avvia Protocollo Master PNL
+            </button>
+          </div>
+        </form>
+
+      </div>
+
+      <!-- LOADING STATE -->
+      <div id="loading-state" class="hidden py-16 text-center no-print">
+        <div class="inline-block w-14 h-14 rounded-full border-4 border-teal-500/20 border-t-teal-400 animate-spin mb-4"></div>
+        <h3 class="text-lg font-bold text-white">Generazione Sessione Clinica Master in corso...</h3>
+        <p class="text-xs text-slate-400 mt-1.5 max-w-md mx-auto">
+          Google Gemini AI e il motore PNL stanno elaborando la diagnosi del Meta-Modello, il salto logico di Dilts, l'ancoraggio corporeo e il piano d'azione in 3 fasi.
+        </p>
+      </div>
+
+      <!-- RESULTS DISPLAY: PROTOCOLLO TRASFORMATIVO COMPLETO -->
+      <div id="results-container" class="hidden space-y-8">
+        
+        <!-- HEADER DELLA SESSIONE RISULTATO + AZIONI VOCALI & STAMPA -->
+        <div class="p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-teal-950/50 to-slate-900 border border-teal-700/60 shadow-2xl flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Sessione Completata</span>
+              <span class="text-xs text-slate-400">Valore Sessione: <strong class="text-amber-400 font-bold">120,00€</strong> (Incluso nel tuo Piano)</span>
+            </div>
+            <h3 class="text-lg md:text-xl font-extrabold text-white">Cartella Clinica di Riprogrammazione Cognitiva</h3>
+          </div>
+
+          <!-- AUDIO COACH & PRINT BUTTONS -->
+          <div class="flex flex-wrap items-center gap-2 no-print">
+            <button id="audio-coach-btn" onclick="toggleAudioCoach()" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-purple-600/30 transition flex items-center gap-2">
+              <span id="audio-icon">🎧</span> <span id="audio-btn-text">Ascolta Sessione Guidata</span>
+            </button>
+            <button onclick="window.print()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl border border-slate-700 transition flex items-center gap-1.5">
+              🖨️ Stampa / Salva PDF
+            </button>
+            <span id="res-engine-badge" class="text-xs font-mono text-teal-300 bg-slate-900 px-3 py-2 rounded-xl border border-slate-700">Engine: Gemini AI</span>
+          </div>
+        </div>
+
+        <!-- ==================================================== -->
+        <!-- QUADRO DI SHIFT NEURO-BIOLOGICO (PRIMA VS DOPO)     -->
+        <!-- ==================================================== -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Stato Prima -->
+          <div class="p-4 rounded-2xl bg-red-950/20 border border-red-900/50 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl">⚠️</span>
+              <div>
+                <span class="text-[10px] font-black uppercase tracking-wider text-red-400 block">Stato Neuro-Fisiologico di Partenza</span>
+                <h4 class="text-sm font-bold text-red-200" id="res-before-state">Contrazione, Cortisolo Alto, Dialogo Frenetico</h4>
+              </div>
+            </div>
+            <span class="text-xs font-mono text-red-400/90 font-bold bg-red-950 px-2.5 py-1 rounded border border-red-800/40">Frequenza Bassa</span>
+          </div>
+
+          <!-- Stato Dopo -->
+          <div class="p-4 rounded-2xl bg-emerald-950/20 border border-emerald-900/50 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl">✨</span>
+              <div>
+                <span class="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">Stato Risorsa Riprogrammato</span>
+                <h4 class="text-sm font-bold text-emerald-200" id="res-after-state">Padronanza, Coerenza Cardiaca, Focus</h4>
+              </div>
+            </div>
+            <span class="text-xs font-mono text-emerald-400/90 font-bold bg-emerald-950 px-2.5 py-1 rounded border border-emerald-800/40">Frequenza Alta</span>
+          </div>
+        </div>
+
+        <!-- ==================================================== -->
+        <!-- MODULO 1: DIAGNOSI NEURO-LINGUISTICA & SUBMODALITÀ  -->
+        <!-- ==================================================== -->
+        <div class="glass-panel rounded-2xl p-6 border border-slate-700">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-xl">🔍</span>
+            <h3 class="text-base font-extrabold text-white uppercase tracking-wider">1. Diagnosi Neuro-Linguistica & Mappatura Submodalità</h3>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            <!-- Canale VAK Card -->
+            <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold uppercase text-slate-400">Canale Rappresentazionale Dominante</span>
+                <span id="res-vak-badge" class="px-3 py-1 rounded-full text-xs font-bold badge-mixed">VAK</span>
+              </div>
+              <p class="text-xs text-slate-300 mb-2">Predicati sensoriali individuati:</p>
+              <div id="res-vak-keywords" class="flex flex-wrap gap-1.5 mb-3"></div>
+              <div class="pt-2 border-t border-slate-800/80">
+                <span class="text-[11px] text-teal-400 font-semibold block mb-0.5">🧠 Come il cervello costruisce il blocco (Submodalità):</span>
+                <p id="res-submodalities-insight" class="text-xs text-slate-300 leading-relaxed"></p>
+              </div>
+            </div>
+
+            <!-- Meta-Model Distortion Card -->
+            <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold uppercase text-slate-400">Trappola del Meta-Modello</span>
+                <span id="res-meta-category" class="px-2.5 py-0.5 rounded text-xs font-bold bg-amber-950/80 text-amber-300 border border-amber-800/80">Generalizzazione</span>
+              </div>
+              <h4 id="res-meta-subtype" class="text-sm font-extrabold text-white mb-1">Quantificatore Universale</h4>
+              <p id="res-meta-explanation" class="text-xs text-slate-300 leading-relaxed mb-3">Spiegazione logica</p>
+              <div id="res-meta-triggers" class="flex flex-wrap gap-1"></div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ==================================================== -->
+        <!-- MODULO 2: LE 4 RISTRUTTURAZIONI COGNITIVE PROFONDE  -->
+        <!-- ==================================================== -->
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <span class="text-xl">🧠</span>
+              <h3 class="text-lg font-black text-white uppercase tracking-wider">2. Le 4 Ristrutturazioni di Livello Superiore (Dilts & Milton)</h3>
+            </div>
+            <span class="text-xs text-teal-400 font-mono">Valuta la risonanza ⭐</span>
+          </div>
+
+          <div id="reframes-cards-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </div>
+
+        <!-- ==================================================== -->
+        <!-- MODULO 3: PROTOCOLLO DI ANCORAGGIO FISIOLOGICO (90s)-->
+        <!-- ==================================================== -->
+        <div class="glass-panel rounded-2xl p-6 border-l-4 border-teal-400 bg-slate-900/90 border border-slate-700">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <div class="flex items-center gap-3">
+              <!-- Visual Breathing Bubble -->
+              <div class="relative w-12 h-12 flex items-center justify-center">
+                <div class="absolute inset-0 rounded-full bg-teal-500/30 animate-breathe"></div>
+                <span class="text-2xl relative z-10">🧘‍♂️</span>
+              </div>
+              <div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-teal-400">Self-Coaching Fisiologico (90 Secondi)</span>
+                <h3 id="res-anchor-title" class="text-base font-extrabold text-white">Ancoraggio di Risorsa e Sicurezza</h3>
+              </div>
+            </div>
+            <span id="res-anchor-tech" class="px-3 py-1 rounded-full text-xs font-bold bg-teal-950 text-teal-300 border border-teal-800">
+              Ancoraggio Cinestesico
+            </span>
+          </div>
+
+          <p class="text-xs text-slate-300 mb-4">
+            Esegui ora questa sequenza corporea per installare fisicamente il nuovo stato emotivo nel tuo sistema nervoso:
+          </p>
+
+          <div id="res-anchor-steps" class="space-y-2.5 mb-4"></div>
+
+          <div class="p-3.5 rounded-xl bg-slate-950/90 border border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-300">
+            <span>Stato bersaglio installato: <strong id="res-anchor-target" class="text-emerald-400 font-bold">Padronanza Assoluta</strong></span>
+            <button onclick="startAnchorTimer()" id="anchor-timer-btn" class="px-4 py-2 bg-teal-700 hover:bg-teal-600 rounded-xl text-white font-bold transition shadow-lg flex items-center gap-2">
+              ⏱️ <span id="timer-btn-text">Avvia Timer Ancoraggio (90s)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ==================================================== -->
+        <!-- MODULO 4: PIANO DI AZIONE IN 3 FASI (2m / 24h / 7d) -->
+        <!-- ==================================================== -->
+        <div class="glass-panel rounded-2xl p-6 border border-slate-700">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <span class="text-xl">📋</span>
+              <h3 class="text-base font-extrabold text-white uppercase tracking-wider">4. Piano di Azione Operativo in 3 Fasi</h3>
+            </div>
+            <span class="text-xs text-slate-400 italic">Spunta le azioni completate</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            
+            <!-- Fase 1: Subito 2 Minuti -->
+            <div class="bg-slate-900/90 p-4 rounded-xl border-t-4 border-emerald-400 border border-slate-800 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[10px] font-black uppercase tracking-widest text-emerald-400">⚡ Fase 1: Subito (2 Minuti)</span>
+                  <input type="checkbox" class="w-4 h-4 rounded text-emerald-500 bg-slate-800 border-slate-700 cursor-pointer" />
+                </div>
+                <h4 class="text-sm font-bold text-white mb-2">Micro-Azione di Sblocco</h4>
+                <p id="res-action-2min" class="text-xs text-slate-200 leading-relaxed mb-3"></p>
+              </div>
+              <span class="text-[11px] text-slate-400 italic">Rompere l'inerzia corporea</span>
+            </div>
+
+            <!-- Fase 2: Nelle prime 24 Ore -->
+            <div class="bg-slate-900/90 p-4 rounded-xl border-t-4 border-cyan-400 border border-slate-800 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[10px] font-black uppercase tracking-widest text-cyan-400">🎯 Fase 2: Entro 24 Ore</span>
+                  <input type="checkbox" class="w-4 h-4 rounded text-cyan-500 bg-slate-800 border-slate-700 cursor-pointer" />
+                </div>
+                <h4 class="text-sm font-bold text-white mb-2">Compito Pratico nel Mondo Reale</h4>
+                <p id="res-action-24h" class="text-xs text-slate-200 leading-relaxed mb-3"></p>
+              </div>
+              <span class="text-[11px] text-slate-400 italic">Validazione materiale</span>
+            </div>
+
+            <!-- Fase 3: Strategia a 7 Giorni -->
+            <div class="bg-slate-900/90 p-4 rounded-xl border-t-4 border-amber-400 border border-slate-800 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[10px] font-black uppercase tracking-widest text-amber-400">🛡️ Fase 3: 7 Giorni</span>
+                  <input type="checkbox" class="w-4 h-4 rounded text-amber-500 bg-slate-800 border-slate-700 cursor-pointer" />
+                </div>
+                <h4 class="text-sm font-bold text-white mb-2">Abitudine di Consolidamento</h4>
+                <p id="res-action-7days" class="text-xs text-slate-200 leading-relaxed mb-3"></p>
+              </div>
+              <span class="text-[11px] text-slate-400 italic">Prevenzione ricadute</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ==================================================== -->
+        <!-- MODULO 5: MANTRA IPNOTICO DI POTERE (ERICKSON)      -->
+        <!-- ==================================================== -->
+        <div class="glass-panel rounded-2xl p-6 border border-amber-600/40 bg-gradient-to-br from-slate-900 via-amber-950/20 to-slate-900 text-center relative overflow-hidden">
+          <span class="text-[10px] font-black uppercase tracking-widest text-amber-400 block mb-1">💎 Formula di Ancoraggio Quotidiano</span>
+          <h3 class="text-lg md:text-xl font-extrabold text-white mb-3" id="res-mantra-text">
+            "Io genero lo spazio per ciò che è sacro per la mia crescita."
+          </h3>
+          <div class="flex flex-wrap items-center justify-center gap-3 no-print">
+            <button onclick="copyMantra()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-bold rounded-xl border border-amber-700/50 transition flex items-center gap-1.5 shadow-md">
+              📋 Copia Mantra
+            </button>
+            <button onclick="saveCurrentFullShift()" class="px-4 py-2 bg-teal-700 hover:bg-teal-600 text-white text-xs font-bold rounded-xl shadow-md transition flex items-center gap-1.5">
+              ☁️ Salva Sessione Completa nel Cloud
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SECTION 2: DIARIO SESSIONI CLOUD           -->
+    <!-- ========================================== -->
+    <section id="saved-shifts-section" class="app-section hidden">
+      <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="text-2xl font-bold text-white">📖 Diario delle Sessioni Master</h2>
+          <p class="text-xs text-slate-400 mt-1">Tutte le schede complete salvate su Windows e Android sono sincronizzate sul database di Railway.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="downloadJournalMarkdown()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5">
+            📥 Scarica Scheda Markdown
+          </button>
+          <button onclick="manualCloudSync()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-teal-800 hover:bg-teal-700 text-teal-200 border border-teal-600 transition flex items-center gap-1.5">
+            🔄 Sincronizza Ora
+          </button>
+        </div>
+      </div>
+
+      <!-- SEARCH & FILTER BAR -->
+      <div class="glass-panel p-3 rounded-xl mb-4 border border-slate-800 flex flex-wrap items-center gap-3">
+        <input 
+          type="text" 
+          id="journal-search-input" 
+          oninput="filterJournalEntries()" 
+          placeholder="🔍 Cerca nelle sessioni (es. 'prezzo', 'tempo', 'focus', 'clienti')..." 
+          class="flex-grow bg-slate-900 text-xs text-white p-2.5 rounded-lg border border-slate-700 outline-none focus:border-teal-500" 
+        />
+        <select id="journal-filter-vak" onchange="filterJournalEntries()" class="bg-slate-900 text-xs text-slate-300 p-2.5 rounded-lg border border-slate-700 outline-none font-medium">
+          <option value="">Tutti i Canali VAK</option>
+          <option value="Visivo">👁️ Visivo (V)</option>
+          <option value="Uditivo">👂 Uditivo (A)</option>
+          <option value="Cinestesico">🖐️ Cinestesico (K)</option>
+        </select>
+      </div>
+
+      <div id="saved-shifts-list" class="space-y-4"></div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SECTION 3: ANALYTICS & TREND VAK           -->
+    <!-- ========================================== -->
+    <section id="analytics-section" class="app-section hidden">
+      <div class="space-y-6">
+        <div>
+          <h2 class="text-2xl font-bold text-white">📊 Analytics Cognitivi & Profilo Sensoriale</h2>
+          <p class="text-xs text-slate-400 mt-1">Mappa in tempo reale della tua evoluzione psicologica e dei canali di trasformazione.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="glass-panel p-4 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400 block mb-1 font-semibold">Sessioni Master Svolte</span>
+            <span id="stat-total-shifts" class="text-2xl font-black text-white">0</span>
+            <p class="text-xs text-teal-400 mt-1">Trasformazioni attive</p>
+          </div>
+          <div class="glass-panel p-4 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400 block mb-1 font-semibold">Canale Dominante</span>
+            <span id="stat-dominant-channel" class="text-lg font-bold text-cyan-300">Calcolo...</span>
+            <p class="text-xs text-slate-500 mt-1">Stile percettivo</p>
+          </div>
+          <div class="glass-panel p-4 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400 block mb-1 font-semibold">Indice di Risonanza</span>
+            <span id="stat-avg-rating" class="text-2xl font-black text-amber-400">4.9 / 5</span>
+            <p class="text-xs text-amber-500/80 mt-1">⭐ Feedback medio</p>
+          </div>
+          <div class="glass-panel p-4 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400 block mb-1 font-semibold">Empowerment Index</span>
+            <span id="stat-empowerment-score" class="text-2xl font-black text-emerald-400">92%</span>
+            <p class="text-xs text-emerald-500/80 mt-1">Potere decisionale</p>
+          </div>
+        </div>
+
+        <!-- SENSORY VAK GAUGES -->
+        <div class="glass-panel p-6 rounded-2xl border border-slate-700">
+          <h3 class="text-base font-bold text-white mb-4 flex items-center gap-2">
+            <span>🧠</span> Distribuzione dei Canali Rappresentazionali (VAK)
+          </h3>
+          <div class="space-y-4">
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span class="text-cyan-300">👁️ Canale Visivo (V)</span>
+                <span id="vak-visual-pct" class="text-slate-300 font-mono">0%</span>
+              </div>
+              <div class="w-full bg-slate-900 rounded-full h-3.5 p-0.5 border border-slate-800">
+                <div id="vak-visual-bar" class="bg-gradient-to-r from-cyan-500 to-blue-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span class="text-purple-300">👂 Canale Uditivo (A)</span>
+                <span id="vak-auditory-pct" class="text-slate-300 font-mono">0%</span>
+              </div>
+              <div class="w-full bg-slate-900 rounded-full h-3.5 p-0.5 border border-slate-800">
+                <div id="vak-auditory-bar" class="bg-gradient-to-r from-purple-500 to-indigo-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span class="text-amber-300">🖐️ Canale Cinestesico (K)</span>
+                <span id="vak-kinesthetic-pct" class="text-slate-300 font-mono">0%</span>
+              </div>
+              <div class="w-full bg-slate-900 rounded-full h-3.5 p-0.5 border border-slate-800">
+                <div id="vak-kinesthetic-bar" class="bg-gradient-to-r from-orange-500 to-amber-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SECTION 4: ROADMAP 4 SETTIMANE             -->
+    <!-- ========================================== -->
+    <section id="roadmap-section" class="app-section hidden">
+      <div class="glass-panel rounded-2xl p-6 mb-6 border border-slate-700">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-teal-400">Paragrafo 6 del Report Strategico</span>
+            <h2 class="text-xl md:text-2xl font-black text-white mt-0.5">Roadmap di Lancio in 4 Settimane per la Rendita Passiva</h2>
+          </div>
+          <div class="text-right">
+            <span class="text-xs text-slate-400">Progresso Globale:</span>
+            <span id="roadmap-progress-text" class="text-xl font-extrabold text-teal-400 ml-1">75%</span>
+          </div>
+        </div>
+        <div class="w-full bg-slate-800 rounded-full h-3 overflow-hidden border border-slate-700">
+          <div id="roadmap-progress-bar" class="bg-gradient-to-r from-teal-500 to-cyan-400 h-full rounded-full transition-all duration-500" style="width: 75%"></div>
+        </div>
+      </div>
+      <div id="roadmap-weeks-container"></div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SECTION 5: CLOUD SYNC WINDOWS ↔ ANDROID    -->
+    <!-- ========================================== -->
+    <section id="cloud-sync-section" class="app-section hidden">
+      <div class="glass-panel rounded-2xl p-6 md:p-8 border border-slate-700 space-y-6 max-w-3xl mx-auto">
+        <div>
+          <h2 class="text-2xl font-bold text-white mb-1">☁️ Sincronizzazione Cross-Device</h2>
+          <p class="text-xs text-slate-400">Condividi istantaneamente le tue sessioni Master e il diario tra PC Windows e smartphone Android da qualsiasi connessione internet.</p>
+        </div>
+
+        <div class="bg-slate-900/80 p-5 rounded-xl border border-slate-800 space-y-4">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">La tua Sync Key Cloud:</span>
+            <div class="flex items-center gap-2">
+              <input type="text" id="sync-key-display" readonly class="w-full bg-slate-950 text-teal-300 font-mono text-sm font-bold p-3 rounded-lg border border-slate-700 outline-none" value="MIND-INIT-XXXX" />
+              <button onclick="copySyncKey()" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-xs font-bold rounded-lg border border-slate-700 transition">
+                📋 Copia
+              </button>
+            </div>
+            <p class="text-xs text-slate-400 mt-2">
+              💡 <em>Copia questo codice e incollalo nella versione Android o Windows per unire i due dispositivi.</em>
+            </p>
+          </div>
+
+          <div class="pt-3 border-t border-slate-800">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">Accoppia un altro dispositivo:</span>
+            <div class="flex gap-2">
+              <input type="text" id="sync-key-input" placeholder="Es. MIND-8F4A-9B21" class="w-full bg-slate-950 text-white font-mono text-sm p-3 rounded-lg border border-slate-700 uppercase focus:border-teal-500 outline-none" />
+              <button onclick="pairDeviceWithInputKey()" class="px-5 py-3 bg-teal-600 hover:bg-teal-500 text-xs font-bold rounded-lg text-white transition whitespace-nowrap">
+                🔗 Collega
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SECTION 6: METODO PNL & LIVELLI DILTS      -->
+    <!-- ========================================== -->
+    <section id="pnl-guide-section" class="app-section hidden">
+      <div class="glass-panel rounded-2xl p-6 md:p-8 border border-slate-700 space-y-6">
+        <div>
+          <h2 class="text-2xl font-bold text-white mb-1">🧠 Architettura PNL Master a 5 Livelli</h2>
+          <p class="text-xs text-slate-400">Fondamenti scientifici della Programmazione Neuro-Linguistica e dei Livelli Logici di Robert Dilts.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+            <h3 class="text-sm font-bold text-teal-400 mb-2">💎 I 5 Livelli di Robert Dilts</h3>
+            <ul class="text-xs text-slate-300 space-y-2 leading-relaxed">
+              <li>• <strong>1. Ambiente & Contesto</strong>: Il dove e il quando.</li>
+              <li>• <strong>2. Comportamento</strong>: L'azione fisica compiuta.</li>
+              <li>• <strong>3. Capacità & Competenze</strong>: Il 'come' fare qualcosa.</li>
+              <li>• <strong>4. Convinzioni & Valori</strong>: Il 'perché' profondo.</li>
+              <li>• <strong>5. Identità</strong>: 'Chi sono io' (la chiave di sblocco).</li>
+            </ul>
+          </div>
+
+          <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+            <h3 class="text-sm font-bold text-cyan-400 mb-2">💻 Valore dell'Abbonamento 9,99€/m</h3>
+            <ul class="text-xs text-slate-300 space-y-2 leading-relaxed">
+              <li>• <strong>Sessioni Cliniche Illimitate</strong> con Google Gemini AI.</li>
+              <li>• <strong>Audio Coach Vocale</strong> con lettura guidata dei reframing e rilassamento.</li>
+              <li>• <strong>Protocolli di Ancoraggio Guidati</strong> con animazione del respiro e timer 90s.</li>
+              <li>• <strong>Cartella Clinica PDF/Stampa</strong> per tenere traccia di ogni evoluzione.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: ONBOARDING WIZARD -->
+  <div id="onboarding-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 no-print">
+    <div class="glass-panel max-w-lg w-full rounded-2xl p-6 border border-slate-700 bg-slate-900 relative">
+      <button onclick="closeOnboardingModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">✕</button>
+      
+      <div class="mb-4">
+        <div class="flex justify-between text-xs text-teal-400 font-semibold mb-1">
+          <span id="wizard-step-label">Passo 1 di 3: Scegli il tuo stile sensoriale</span>
+          <span id="wizard-step-num">33%</span>
+        </div>
+        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+          <div id="wizard-progress-bar" class="bg-teal-500 h-full rounded-full transition-all" style="width: 33%"></div>
+        </div>
+      </div>
+
+      <div id="wizard-step-1" class="wizard-step space-y-4">
+        <h3 class="text-lg font-bold text-white">Come elabori le situazioni?</h3>
+        <div class="grid grid-cols-1 gap-2.5">
+          <button onclick="selectWizardVak('Visivo (V)')" class="p-3 text-left rounded-xl bg-slate-800/90 hover:bg-slate-700/90 border border-slate-700 hover:border-cyan-500 transition">
+            <span class="font-bold text-xs text-cyan-300 block mb-0.5">👁️ Visivo</span>
+            <span class="text-xs text-slate-300">Ragiono per immagini, schemi mentali, quadri e prospettive.</span>
+          </button>
+          <button onclick="selectWizardVak('Uditivo (A)')" class="p-3 text-left rounded-xl bg-slate-800/90 hover:bg-slate-700/90 border border-slate-700 hover:border-purple-500 transition">
+            <span class="font-bold text-xs text-purple-300 block mb-0.5">👂 Uditivo</span>
+            <span class="text-xs text-slate-300">Ragiono attraverso il dialogo interno, le parole e i suoni.</span>
+          </button>
+          <button onclick="selectWizardVak('Cinestesico (K)')" class="p-3 text-left rounded-xl bg-slate-800/90 hover:bg-slate-700/90 border border-slate-700 hover:border-amber-500 transition">
+            <span class="font-bold text-xs text-amber-300 block mb-0.5">🖐️ Cinestesico</span>
+            <span class="text-xs text-slate-300">Ragiono attraverso sensazioni corporee, impatti fisici e intuizioni emotive.</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="wizard-step-2" class="wizard-step hidden space-y-4">
+        <h3 class="text-lg font-bold text-white">Qual è il tuo ostacolo principale oggi?</h3>
+        <div class="space-y-2">
+          <button onclick="selectWizardThought('Non riesco a trovare il coraggio di chiedere il giusto prezzo per la mia consulenza.')" class="w-full text-left p-2.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-200 border border-slate-700">
+            💶 "Chiedere il giusto prezzo per i miei servizi"
+          </button>
+          <button onclick="selectWizardThought('Non ho abbastanza tempo per lanciare questo progetto.')" class="w-full text-left p-2.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-200 border border-slate-700">
+            ⏱️ "Non ho abbastanza tempo per lanciare questo progetto"
+          </button>
+          <button onclick="selectWizardThought('Non sono abbastanza bravo rispetto alla concorrenza.')" class="w-full text-left p-2.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-200 border border-slate-700">
+            🏆 "Non sono abbastanza bravo rispetto alla concorrenza"
+          </button>
+        </div>
+      </div>
+
+      <div id="wizard-step-3" class="wizard-step hidden text-center py-4 space-y-3">
+        <span class="text-4xl block">✨</span>
+        <h3 class="text-lg font-bold text-white">Pronto per la tua Sessione Master PNL!</h3>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Il protocollo è calibrato sul tuo profilo. Clicca per generare la scheda completa a 5 livelli.
+        </p>
+        <button onclick="executeWizardShift()" class="w-full py-3.5 rounded-xl font-bold text-sm bg-gradient-to-r from-teal-500 to-cyan-400 text-slate-950 font-black shadow-lg transition">
+          🚀 Genera Protocollo Master
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL: PRICING -->
+  <div id="pricing-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 no-print">
+    <div class="glass-panel max-w-md w-full rounded-2xl p-6 border border-slate-700 bg-slate-900 relative">
+      <button onclick="closePricingModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">✕</button>
+      <div class="text-center mb-6">
+        <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-950 text-amber-300 border border-amber-800/80">PIANO MASTER COACHING</span>
+        <h3 class="text-2xl font-extrabold text-white mt-2">MindShift Coach Pro</h3>
+        <p class="text-xs text-slate-400 mt-1">Sessioni illimitate di Coaching Clinico PNL.</p>
+        <div class="mt-4 flex items-baseline justify-center gap-1">
+          <span class="text-4xl font-black text-white">€9,99</span>
+          <span class="text-xs text-slate-400">/ mese</span>
+        </div>
+        <p class="text-xs text-emerald-400 font-semibold mt-1">🎉 Include 3 Giorni di Prova Gratuita</p>
+      </div>
+      <ul class="text-xs text-slate-300 space-y-2.5 mb-6">
+        <li class="flex items-center gap-2">✅ Sessioni Cliniche a 5 Moduli (Valore 120€ a sessione)</li>
+        <li class="flex items-center gap-2">✅ Audio Coach Vocale con Ipnosi Milton Model</li>
+        <li class="flex items-center gap-2">✅ Riprogrammazione Identità (Dilts) & Ancoraggio Guidato</li>
+        <li class="flex items-center gap-2">✅ Sincronizzazione Realtime illimitata Windows & Android</li>
+      </ul>
+      <button onclick="startStripeCheckout()" class="w-full py-3.5 rounded-xl font-black text-sm bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white shadow-lg shadow-orange-500/20 transition">
+        Inizia Prova Gratuita di 3 Giorni
+      </button>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-slate-900/95 border-t border-slate-800 py-4 text-center text-xs text-slate-500 no-print">
+    <div class="max-w-6xl mx-auto px-4 flex flex-wrap items-center justify-between gap-2">
+      <span>MindShift Coach v0.4.0 • Protocollo Clinico PNL Master</span>
+      <span>Sincronizzato in Cloud tra Windows & Android</span>
+    </div>
+  </footer>
+
+  <!-- App Script with Cache Buster -->
+  <script src="/static/js/app.js?v=4.2"></script>
+</body>
+</html>
