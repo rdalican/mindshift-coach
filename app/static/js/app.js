@@ -473,7 +473,7 @@ function copyMantra() {
 // --- SALVATAGGIO & SINCRONIZZAZIONE CLOUD ---
 async function saveCurrentFullShift() {
   if (!currentShiftData) return;
-  const shiftId = Date.now().toString();
+  const shiftId = (currentShiftData && currentShiftData.id) ? currentShiftData.id : Date.now().toString();
   const payload = {
     id: shiftId,
     sync_key: currentSyncKey,

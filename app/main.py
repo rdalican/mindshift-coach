@@ -161,6 +161,7 @@ async def perform_reframe(req: MindShiftRequest, db: Session = Depends(get_db)):
             ))
         db.commit()
 
+        response.id = shift_id
         return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Errore durante l'elaborazione PNL: {str(e)}")
@@ -382,7 +383,10 @@ async def save_synced_shift(item: SyncShiftItem, db: Session = Depends(get_db)):
     protocol_json = json.dumps(item.anchoring_protocol.model_dump()) if item.anchoring_protocol else None
     action_plan_json = json.dumps(item.action_plan.model_dump()) if item.action_plan else None
     
-    existing = db.query(SavedMindShift).filter(SavedMindShift.id == item.id).first()
+    existing = db.query(SavedMindShift).filter(
+        (SavedMindShift.id == item.id) | 
+        ((SavedMindShift.sync_key == clean_key) & (SavedMindShift.original_thought == item.original_thought))
+    ).first()
     if existing:
         existing.original_thought = item.original_thought
         existing.context = item.context

@@ -46,7 +46,9 @@ class MindShiftRequest(BaseModel):
     sync_key: Optional[str] = Field(None, description="Sync Key per sincronizzare immediatamente il risultato nel Cloud.")
 
 class MindShiftResponse(BaseModel):
+    id: Optional[str] = None
     original_thought: str
+    context: Optional[str] = None
     detected_channel: VAKChannel
     vak_keywords: List[str] = []
     meta_model: MetaModelAnalysis
