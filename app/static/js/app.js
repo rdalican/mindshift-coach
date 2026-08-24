@@ -360,8 +360,9 @@ function renderMasterProtocol(data) {
   document.getElementById('res-mantra-text').textContent = `"${mantra}"`;
 }
 
-// --- GESTIONE VOCI NATURALI & NEURALI (AUDIO COACH CALDO E FLUIDO) ---
+// --- GESTIONE VOCI NATURALI & NEURALI (AUDIO COACH GREVE, PROFONDO E FLUIDO) ---
 let availableVoices = [];
+window._activeSpeechUtterance = null; // Previene il Garbage Collector di Chrome/Windows (Causa dei glitch audio)
 
 function loadVoices() {
   if ('speechSynthesis' in window) {
@@ -374,7 +375,7 @@ if ('speechSynthesis' in window) {
   window.speechSynthesis.onvoiceschanged = loadVoices;
 }
 
-function getBestWarmItalianVoice() {
+function getBestGraveItalianVoice() {
   if (!availableVoices || availableVoices.length === 0) {
     loadVoices();
   }
@@ -382,20 +383,19 @@ function getBestWarmItalianVoice() {
   const italianVoices = availableVoices.filter(v => v.lang && v.lang.startsWith('it'));
   if (italianVoices.length === 0) return null;
 
-  // 1. Cerca voci Neural / Natural / Premium (Edge, Chrome, Safari)
+  // 1. Cerca prioritariamente voci maschili / profonde (Diego, Cosimo, Luca)
+  const maleVoice = italianVoices.find(v => {
+    const n = (v.name || '').toLowerCase();
+    return n.includes('diego') || n.includes('cosimo') || n.includes('luca') || n.includes('male') || n.includes('maschile');
+  });
+  if (maleVoice) return maleVoice;
+
+  // 2. Cerca voci Neural / Natural / Premium (Elsa, Isabella, Google)
   const neuralVoice = italianVoices.find(v => {
     const n = (v.name || '').toLowerCase();
-    return n.includes('natural') || n.includes('neural') || n.includes('online');
+    return n.includes('natural') || n.includes('neural') || n.includes('online') || n.includes('google');
   });
   if (neuralVoice) return neuralVoice;
-
-  // 2. Cerca Google Italiano o voci avanzate (Elsa, Diego, Isabella, Alice, Federica)
-  const premiumVoice = italianVoices.find(v => {
-    const n = (v.name || '').toLowerCase();
-    return n.includes('google') || n.includes('elsa') || n.includes('diego') || 
-           n.includes('isabella') || n.includes('alice') || n.includes('federica') || n.includes('luca');
-  });
-  if (premiumVoice) return premiumVoice;
 
   return italianVoices[0];
 }
@@ -411,6 +411,7 @@ function stopAudioCoach() {
     clearTimeout(speechTimeoutId);
     speechTimeoutId = null;
   }
+  window._activeSpeechUtterance = null;
   isSpeakingSequence = false;
   isAudioPlaying = false;
   
@@ -418,6 +419,37 @@ function stopAudioCoach() {
   const icon = document.getElementById('audio-icon');
   if (btnText) btnText.textContent = "Ascolta Sessione Guidata";
   if (icon) icon.textContent = "🎧";
+}
+
+function splitIntoShortPhrases(text, maxWords = 12) {
+  if (!text) return [];
+  // Divide per punteggiatura forte
+  const rawSegments = text.split(/([.!?;]+)/).filter(s => s.trim().length > 0);
+  const result = [];
+  let current = "";
+
+  for (let i = 0; i < rawSegments.length; i++) {
+    const seg = rawSegments[i].trim();
+    if (seg === "." || seg === "!" || seg === "?" || seg === ";") {
+      if (current) {
+        result.push(current + seg);
+        current = "";
+      }
+    } else {
+      if (current) result.push(current);
+      // Se il segmento è molto lungo, dividilo per virgole o parole
+      const words = seg.split(/\s+/);
+      if (words.length > maxWords) {
+        const half = Math.ceil(words.length / 2);
+        result.push(words.slice(0, half).join(" ") + "...");
+        current = words.slice(half).join(" ");
+      } else {
+        current = seg;
+      }
+    }
+  }
+  if (current) result.push(current);
+  return result.filter(r => r.trim().length > 1);
 }
 
 function playChunkedHypnoticSession(shiftData, onFinishCallback) {
@@ -428,24 +460,42 @@ function playChunkedHypnoticSession(shiftData, onFinishCallback) {
 
   stopAudioCoach();
 
-  const voice = getBestWarmItalianVoice();
+  // Sblocca eventuale coda di speech bloccata nel browser
+  if (window.speechSynthesis.paused) {
+    window.speechSynthesis.resume();
+  }
+
+  const voice = getBestGraveItalianVoice();
   const meaning = shiftData.meaning_reframe || shiftData.context_reframe || "";
   const identity = shiftData.identity_reframe || "";
   const mantra = shiftData.anchoring_mantra || "";
   const socratic = shiftData.socratic_question || "";
 
-  // Frasi sequenziali con modulazione melodica dell'intonazione (Dynamic Prosody)
-  const phrases = [
-    { text: "Fai un respiro lento e profondo...", rate: 0.74, pitch: 0.90, pauseAfter: 800 },
-    { text: "Rilassa le spalle, e lascia andare ogni tensione.", rate: 0.76, pitch: 0.88, pauseAfter: 900 },
-    { text: "Ascolta con calma questa nuova prospettiva.", rate: 0.78, pitch: 0.96, pauseAfter: 600 },
-    { text: `${meaning}.`, rate: 0.75, pitch: 0.92, pauseAfter: 1000 },
-    identity ? { text: `E a livello della tua identità profonda, ricorda: ${identity}.`, rate: 0.72, pitch: 0.88, pauseAfter: 1000 } : null,
-    socratic ? { text: `Ora chiediti: ${socratic}?`, rate: 0.76, pitch: 0.98, pauseAfter: 800 } : null,
-    { text: "Ripeti dentro di te, con ferma certezza:", rate: 0.72, pitch: 0.90, pauseAfter: 700 },
-    { text: `"${mantra}"`, rate: 0.68, pitch: 0.92, pauseAfter: 1200 },
-    { text: "Senti questa sicurezza che si stabilizza in tutto il tuo corpo.", rate: 0.72, pitch: 0.86, pauseAfter: 500 }
-  ].filter(Boolean);
+  // Costruzione sequenza con spezzettamento anti-glitch e tono greve (Pitch 0.72 - 0.82 / Rate 0.65 - 0.70)
+  const phrases = [];
+
+  phrases.push({ text: "Fai un respiro lento e profondo...", rate: 0.66, pitch: 0.76, pauseAfter: 900 });
+  phrases.push({ text: "Rilassa le spalle, e lascia andare ogni tensione.", rate: 0.68, pitch: 0.74, pauseAfter: 1000 });
+  phrases.push({ text: "Ascolta con calma questa nuova prospettiva.", rate: 0.70, pitch: 0.80, pauseAfter: 700 });
+
+  splitIntoShortPhrases(meaning).forEach(mText => {
+    phrases.push({ text: mText, rate: 0.68, pitch: 0.78, pauseAfter: 900 });
+  });
+
+  if (identity) {
+    phrases.push({ text: "E a livello della tua identità autentica, ricorda:", rate: 0.68, pitch: 0.76, pauseAfter: 600 });
+    splitIntoShortPhrases(identity).forEach(iText => {
+      phrases.push({ text: iText, rate: 0.65, pitch: 0.74, pauseAfter: 1000 });
+    });
+  }
+
+  if (socratic) {
+    phrases.push({ text: `Ora chiediti: ${socratic}`, rate: 0.70, pitch: 0.82, pauseAfter: 900 });
+  }
+
+  phrases.push({ text: "Ripeti dentro di te, con calma e profonda certezza:", rate: 0.66, pitch: 0.76, pauseAfter: 800 });
+  phrases.push({ text: `"${mantra}"`, rate: 0.62, pitch: 0.72, pauseAfter: 1300 });
+  phrases.push({ text: "Senti questa sicurezza che si stabilizza in tutto il tuo corpo.", rate: 0.66, pitch: 0.72, pauseAfter: 600 });
 
   isSpeakingSequence = true;
   isAudioPlaying = true;
@@ -463,23 +513,27 @@ function playChunkedHypnoticSession(shiftData, onFinishCallback) {
 
     const chunk = phrases[idx];
     const utterance = new SpeechSynthesisUtterance(chunk.text);
+    window._activeSpeechUtterance = utterance; // Mantiene la referenza attiva per prevenire il garbage collection glitch
+
     if (voice) utterance.voice = voice;
     utterance.lang = 'it-IT';
-    utterance.rate = chunk.rate;   // Pacing lento e rilassante
-    utterance.pitch = chunk.pitch; // Modulazione melodica variabile
+    utterance.rate = chunk.rate;   // Ritmo lento e calibrato (0.62 - 0.70)
+    utterance.pitch = chunk.pitch; // Tono greve, caldo e autorevole (0.72 - 0.82)
     utterance.volume = 1.0;
 
     utterance.onend = () => {
       if (!isSpeakingSequence) return;
       speechTimeoutId = setTimeout(() => {
         speakChunk(idx + 1);
-      }, chunk.pauseAfter || 600);
+      }, chunk.pauseAfter || 700);
     };
 
     utterance.onerror = (err) => {
       console.warn("Audio chunk error:", err);
       if (!isSpeakingSequence) return;
-      speakChunk(idx + 1);
+      speechTimeoutId = setTimeout(() => {
+        speakChunk(idx + 1);
+      }, 300);
     };
 
     window.speechSynthesis.speak(utterance);
