@@ -421,37 +421,6 @@ function stopAudioCoach() {
   if (icon) icon.textContent = "🎧";
 }
 
-function splitIntoShortPhrases(text, maxWords = 12) {
-  if (!text) return [];
-  // Divide per punteggiatura forte
-  const rawSegments = text.split(/([.!?;]+)/).filter(s => s.trim().length > 0);
-  const result = [];
-  let current = "";
-
-  for (let i = 0; i < rawSegments.length; i++) {
-    const seg = rawSegments[i].trim();
-    if (seg === "." || seg === "!" || seg === "?" || seg === ";") {
-      if (current) {
-        result.push(current + seg);
-        current = "";
-      }
-    } else {
-      if (current) result.push(current);
-      // Se il segmento è molto lungo, dividilo per virgole o parole
-      const words = seg.split(/\s+/);
-      if (words.length > maxWords) {
-        const half = Math.ceil(words.length / 2);
-        result.push(words.slice(0, half).join(" ") + "...");
-        current = words.slice(half).join(" ");
-      } else {
-        current = seg;
-      }
-    }
-  }
-  if (current) result.push(current);
-  return result.filter(r => r.trim().length > 1);
-}
-
 function playChunkedHypnoticSession(shiftData, onFinishCallback) {
   if (!('speechSynthesis' in window)) {
     alert('La sintesi vocale non è supportata dal tuo browser.');
@@ -460,7 +429,6 @@ function playChunkedHypnoticSession(shiftData, onFinishCallback) {
 
   stopAudioCoach();
 
-  // Sblocca eventuale coda di speech bloccata nel browser
   if (window.speechSynthesis.paused) {
     window.speechSynthesis.resume();
   }
@@ -471,31 +439,15 @@ function playChunkedHypnoticSession(shiftData, onFinishCallback) {
   const mantra = shiftData.anchoring_mantra || "";
   const socratic = shiftData.socratic_question || "";
 
-  // Costruzione sequenza con spezzettamento anti-glitch e tono greve (Pitch 0.72 - 0.82 / Rate 0.65 - 0.70)
-  const phrases = [];
-
-  phrases.push({ text: "Fai un respiro lento e profondo...", rate: 0.66, pitch: 0.76, pauseAfter: 900 });
-  phrases.push({ text: "Rilassa le spalle, e lascia andare ogni tensione.", rate: 0.68, pitch: 0.74, pauseAfter: 1000 });
-  phrases.push({ text: "Ascolta con calma questa nuova prospettiva.", rate: 0.70, pitch: 0.80, pauseAfter: 700 });
-
-  splitIntoShortPhrases(meaning).forEach(mText => {
-    phrases.push({ text: mText, rate: 0.68, pitch: 0.78, pauseAfter: 900 });
-  });
-
-  if (identity) {
-    phrases.push({ text: "E a livello della tua identità autentica, ricorda:", rate: 0.68, pitch: 0.76, pauseAfter: 600 });
-    splitIntoShortPhrases(identity).forEach(iText => {
-      phrases.push({ text: iText, rate: 0.65, pitch: 0.74, pauseAfter: 1000 });
-    });
-  }
-
-  if (socratic) {
-    phrases.push({ text: `Ora chiediti: ${socratic}`, rate: 0.70, pitch: 0.82, pauseAfter: 900 });
-  }
-
-  phrases.push({ text: "Ripeti dentro di te, con calma e profonda certezza:", rate: 0.66, pitch: 0.76, pauseAfter: 800 });
-  phrases.push({ text: `"${mantra}"`, rate: 0.62, pitch: 0.72, pauseAfter: 1300 });
-  phrases.push({ text: "Senti questa sicurezza che si stabilizza in tutto il tuo corpo.", rate: 0.66, pitch: 0.72, pauseAfter: 600 });
+  // Frasi complete e naturali (senza spezzare le parole o la grammatica)
+  const phrases = [
+    { text: "Fai un respiro lento e profondo, e rilassa le spalle.", pauseAfter: 500 },
+    { text: `Ascolta questa nuova prospettiva: ${meaning}`, pauseAfter: 600 },
+    identity ? { text: `A livello della tua identità profonda, ricorda: ${identity}`, pauseAfter: 600 } : null,
+    socratic ? { text: `Ora chiediti: ${socratic}`, pauseAfter: 500 } : null,
+    { text: `Ripeti dentro di te la tua formula di potere: ${mantra}`, pauseAfter: 700 },
+    { text: "Senti questa sicurezza e chiarezza stabilizzarsi in tutto il tuo corpo.", pauseAfter: 400 }
+  ].filter(Boolean);
 
   isSpeakingSequence = true;
   isAudioPlaying = true;
@@ -513,23 +465,23 @@ function playChunkedHypnoticSession(shiftData, onFinishCallback) {
 
     const chunk = phrases[idx];
     const utterance = new SpeechSynthesisUtterance(chunk.text);
-    window._activeSpeechUtterance = utterance; // Mantiene la referenza attiva per prevenire il garbage collection glitch
+    window._activeSpeechUtterance = utterance; // Mantiene attiva la referenza contro i bug di GC
 
     if (voice) utterance.voice = voice;
     utterance.lang = 'it-IT';
-    utterance.rate = chunk.rate;   // Ritmo lento e calibrato (0.62 - 0.70)
-    utterance.pitch = chunk.pitch; // Tono greve, caldo e autorevole (0.72 - 0.82)
+    utterance.rate = 0.84;  // Cadenza naturale, chiara e fluida (non trascinata)
+    utterance.pitch = 0.80; // Tono basso/baritonale maschile profondo e naturale
     utterance.volume = 1.0;
 
     utterance.onend = () => {
       if (!isSpeakingSequence) return;
       speechTimeoutId = setTimeout(() => {
         speakChunk(idx + 1);
-      }, chunk.pauseAfter || 700);
+      }, chunk.pauseAfter || 500);
     };
 
     utterance.onerror = (err) => {
-      console.warn("Audio chunk error:", err);
+      console.warn("Audio error:", err);
       if (!isSpeakingSequence) return;
       speechTimeoutId = setTimeout(() => {
         speakChunk(idx + 1);
