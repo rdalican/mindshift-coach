@@ -44,3 +44,14 @@ def test_toggle_roadmap_step():
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "success"
+
+def test_admin_overview_endpoint():
+    response = client.get("/api/admin/overview")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "success"
+    assert "total_active_testers" in data
+    assert "total_saved_sessions" in data
+    assert "total_feedback_ratings" in data
+    assert "feedbacks" in data
+    assert "recent_sessions" in data

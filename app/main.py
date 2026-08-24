@@ -480,6 +480,52 @@ async def get_plan_status(sync_key: str, db: Session = Depends(get_db)):
     return {"plan_status": profile.plan_status, "sync_key": clean_key}
 
 # ==========================================
+# ADMIN & TESTER FEEDBACK OVERVIEW API
+# ==========================================
+@app.get("/api/admin/overview")
+async def get_admin_overview(db: Session = Depends(get_db)):
+    """Restituisce il riepilogo in tempo reale di tutte le sessioni e i feedback dei tester."""
+    profiles = db.query(UserSyncProfile).order_by(UserSyncProfile.created_at.desc()).all()
+    shifts = db.query(SavedMindShift).order_by(SavedMindShift.created_at.desc()).all()
+    feedbacks = db.query(ReframeFeedback).order_by(ReframeFeedback.created_at.desc()).all()
+    
+    return {
+        "status": "success",
+        "total_active_testers": len(profiles),
+        "total_saved_sessions": len(shifts),
+        "total_feedback_ratings": len(feedbacks),
+        "feedbacks": [
+            {
+                "id": f.id,
+                "sync_key": f.sync_key,
+                "shift_id": f.shift_id,
+                "reframe_type": f.reframe_type,
+                "rating": f.rating,
+                "comment": f.comment,
+                "created_at": f.created_at.strftime("%Y-%m-%d %H:%M:%S") if f.created_at else None
+            }
+            for f in feedbacks
+        ],
+        "recent_sessions": [
+            {
+                "id": s.id,
+                "sync_key": s.sync_key,
+                "original_thought": s.original_thought,
+                "context": s.context,
+                "detected_channel": s.detected_channel,
+                "meta_category": s.meta_category,
+                "meta_subtype": s.meta_subtype,
+                "identity_reframe": s.identity_reframe,
+                "socratic_question": s.socratic_question,
+                "mantra": s.anchoring_mantra,
+                "empowering_micro_action": s.empowering_micro_action,
+                "created_at": s.created_at.strftime("%Y-%m-%d %H:%M:%S") if s.created_at else None
+            }
+            for s in shifts[:50]
+        ]
+    }
+
+# ==========================================
 # ROADMAP API & PWA STATIC
 # ==========================================
 @app.get("/api/roadmap", response_model=RoadmapResponse)

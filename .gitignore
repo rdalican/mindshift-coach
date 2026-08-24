@@ -12,9 +12,11 @@ ENV/
 *.db
 *.sqlite3
 
-# Secrets
+# Secrets & Local Prompts
 .env
 .env.local
+Prompts.txt
+prompts.txt
 
 # Pytest / Cache
 .pytest_cache/
