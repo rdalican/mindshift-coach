@@ -360,7 +360,64 @@ function renderMasterProtocol(data) {
   document.getElementById('res-mantra-text').textContent = `"${mantra}"`;
 }
 
-// --- AUDIO COACH VOCALE (SPEECH SYNTHESIS) ---
+// --- GESTIONE VOCI NATURALI & NEURALI (AUDIO COACH CALDO E FLUIDO) ---
+let availableVoices = [];
+
+function loadVoices() {
+  if ('speechSynthesis' in window) {
+    availableVoices = window.speechSynthesis.getVoices();
+  }
+}
+
+if ('speechSynthesis' in window) {
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+function getBestWarmItalianVoice() {
+  if (!availableVoices || availableVoices.length === 0) {
+    loadVoices();
+  }
+  
+  const italianVoices = availableVoices.filter(v => v.lang && v.lang.startsWith('it'));
+  if (italianVoices.length === 0) return null;
+
+  // 1. Cerca voci Neural / Natural / Premium (Edge, Chrome, Safari)
+  const neuralVoice = italianVoices.find(v => {
+    const n = (v.name || '').toLowerCase();
+    return n.includes('natural') || n.includes('neural') || n.includes('online');
+  });
+  if (neuralVoice) return neuralVoice;
+
+  // 2. Cerca Google Italiano o voci avanzate (Elsa, Diego, Isabella, Alice, Federica)
+  const premiumVoice = italianVoices.find(v => {
+    const n = (v.name || '').toLowerCase();
+    return n.includes('google') || n.includes('elsa') || n.includes('diego') || 
+           n.includes('isabella') || n.includes('alice') || n.includes('federica') || n.includes('luca');
+  });
+  if (premiumVoice) return premiumVoice;
+
+  return italianVoices[0];
+}
+
+function formatWarmHypnoticScript(shiftData) {
+  const meaning = shiftData.meaning_reframe || shiftData.context_reframe || "";
+  const identity = shiftData.identity_reframe || "";
+  const mantra = shiftData.anchoring_mantra || "";
+
+  return `
+    Fai un respiro lento e profondo...
+    Rilassa le spalle, e lascia andare ogni tensione...
+    Ascolta con mente aperta questa nuova prospettiva:
+    ${meaning}...
+    ${identity ? `E a livello della tua identità profonda, ricorda: ${identity}...` : ''}
+    Ora, ripeti dentro di te, con calma e sicurezza:
+    "${mantra}"...
+    Senti questa certezza che si diffonde e si ancora nel tuo corpo.
+  `.trim();
+}
+
+// --- AUDIO COACH VOCALE (SPEECH SYNTHESIS CALDO & FLUIDO) ---
 function toggleAudioCoach() {
   if (!('speechSynthesis' in window)) {
     alert('La sintesi vocale non è supportata dal tuo browser.');
@@ -380,22 +437,17 @@ function toggleAudioCoach() {
 
   if (!currentShiftData) return;
 
-  const script = `
-    Benvenuto nella tua sessione di riprogrammazione cognitiva.
-    Fai un respiro lento e profondo.
-    Ascolta la nuova prospettiva di significato:
-    ${currentShiftData.meaning_reframe}.
-    E a livello di identità autentica, ricorda:
-    ${currentShiftData.identity_reframe}.
-    Ora, ripeti dentro di te la tua formula di potere:
-    ${currentShiftData.anchoring_mantra}.
-    E senti la stabilità che ritorna in tutto il tuo corpo.
-  `;
-
+  const script = formatWarmHypnoticScript(currentShiftData);
   const utterance = new SpeechSynthesisUtterance(script);
+  
+  const bestVoice = getBestWarmItalianVoice();
+  if (bestVoice) {
+    utterance.voice = bestVoice;
+  }
   utterance.lang = 'it-IT';
-  utterance.rate = 0.88; // Pacing calmo e rilassante da Coach
-  utterance.pitch = 0.95;
+  utterance.rate = 0.84;  // Cadenza ipnotica, rilassata e naturale da Coach
+  utterance.pitch = 0.92; // Tono caldo, profondo e accogliente (elimina l'effetto robotico)
+  utterance.volume = 1.0;
 
   utterance.onstart = () => {
     isAudioPlaying = true;
@@ -642,21 +694,20 @@ function playSavedAudioCoach(shiftId) {
   const shift = cachedShifts.find(s => s.id === shiftId);
   if (!shift) return;
 
-  let textToRead = "";
-  if (shift.anchoring_protocol && shift.anchoring_protocol.audio_script) {
-    textToRead = shift.anchoring_protocol.audio_script;
-  } else {
-    textToRead = `Chiudi gli occhi e fai un respiro profondo. ${shift.meaning_reframe || shift.context_reframe}. Ripeti nella tua mente: ${shift.anchoring_mantra || 'Io scelgo la chiarezza e l\'azione'}.`;
-  }
+  const textToRead = formatWarmHypnoticScript(shift);
 
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(textToRead);
+    const bestVoice = getBestWarmItalianVoice();
+    if (bestVoice) {
+      utterance.voice = bestVoice;
+    }
     utterance.lang = 'it-IT';
-    utterance.rate = 0.9;
-    utterance.pitch = 0.95;
+    utterance.rate = 0.84;
+    utterance.pitch = 0.92;
+    utterance.volume = 1.0;
     window.speechSynthesis.speak(utterance);
-    alert('🎧 Riproduzione Audio Coach avviata!');
   } else {
     alert('Sintesi vocale non supportata su questo browser.');
   }
