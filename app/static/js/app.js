@@ -400,74 +400,104 @@ function getBestWarmItalianVoice() {
   return italianVoices[0];
 }
 
-function formatWarmHypnoticScript(shiftData) {
-  const meaning = shiftData.meaning_reframe || shiftData.context_reframe || "";
-  const identity = shiftData.identity_reframe || "";
-  const mantra = shiftData.anchoring_mantra || "";
+let isSpeakingSequence = false;
+let speechTimeoutId = null;
 
-  return `
-    Fai un respiro lento e profondo...
-    Rilassa le spalle, e lascia andare ogni tensione...
-    Ascolta con mente aperta questa nuova prospettiva:
-    ${meaning}...
-    ${identity ? `E a livello della tua identità profonda, ricorda: ${identity}...` : ''}
-    Ora, ripeti dentro di te, con calma e sicurezza:
-    "${mantra}"...
-    Senti questa certezza che si diffonde e si ancora nel tuo corpo.
-  `.trim();
+function stopAudioCoach() {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+  if (speechTimeoutId) {
+    clearTimeout(speechTimeoutId);
+    speechTimeoutId = null;
+  }
+  isSpeakingSequence = false;
+  isAudioPlaying = false;
+  
+  const btnText = document.getElementById('audio-btn-text');
+  const icon = document.getElementById('audio-icon');
+  if (btnText) btnText.textContent = "Ascolta Sessione Guidata";
+  if (icon) icon.textContent = "🎧";
 }
 
-// --- AUDIO COACH VOCALE (SPEECH SYNTHESIS CALDO & FLUIDO) ---
-function toggleAudioCoach() {
+function playChunkedHypnoticSession(shiftData, onFinishCallback) {
   if (!('speechSynthesis' in window)) {
     alert('La sintesi vocale non è supportata dal tuo browser.');
     return;
   }
 
+  stopAudioCoach();
+
+  const voice = getBestWarmItalianVoice();
+  const meaning = shiftData.meaning_reframe || shiftData.context_reframe || "";
+  const identity = shiftData.identity_reframe || "";
+  const mantra = shiftData.anchoring_mantra || "";
+  const socratic = shiftData.socratic_question || "";
+
+  // Frasi sequenziali con modulazione melodica dell'intonazione (Dynamic Prosody)
+  const phrases = [
+    { text: "Fai un respiro lento e profondo...", rate: 0.74, pitch: 0.90, pauseAfter: 800 },
+    { text: "Rilassa le spalle, e lascia andare ogni tensione.", rate: 0.76, pitch: 0.88, pauseAfter: 900 },
+    { text: "Ascolta con calma questa nuova prospettiva.", rate: 0.78, pitch: 0.96, pauseAfter: 600 },
+    { text: `${meaning}.`, rate: 0.75, pitch: 0.92, pauseAfter: 1000 },
+    identity ? { text: `E a livello della tua identità profonda, ricorda: ${identity}.`, rate: 0.72, pitch: 0.88, pauseAfter: 1000 } : null,
+    socratic ? { text: `Ora chiediti: ${socratic}?`, rate: 0.76, pitch: 0.98, pauseAfter: 800 } : null,
+    { text: "Ripeti dentro di te, con ferma certezza:", rate: 0.72, pitch: 0.90, pauseAfter: 700 },
+    { text: `"${mantra}"`, rate: 0.68, pitch: 0.92, pauseAfter: 1200 },
+    { text: "Senti questa sicurezza che si stabilizza in tutto il tuo corpo.", rate: 0.72, pitch: 0.86, pauseAfter: 500 }
+  ].filter(Boolean);
+
+  isSpeakingSequence = true;
+  isAudioPlaying = true;
   const btnText = document.getElementById('audio-btn-text');
   const icon = document.getElementById('audio-icon');
+  if (btnText) btnText.textContent = "Pausa Audio Guida";
+  if (icon) icon.textContent = "⏸️";
 
+  function speakChunk(idx) {
+    if (!isSpeakingSequence || idx >= phrases.length) {
+      stopAudioCoach();
+      if (onFinishCallback) onFinishCallback();
+      return;
+    }
+
+    const chunk = phrases[idx];
+    const utterance = new SpeechSynthesisUtterance(chunk.text);
+    if (voice) utterance.voice = voice;
+    utterance.lang = 'it-IT';
+    utterance.rate = chunk.rate;   // Pacing lento e rilassante
+    utterance.pitch = chunk.pitch; // Modulazione melodica variabile
+    utterance.volume = 1.0;
+
+    utterance.onend = () => {
+      if (!isSpeakingSequence) return;
+      speechTimeoutId = setTimeout(() => {
+        speakChunk(idx + 1);
+      }, chunk.pauseAfter || 600);
+    };
+
+    utterance.onerror = (err) => {
+      console.warn("Audio chunk error:", err);
+      if (!isSpeakingSequence) return;
+      speakChunk(idx + 1);
+    };
+
+    window.speechSynthesis.speak(utterance);
+  }
+
+  speakChunk(0);
+}
+
+// --- AUDIO COACH VOCALE (SPEECH SYNTHESIS CALDO, MODULATO & FLUIDO) ---
+function toggleAudioCoach() {
   if (isAudioPlaying) {
-    window.speechSynthesis.cancel();
-    isAudioPlaying = false;
-    btnText.textContent = "Ascolta Sessione Guidata";
-    icon.textContent = "🎧";
+    stopAudioCoach();
     return;
   }
 
   if (!currentShiftData) return;
 
-  const script = formatWarmHypnoticScript(currentShiftData);
-  const utterance = new SpeechSynthesisUtterance(script);
-  
-  const bestVoice = getBestWarmItalianVoice();
-  if (bestVoice) {
-    utterance.voice = bestVoice;
-  }
-  utterance.lang = 'it-IT';
-  utterance.rate = 0.84;  // Cadenza ipnotica, rilassata e naturale da Coach
-  utterance.pitch = 0.92; // Tono caldo, profondo e accogliente (elimina l'effetto robotico)
-  utterance.volume = 1.0;
-
-  utterance.onstart = () => {
-    isAudioPlaying = true;
-    btnText.textContent = "Pausa Audio Guida";
-    icon.textContent = "⏸️";
-  };
-
-  utterance.onend = () => {
-    isAudioPlaying = false;
-    btnText.textContent = "Riascolta Sessione";
-    icon.textContent = "🎧";
-  };
-
-  utterance.onerror = () => {
-    isAudioPlaying = false;
-    btnText.textContent = "Ascolta Sessione Guidata";
-    icon.textContent = "🎧";
-  };
-
-  window.speechSynthesis.speak(utterance);
+  playChunkedHypnoticSession(currentShiftData);
 }
 
 // --- TIMER ANCORAGGIO FISIOLOGICO 90 SECONDI ---
@@ -694,23 +724,7 @@ function playSavedAudioCoach(shiftId) {
   const shift = cachedShifts.find(s => s.id === shiftId);
   if (!shift) return;
 
-  const textToRead = formatWarmHypnoticScript(shift);
-
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(textToRead);
-    const bestVoice = getBestWarmItalianVoice();
-    if (bestVoice) {
-      utterance.voice = bestVoice;
-    }
-    utterance.lang = 'it-IT';
-    utterance.rate = 0.84;
-    utterance.pitch = 0.92;
-    utterance.volume = 1.0;
-    window.speechSynthesis.speak(utterance);
-  } else {
-    alert('Sintesi vocale non supportata su questo browser.');
-  }
+  playChunkedHypnoticSession(shift);
 }
 
 function filterJournalEntries() {
