@@ -520,23 +520,7 @@ async def get_admin_overview(db: Session = Depends(get_db)):
             }
             for f in feedbacks
         ],
-        "recent_sessions": [
-            {
-                "id": s.id,
-                "sync_key": s.sync_key,
-                "original_thought": s.original_thought,
-                "context": s.context,
-                "detected_channel": s.detected_channel,
-                "meta_category": s.meta_category,
-                "meta_subtype": s.meta_subtype,
-                "identity_reframe": s.identity_reframe,
-                "socratic_question": s.socratic_question,
-                "mantra": s.anchoring_mantra,
-                "empowering_micro_action": s.empowering_micro_action,
-                "created_at": s.created_at.strftime("%Y-%m-%d %H:%M:%S") if s.created_at else None
-            }
-            for s in shifts[:50]
-        ]
+        "recent_sessions": [s.to_dict() for s in shifts[:50]]
     }
 
 # ==========================================

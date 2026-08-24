@@ -542,45 +542,124 @@ function renderFilteredShifts(shifts) {
     return;
   }
 
-  container.innerHTML = shifts.map(item => `
-    <div class="glass-panel rounded-2xl p-6 mb-5 border border-slate-700/80 shadow-xl">
+  container.innerHTML = shifts.map((item, idx) => `
+    <div class="glass-panel rounded-2xl p-6 mb-6 border border-slate-700/80 shadow-xl relative">
       <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-        <span class="text-xs text-teal-400 font-mono font-bold">☁️ Sessione Master Sincronizzata</span>
+        <span class="text-xs text-teal-400 font-mono font-bold">☁️ Sessione Master #${idx + 1} (${item.created_at ? new Date(item.created_at).toLocaleDateString('it-IT') : 'Recente'})</span>
         <div class="flex items-center gap-2">
           <span class="text-xs px-2.5 py-0.5 rounded bg-slate-800 text-teal-300 border border-teal-800/40 font-bold">${item.detected_channel}</span>
           <span class="text-xs px-2.5 py-0.5 rounded bg-slate-800 text-amber-300 border border-amber-800/40 font-bold">${item.meta_subtype}</span>
-          <button onclick="deleteShift('${item.id}')" class="text-xs text-red-400 hover:text-red-300 ml-2">🗑️</button>
+          <button onclick="reloadSavedShiftIntoMainView('${item.id}')" title="Riapri nel Protocollo Interattivo" class="text-xs px-2.5 py-1 rounded bg-teal-900/60 hover:bg-teal-800 text-teal-300 border border-teal-700 font-bold ml-1 transition">🔍 Riapri</button>
+          <button onclick="deleteShift('${item.id}')" title="Elimina" class="text-xs text-red-400 hover:text-red-300 ml-2">🗑️</button>
         </div>
       </div>
       
-      <div class="mb-4 bg-slate-900/80 p-3.5 rounded-xl border-l-4 border-amber-500">
+      <div class="mb-4 bg-slate-900/80 p-4 rounded-xl border-l-4 border-amber-500">
         <span class="text-xs text-slate-400 font-bold block mb-1">Pensiero di partenza:</span>
-        <p class="text-sm text-slate-100 font-medium italic">"${item.original_thought}"</p>
+        <p class="text-base text-slate-100 font-medium italic">"${item.original_thought}"</p>
       </div>
 
+      <!-- 4 RISTRUTTURAZIONI -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
         ${(item.reframes || []).map(r => `
-          <div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700/50">
+          <div class="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700/50">
             <span class="text-xs font-extrabold text-teal-300 block mb-1">${r.icon || '💡'} ${r.type}</span>
             <p class="text-xs text-slate-200 leading-relaxed">${r.content}</p>
           </div>
         `).join('')}
       </div>
 
+      <!-- MANTRA DI ANCORAGGIO -->
       ${item.anchoring_mantra ? `
-        <div class="p-3 rounded-xl bg-amber-950/30 border border-amber-800/40 text-center text-xs text-amber-300 font-semibold mb-3">
-          💎 Mantra: "${item.anchoring_mantra}"
+        <div class="p-3.5 rounded-xl bg-amber-950/30 border border-amber-800/40 text-center text-sm text-amber-300 font-bold mb-4 shadow-inner">
+          💎 Mantra di Ancoraggio: "${item.anchoring_mantra}"
         </div>
       ` : ''}
 
-      ${item.empowering_micro_action ? `
+      <!-- AUDIO COACH VOCALE PLAYER & ANCORAGGIO -->
+      <div class="p-3.5 rounded-xl bg-slate-800/60 border border-teal-800/30 mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <button onclick="playSavedAudioCoach('${item.id}')" class="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs flex items-center gap-1.5 transition">
+            <span>🎧</span> <span>Ascolta Audio Coach</span>
+          </button>
+          <span class="text-xs text-slate-400">Guida vocale e riprogrammazione ipnotica</span>
+        </div>
+        ${item.anchoring_protocol && item.anchoring_protocol.breath_pace ? `
+          <div class="text-xs text-teal-300 font-mono bg-slate-900/80 px-2.5 py-1 rounded border border-teal-900">
+            Respiro: ${item.anchoring_protocol.breath_pace}
+          </div>
+        ` : ''}
+      </div>
+
+      <!-- PIANO DI AZIONE 3 FASI -->
+      ${item.action_plan ? `
+        <div class="pt-3 border-t border-slate-700/60">
+          <span class="text-xs font-bold text-slate-300 block mb-2">📋 Piano Operativo di Sblocco in 3 Fasi:</span>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <div class="p-2.5 rounded-lg bg-slate-900/60 border border-emerald-900/40">
+              <span class="text-emerald-400 text-xs font-bold block mb-1">⚡ 2 Minuti:</span>
+              <p class="text-xs text-slate-300">${item.action_plan.micro_action_2min || item.empowering_micro_action || 'Esegui il respiro'}</p>
+            </div>
+            <div class="p-2.5 rounded-lg bg-slate-900/60 border border-teal-900/40">
+              <span class="text-teal-400 text-xs font-bold block mb-1">📅 24 Ore:</span>
+              <p class="text-xs text-slate-300">${item.action_plan.task_24h || 'Applica la ristrutturazione'}</p>
+            </div>
+            <div class="p-2.5 rounded-lg bg-slate-900/60 border border-indigo-900/40">
+              <span class="text-indigo-400 text-xs font-bold block mb-1">🔄 7 Giorni:</span>
+              <p class="text-xs text-slate-300">${item.action_plan.habit_7days || 'Ripeti il mantra al mattino'}</p>
+            </div>
+          </div>
+        </div>
+      ` : (item.empowering_micro_action ? `
         <div class="pt-2 border-t border-slate-700/50 flex items-center gap-2 text-xs text-emerald-300 font-medium">
           <span>⚡ Micro-Azione:</span>
           <span>${item.empowering_micro_action}</span>
         </div>
-      ` : ''}
+      ` : '')}
     </div>
   `).join('');
+}
+
+function reloadSavedShiftIntoMainView(shiftId) {
+  const shift = cachedShifts.find(s => s.id === shiftId);
+  if (!shift) return;
+
+  currentShiftData = shift;
+  renderMasterProtocol(shift);
+
+  // Switch to Protocol Tab
+  const mainTabBtn = document.querySelector('[data-tab="reframe"]');
+  if (mainTabBtn) mainTabBtn.click();
+
+  const resultsContainer = document.getElementById('results-container');
+  if (resultsContainer) {
+    resultsContainer.classList.remove('hidden');
+    resultsContainer.scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+function playSavedAudioCoach(shiftId) {
+  const shift = cachedShifts.find(s => s.id === shiftId);
+  if (!shift) return;
+
+  let textToRead = "";
+  if (shift.anchoring_protocol && shift.anchoring_protocol.audio_script) {
+    textToRead = shift.anchoring_protocol.audio_script;
+  } else {
+    textToRead = `Chiudi gli occhi e fai un respiro profondo. ${shift.meaning_reframe || shift.context_reframe}. Ripeti nella tua mente: ${shift.anchoring_mantra || 'Io scelgo la chiarezza e l\'azione'}.`;
+  }
+
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(textToRead);
+    utterance.lang = 'it-IT';
+    utterance.rate = 0.9;
+    utterance.pitch = 0.95;
+    window.speechSynthesis.speak(utterance);
+    alert('🎧 Riproduzione Audio Coach avviata!');
+  } else {
+    alert('Sintesi vocale non supportata su questo browser.');
+  }
 }
 
 function filterJournalEntries() {
