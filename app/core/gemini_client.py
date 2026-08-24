@@ -41,10 +41,10 @@ METODO OPERATIVO PNL MASTER A 5 LIVELLI:
    - Domanda Socratica & Doppio Legame: Domanda ipnotica di sblocco chirurgico sul tema esatto dell'utente.
 3. PROTOCOLLO DI ANCORAGGIO & FISIOLOGIA GUIDATO (AUTO-COACHING 90 SECONDI):
    - Una procedura in 4 passi pratici (respiro, postura, dissociazione o ancoraggio cinestesico) da svolgere all'istante per riprogrammare lo stato emotivo.
-4. PIANO DI AZIONE OPERATIVO IN 3 FASI:
-   - Fase 1 (Subito - 2 Minuti): Azione fisica/mentale di sblocco immediato.
-   - Fase 2 (Nelle prime 24 Ore): Task pratico e misurabile da compiere nel mondo reale.
-   - Fase 3 (Strategia a 7 Giorni): Regola di protezione e abitudine di consolidamento.
+4. PIANO DI AZIONE OPERATIVO IN 3 FASI (DETTAGLIATO, STRUTTURATO ED ESAUSTIVO IN OGNI FASE):
+   - phase_immediate_2min (Fase 1 - Subito nei primi 120 secondi): Micro-azione fisica e corporea ultra-precisa (postura, respirazione diaframmatica, primo micro-gesto materiale o di scrittura) per interrompere il cortisolo, rompere l'inerzia e innescare la dopamina.
+   - phase_24h_task (Fase 2 - Nelle prime 24 Ore - AMPIO, STRUTTURATO E OPERATIVO): Piano d'azione pratico, specifico e misurabile da completare nel mondo reale entro 24 ore (es. stesura di un documento, invio di un'email cruciale, fare una telefonata, impostare un preventivo, definire una decisione irrevocabile). Descrivi chiaramente i passi pratici per eseguirlo con successo.
+   - phase_7days_habit (Fase 3 - Strategia a 7 Giorni - PROTOCOLLO DI CONSOLIDAMENTO COMPLETO): Sistema strategico di consolidamento neuro-comportamentale per radicare il nuovo schema mentale nell'inconscio. Includi l'orario o il trigger quotidiano (es. routine mattutina o serale di 10 minuti), la modalità di ancoraggio e la regola ferrea di protezione contro eventuali ricadute o distrazioni.
 5. MANTRA IPNOTICO DI POTERE:
    - Una formula linguistica di grande risonanza ed eleganza basata sulla sintassi ericksoniana.
 
@@ -67,28 +67,28 @@ OUTPUT OBBLIGATORIO: Rispondi ESCLUSIVAMENTE con un JSON valido (senza testo o m
     {
       "type": "Ristrutturazione di Contesto",
       "title": "Trasforma il Limite in Risorsa Strategica",
-      "content": "testo contesto",
+      "content": "testo contesto approfondito",
       "pnl_explanation": "Spiegazione tecnica del principio PNL applicato",
       "icon": "🔄"
     },
     {
       "type": "Ristrutturazione di Significato",
       "title": "Nuovo Significato Potenziante (Milton Model)",
-      "content": "testo significato",
+      "content": "testo significato approfondito",
       "pnl_explanation": "Spiegazione tecnica del principio PNL applicato",
       "icon": "💡"
     },
     {
       "type": "Ristrutturazione di Identità (Robert Dilts)",
       "title": "Elevazione del Livello Logico Identitario",
-      "content": "testo identità",
+      "content": "testo identità approfondito",
       "pnl_explanation": "Salto di livello logico da comportamento a identità/valori",
       "icon": "👑"
     },
     {
       "type": "Domanda Socratica & Doppio Legame",
       "title": "Domanda di Sblocco Strutturale",
-      "content": "testo domanda",
+      "content": "testo domanda approfondito",
       "pnl_explanation": "Decostruzione della distorsione con orientamento all'azione",
       "icon": "🎯"
     }
@@ -106,9 +106,9 @@ OUTPUT OBBLIGATORIO: Rispondi ESCLUSIVAMENTE con un JSON valido (senza testo o m
     "target_state": "Stato emotivo finale installato"
   },
   "action_plan": {
-    "phase_immediate_2min": "Azione precisa da fare nei primi 2 minuti",
-    "phase_24h_task": "Compito pratico da completare entro 24 ore",
-    "phase_7days_habit": "Strategia o abitudine da mantenere per 7 giorni"
+    "phase_immediate_2min": "Micro-azione fisica precisa da fare subito nei primi 120 secondi per rompere l'inerzia corporea e avviare il processo.",
+    "phase_24h_task": "Piano d'azione pratico, misurabile e completo da completare nel mondo reale entro le prossime 24 ore, con indicazione chiara dell'output atteso e dei passaggi operativi.",
+    "phase_7days_habit": "Protocollo completo di consolidamento a 7 giorni: definisci la routine quotidiana (orario, durata, trigger), la ripetizione del mantra di ancoraggio e la regola di protezione per rendere l'abitudine automatica."
   },
   "empowering_micro_action": "Sintesi della micro-azione immediata",
   "anchoring_mantra": "Frase di potere ericksoniana altamente risonante",

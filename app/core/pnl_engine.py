@@ -235,9 +235,9 @@ class PNLEngine:
             mean = f"Questo momento di frizione non è un blocco invalicabile, ma il segnale fisiologico che stai uscendo dalla tua vecchia zona di comfort."
             ident = f"Non sei definito dalle tue temporanee esitazioni: sei colui che osserva il pensiero e ha il potere di riprogrammarlo."
             soc = f"Se sapessi con certezza che ogni tentativo affina la tua maestria, quale singolo passo compiresti adesso?"
-            act_2m = "Alzati in piedi, raddrizza le spalle, fai 3 respiri profondi e scrivi la prima parola chiave del tuo obiettivo."
-            act_24h = "Compi un'azione materiale che porti il progetto avanti anche solo dell'1% entro la fine della giornata."
-            act_7d = "Dedica 15 minuti ogni sera a registrare i 3 micro-successi ottenuti durante il giorno."
+            act_2m = "Alzati in piedi, apri il torace e fai 3 respiri profondi con espirazione prolungata (4s dentro, 6s fuori). Scrivi subito su un foglio la prima azione concreta da compiere per rompere l'inerzia."
+            act_24h = "Blocca uno slot di 30 minuti nel tuo calendario di oggi: esegui e completa il compito operativo principale (es. stesura bozza, invio messaggio/email chiave, definizione preventivo) senza accettare interruzioni."
+            act_7d = "Protocollo di consolidamento a 7 giorni: ogni mattina alle 8:30 ripeti il mantra di potere per 60 secondi prima di aprire le notifiche e registra ogni sera sul diario i 3 micro-progressi reali conseguiti."
             mantra = "Io sono più grande di qualsiasi ostacolo temporaneo e avanzo con chiarezza e potere."
             anchor_title = "Ancoraggio di Risorsa Istantanea",
             anchor_tech = "Cambio di Fisiologia e Ancoraggio Circolare",
