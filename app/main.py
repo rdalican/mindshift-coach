@@ -123,33 +123,43 @@ async def perform_reframe(req: MindShiftRequest, db: Session = Depends(get_db)):
     try:
         response = await gemini_pnl_client.generate_shift(req)
         
-        if req.sync_key and req.sync_key.strip():
-            shift_id = str(uuid.uuid4())
-            reframes_json = json.dumps([r.model_dump() for r in response.reframes])
-            protocol_json = json.dumps(response.anchoring_protocol.model_dump()) if response.anchoring_protocol else None
-            action_plan_json = json.dumps(response.action_plan.model_dump()) if response.action_plan else None
+        sync_key = (req.sync_key.strip().upper() if req.sync_key and req.sync_key.strip() else f"TESTER-{uuid.uuid4().hex[:8].upper()}")
+        shift_id = str(uuid.uuid4())
+        reframes_json = json.dumps([r.model_dump() for r in response.reframes])
+        protocol_json = json.dumps(response.anchoring_protocol.model_dump()) if response.anchoring_protocol else None
+        action_plan_json = json.dumps(response.action_plan.model_dump()) if response.action_plan else None
 
-            db_shift = SavedMindShift(
-                id=shift_id,
-                sync_key=req.sync_key.strip().upper(),
-                original_thought=response.original_thought,
-                context=req.context,
-                detected_channel=response.detected_channel.value,
-                meta_category=response.meta_model.category,
-                meta_subtype=response.meta_model.subtype,
-                meta_explanation=response.meta_model.explanation,
-                context_reframe=response.context_reframe,
-                meaning_reframe=response.meaning_reframe,
-                identity_reframe=response.identity_reframe,
-                socratic_question=response.socratic_question,
-                empowering_micro_action=response.empowering_micro_action,
-                anchoring_mantra=response.anchoring_mantra,
-                reframes_json=reframes_json,
-                protocol_json=protocol_json,
-                action_plan_json=action_plan_json
-            )
-            db.add(db_shift)
-            db.commit()
+        db_shift = SavedMindShift(
+            id=shift_id,
+            sync_key=sync_key,
+            original_thought=response.original_thought,
+            context=req.context,
+            detected_channel=response.detected_channel.value,
+            meta_category=response.meta_model.category,
+            meta_subtype=response.meta_model.subtype,
+            meta_explanation=response.meta_model.explanation,
+            context_reframe=response.context_reframe,
+            meaning_reframe=response.meaning_reframe,
+            identity_reframe=response.identity_reframe,
+            socratic_question=response.socratic_question,
+            empowering_micro_action=response.empowering_micro_action,
+            anchoring_mantra=response.anchoring_mantra,
+            reframes_json=reframes_json,
+            protocol_json=protocol_json,
+            action_plan_json=action_plan_json
+        )
+        db.add(db_shift)
+        
+        # Registra anche il profilo utente se non esiste
+        existing_profile = db.query(UserSyncProfile).filter(UserSyncProfile.sync_key == sync_key).first()
+        if not existing_profile:
+            db.add(UserSyncProfile(
+                sync_key=sync_key,
+                device_name="Web Tester",
+                preferred_vak=response.detected_channel.value,
+                plan_status="trial"
+            ))
+        db.commit()
 
         return response
     except Exception as e:
