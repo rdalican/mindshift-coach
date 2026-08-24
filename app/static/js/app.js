@@ -683,18 +683,24 @@ function renderFilteredShifts(shifts) {
       ${item.action_plan ? `
         <div class="pt-3 border-t border-slate-700/60">
           <span class="text-xs font-bold text-slate-300 block mb-2">📋 Piano Operativo di Sblocco in 3 Fasi:</span>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-            <div class="p-2.5 rounded-lg bg-slate-900/60 border border-emerald-900/40">
-              <span class="text-emerald-400 text-xs font-bold block mb-1">⚡ 2 Minuti:</span>
-              <p class="text-xs text-slate-300">${item.action_plan.micro_action_2min || item.empowering_micro_action || 'Esegui il respiro'}</p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div class="p-3 rounded-xl bg-slate-900/80 border border-emerald-900/50 flex flex-col justify-between">
+              <div>
+                <span class="text-emerald-400 text-xs font-black uppercase tracking-wider block mb-1">⚡ 1. Subito (2 Minuti):</span>
+                <p class="text-xs text-slate-200 leading-relaxed">${item.action_plan.phase_immediate_2min || item.action_plan.micro_action_2min || item.empowering_micro_action || 'Micro-azione corporea immediata'}</p>
+              </div>
             </div>
-            <div class="p-2.5 rounded-lg bg-slate-900/60 border border-teal-900/40">
-              <span class="text-teal-400 text-xs font-bold block mb-1">📅 24 Ore:</span>
-              <p class="text-xs text-slate-300">${item.action_plan.task_24h || 'Applica la ristrutturazione'}</p>
+            <div class="p-3 rounded-xl bg-slate-900/80 border border-teal-900/50 flex flex-col justify-between">
+              <div>
+                <span class="text-teal-400 text-xs font-black uppercase tracking-wider block mb-1">📅 2. Entro 24 Ore:</span>
+                <p class="text-xs text-slate-200 leading-relaxed">${item.action_plan.phase_24h_task || item.action_plan.task_24h || 'Compito operativo nel mondo reale'}</p>
+              </div>
             </div>
-            <div class="p-2.5 rounded-lg bg-slate-900/60 border border-indigo-900/40">
-              <span class="text-indigo-400 text-xs font-bold block mb-1">🔄 7 Giorni:</span>
-              <p class="text-xs text-slate-300">${item.action_plan.habit_7days || 'Ripeti il mantra al mattino'}</p>
+            <div class="p-3 rounded-xl bg-slate-900/80 border border-indigo-900/50 flex flex-col justify-between">
+              <div>
+                <span class="text-indigo-400 text-xs font-black uppercase tracking-wider block mb-1">🔄 3. Strategia a 7 Giorni:</span>
+                <p class="text-xs text-slate-200 leading-relaxed">${item.action_plan.phase_7days_habit || item.action_plan.habit_7days || 'Abitudine di consolidamento'}</p>
+              </div>
             </div>
           </div>
         </div>
