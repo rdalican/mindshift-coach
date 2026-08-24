@@ -152,6 +152,26 @@ THEMATIC_DOMAINS = [
             "Osserva le opinioni altrui rimbalzare sulla superficie della bolla senza toccare il tuo nucleo.",
             "Senti la calma interiore mentre mantieni il sorriso e il contatto visivo."
         ]
+    },
+    {
+        "domain": "intimita_sessualita",
+        "keywords": ["sesso", "sessuale", "intimità", "prestazione", "erezione", "letto", "partner", "desiderio", "orgasmo", "corpo", "vergogna", "defaillance", "fallire"],
+        "context_reframe": "La tua vulnerabilità e la sensibilità corporea non sono debolezze: indicano che tieni profondamente alla connessione con il partner. Trasformiamo questa attenzione da un giudice severo in un radar di sintonizzazione ed empatia.",
+        "meaning_reframe": "Il corpo nell'intimità non è una macchina a comando digitale con un compito da svolgere, ma uno strumento a corda che risponde alla presenza e alla complicità. Rallentare apre lo spazio al piacere cinestesico profondo invece della fretta.",
+        "identity_reframe": "Non sei una prestazione da valutare con un voto: sei una persona intera capace di dare e ricevere piacere attraverso tutti i sensi, in totale libertà e sicurezza emotiva.",
+        "socratic_question": "Cosa accadrebbe se durante l'intimità spegnessi il dialogo interno di controllo e lasciassi che sia il contatto della pelle e il respiro a guidare ogni secondo?",
+        "action_2min": "Esegui 4 cicli di respirazione 4-8 (inspira 4 secondi dal naso, espira 8 secondi a labbra socchiuse) per attivare all'istante il sistema nervoso parasimpatico e sciogliere il diaframma.",
+        "action_24h": "Condividi con il partner un momento di coccole o massaggio sensoriale di 15 minuti con l'accordo esplicito di focalizzarsi solo sul piacere tattile, senza alcun obiettivo prestazionale.",
+        "action_7days": "Installa la pratica del 'Sensory Grounding': ogni volta che avverti un pensiero di giudizio sul tuo corpo o sulla prestazione, ri-ancora l'attenzione su 3 sensazioni tattili fisiche dirette (il calore, il respiro, il contatto).",
+        "mantra": "Io abito il mio corpo con gioia e sicurezza: il piacere nasce dalla mia presenza, non dalla perfezione.",
+        "anchor_title": "Ancoraggio di Presenza Sensoriale e Calma Parasimpatica",
+        "anchor_technique": "Ri-associazione Cinestesica & Respirazione Vago-Mediata",
+        "anchor_steps": [
+            "Fai un respiro diaframmatico profondo espirando lentamente a labbra socchiuse.",
+            "Porta tutta la tua attenzione sensoriale sul contatto dei tuoi piedi a terra e sul calore delle tue mani.",
+            "Chiudi gli occhi e visualizza un'onda calda di sicurezza che rilassa il bacino e il plesso solare.",
+            "Ripeti dentro di te: 'Io sono presente nel piacere, qui e ora'."
+        ]
     }
 ]
 
