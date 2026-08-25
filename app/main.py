@@ -123,45 +123,72 @@ async def perform_reframe(req: MindShiftRequest, db: Session = Depends(get_db)):
     try:
         response = await gemini_pnl_client.generate_shift(req)
         
-        sync_key = (req.sync_key.strip().upper() if req.sync_key and req.sync_key.strip() else f"TESTER-{uuid.uuid4().hex[:8].upper()}")
-        shift_id = str(uuid.uuid4())
-        reframes_json = json.dumps([r.model_dump() for r in response.reframes])
-        protocol_json = json.dumps(response.anchoring_protocol.model_dump()) if response.anchoring_protocol else None
-        action_plan_json = json.dumps(response.action_plan.model_dump()) if response.action_plan else None
-
-        db_shift = SavedMindShift(
-            id=shift_id,
-            sync_key=sync_key,
-            original_thought=response.original_thought,
-            context=req.context,
-            detected_channel=response.detected_channel.value,
-            meta_category=response.meta_model.category,
-            meta_subtype=response.meta_model.subtype,
-            meta_explanation=response.meta_model.explanation,
-            context_reframe=response.context_reframe,
-            meaning_reframe=response.meaning_reframe,
-            identity_reframe=response.identity_reframe,
-            socratic_question=response.socratic_question,
-            empowering_micro_action=response.empowering_micro_action,
-            anchoring_mantra=response.anchoring_mantra,
-            reframes_json=reframes_json,
-            protocol_json=protocol_json,
-            action_plan_json=action_plan_json
-        )
-        db.add(db_shift)
-        
-        # Registra anche il profilo utente se non esiste
-        existing_profile = db.query(UserSyncProfile).filter(UserSyncProfile.sync_key == sync_key).first()
-        if not existing_profile:
-            db.add(UserSyncProfile(
-                sync_key=sync_key,
-                device_name="Web Tester",
-                preferred_vak=response.detected_channel.value,
-                plan_status="trial"
-            ))
-        db.commit()
-
+        sync_key = req.sync_key.strip().upper() if req.sync_key and req.sync_key.strip() else None
+        shift_id = response.id if response.id else str(uuid.uuid4())
         response.id = shift_id
+
+        # Salva o aggiorna la sessione nel DB solo se sync_key è fornito
+        if sync_key:
+            reframes_json = json.dumps([r.model_dump() for r in response.reframes])
+            protocol_json = json.dumps(response.anchoring_protocol.model_dump()) if response.anchoring_protocol else None
+            action_plan_json = json.dumps(response.action_plan.model_dump()) if response.action_plan else None
+
+            existing = db.query(SavedMindShift).filter(
+                (SavedMindShift.id == shift_id) |
+                ((SavedMindShift.sync_key == sync_key) & (SavedMindShift.original_thought == response.original_thought))
+            ).first()
+
+            if existing:
+                existing.original_thought = response.original_thought
+                existing.context = req.context
+                existing.detected_channel = response.detected_channel.value
+                existing.meta_category = response.meta_model.category
+                existing.meta_subtype = response.meta_model.subtype
+                existing.meta_explanation = response.meta_model.explanation
+                existing.context_reframe = response.context_reframe
+                existing.meaning_reframe = response.meaning_reframe
+                existing.identity_reframe = response.identity_reframe
+                existing.socratic_question = response.socratic_question
+                existing.empowering_micro_action = response.empowering_micro_action
+                existing.anchoring_mantra = response.anchoring_mantra
+                existing.reframes_json = reframes_json
+                existing.protocol_json = protocol_json
+                existing.action_plan_json = action_plan_json
+                db.commit()
+                response.id = existing.id
+            else:
+                db_shift = SavedMindShift(
+                    id=shift_id,
+                    sync_key=sync_key,
+                    original_thought=response.original_thought,
+                    context=req.context,
+                    detected_channel=response.detected_channel.value,
+                    meta_category=response.meta_model.category,
+                    meta_subtype=response.meta_model.subtype,
+                    meta_explanation=response.meta_model.explanation,
+                    context_reframe=response.context_reframe,
+                    meaning_reframe=response.meaning_reframe,
+                    identity_reframe=response.identity_reframe,
+                    socratic_question=response.socratic_question,
+                    empowering_micro_action=response.empowering_micro_action,
+                    anchoring_mantra=response.anchoring_mantra,
+                    reframes_json=reframes_json,
+                    protocol_json=protocol_json,
+                    action_plan_json=action_plan_json
+                )
+                db.add(db_shift)
+                
+                # Registra anche il profilo utente se non esiste
+                existing_profile = db.query(UserSyncProfile).filter(UserSyncProfile.sync_key == sync_key).first()
+                if not existing_profile:
+                    db.add(UserSyncProfile(
+                        sync_key=sync_key,
+                        device_name="Web Tester",
+                        preferred_vak=response.detected_channel.value,
+                        plan_status="trial"
+                    ))
+                db.commit()
+
         return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Errore durante l'elaborazione PNL: {str(e)}")
@@ -434,18 +461,56 @@ async def save_synced_shift(item: SyncShiftItem, db: Session = Depends(get_db)):
         return SyncShiftItem(**new_shift.to_dict())
 
 @app.delete("/api/sync/shifts/{shift_id}")
-async def delete_synced_shift(shift_id: str, sync_key: str, db: Session = Depends(get_db)):
-    clean_key = sync_key.strip().upper()
-    shift = db.query(SavedMindShift).filter(
-        SavedMindShift.id == shift_id,
-        SavedMindShift.sync_key == clean_key
-    ).first()
+async def delete_synced_shift(shift_id: str, sync_key: Optional[str] = None, db: Session = Depends(get_db)):
+    clean_key = sync_key.strip().upper() if sync_key else None
+    
+    # 1. Cerca per ID
+    shift = db.query(SavedMindShift).filter(SavedMindShift.id == shift_id).first()
+    
+    # 2. Se non trovato e c'è sync_key, cerca per corrispondenza esatta o per ID
+    if not shift and clean_key:
+        shift = db.query(SavedMindShift).filter(
+            (SavedMindShift.id == shift_id) & (SavedMindShift.sync_key == clean_key)
+        ).first()
+
     if not shift:
         raise HTTPException(status_code=404, detail="Sessione non trovata.")
     
+    # Rimuovi la sessione e pulisci eventuali duplicati con stesso pensiero e chiave
+    thought = shift.original_thought
+    s_key = shift.sync_key
+    db.delete(shift)
+
+    if thought and s_key:
+        duplicates = db.query(SavedMindShift).filter(
+            SavedMindShift.sync_key == s_key,
+            SavedMindShift.original_thought == thought
+        ).all()
+        for d in duplicates:
+            db.delete(d)
+
+    db.commit()
+    return {"status": "deleted", "id": shift_id}
+
+@app.delete("/api/admin/shifts/{shift_id}")
+async def admin_delete_shift(shift_id: str, db: Session = Depends(get_db)):
+    """Elimina definitivamente una sessione specifica dal database per gli amministratori."""
+    shift = db.query(SavedMindShift).filter(SavedMindShift.id == shift_id).first()
+    if not shift:
+        raise HTTPException(status_code=404, detail="Sessione non trovata.")
     db.delete(shift)
     db.commit()
     return {"status": "deleted", "id": shift_id}
+
+@app.post("/api/admin/clean-tests")
+async def admin_clean_tests(db: Session = Depends(get_db)):
+    """Elimina tutte le sessioni temporanee di diagnostica e test dal database."""
+    test_keys = ["BRIDGE-TEST", "TEST", "DIAGNOSTICS-TEST"]
+    deleted_count = db.query(SavedMindShift).filter(
+        (SavedMindShift.sync_key.in_(test_keys)) | (SavedMindShift.sync_key.like("TESTER-%"))
+    ).delete(synchronize_session=False)
+    db.commit()
+    return {"status": "success", "deleted_count": deleted_count}
 
 # ==========================================
 # STRIPE PAYMENTS API
