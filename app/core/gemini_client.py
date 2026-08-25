@@ -133,10 +133,10 @@ OUTPUT OBBLIGATORIO: Rispondi ESCLUSIVAMENTE con un JSON valido (senza testo o m
 """
 
 CANDIDATE_MODELS = [
-    "gemini-3-flash-preview",
-    "gemini-3.5-flash",
-    "gemini-flash-latest",
-    "gemini-2.5-flash"
+    "gemini-1.5-flash",
+    "gemini-2.0-flash",
+    "gemini-2.5-flash",
+    "gemini-1.5-pro"
 ]
 
 class GeminiPNLClient:
@@ -166,7 +166,7 @@ class GeminiPNLClient:
             headers={"Content-Type": "application/json"},
             method="POST"
         )
-        with urllib.request.urlopen(req, timeout=25) as resp:
+        with urllib.request.urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             raw_text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
             

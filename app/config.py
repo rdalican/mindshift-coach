@@ -15,7 +15,7 @@ class Settings(BaseSettings):
 
     # Google Gemini AI Key & Models (Supporta chiavi AQ. e AIzaSy)
     GEMINI_API_KEY: str = ""
-    GEMINI_MODEL: str = "gemini-3-flash-preview"
+    GEMINI_MODEL: str = "gemini-1.5-flash"
 
     # Monetizzazione & Stripe Micro-SaaS
     STRIPE_SECRET_KEY: str = ""
