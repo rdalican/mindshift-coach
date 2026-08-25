@@ -502,15 +502,38 @@ async def admin_delete_shift(shift_id: str, db: Session = Depends(get_db)):
     db.commit()
     return {"status": "deleted", "id": shift_id}
 
+@app.delete("/api/admin/testers/{sync_key}")
+async def admin_delete_tester(sync_key: str, db: Session = Depends(get_db)):
+    """Elimina definitivamente un profilo tester e tutte le sue sessioni/feedback dal database."""
+    clean_key = sync_key.strip().upper()
+    profile = db.query(UserSyncProfile).filter(UserSyncProfile.sync_key == clean_key).first()
+    if not profile:
+        raise HTTPException(status_code=404, detail="Profilo tester non trovato.")
+    
+    db.query(SavedMindShift).filter(SavedMindShift.sync_key == clean_key).delete()
+    db.query(ReframeFeedback).filter(ReframeFeedback.sync_key == clean_key).delete()
+    db.delete(profile)
+    db.commit()
+    return {"status": "deleted", "sync_key": clean_key}
+
 @app.post("/api/admin/clean-tests")
 async def admin_clean_tests(db: Session = Depends(get_db)):
-    """Elimina tutte le sessioni temporanee di diagnostica e test dal database."""
+    """Elimina tutte le sessioni e i profili temporanei di diagnostica e test dal database."""
     test_keys = ["BRIDGE-TEST", "TEST", "DIAGNOSTICS-TEST"]
-    deleted_count = db.query(SavedMindShift).filter(
+    deleted_shifts = db.query(SavedMindShift).filter(
         (SavedMindShift.sync_key.in_(test_keys)) | (SavedMindShift.sync_key.like("TESTER-%"))
     ).delete(synchronize_session=False)
+    
+    deleted_profiles = db.query(UserSyncProfile).filter(
+        (UserSyncProfile.sync_key.in_(test_keys)) | (UserSyncProfile.sync_key.like("TESTER-%"))
+    ).delete(synchronize_session=False)
+    
     db.commit()
-    return {"status": "success", "deleted_count": deleted_count}
+    return {
+        "status": "success",
+        "deleted_shifts": deleted_shifts,
+        "deleted_profiles": deleted_profiles
+    }
 
 # ==========================================
 # STRIPE PAYMENTS API
@@ -563,16 +586,29 @@ async def get_plan_status(sync_key: str, db: Session = Depends(get_db)):
 # ==========================================
 @app.get("/api/admin/overview")
 async def get_admin_overview(db: Session = Depends(get_db)):
-    """Restituisce il riepilogo in tempo reale di tutte le sessioni e i feedback dei tester."""
+    """Restituisce il riepilogo in tempo reale di tutte le sessioni e i feedback dei tester con dettaglio profili."""
     profiles = db.query(UserSyncProfile).order_by(UserSyncProfile.created_at.desc()).all()
     shifts = db.query(SavedMindShift).order_by(SavedMindShift.created_at.desc()).all()
     feedbacks = db.query(ReframeFeedback).order_by(ReframeFeedback.created_at.desc()).all()
     
+    testers_detail = []
+    for p in profiles:
+        user_shifts_count = db.query(SavedMindShift).filter(SavedMindShift.sync_key == p.sync_key).count()
+        testers_detail.append({
+            "sync_key": p.sync_key,
+            "device_name": p.device_name or "Dispositivo Web",
+            "plan_status": p.plan_status,
+            "preferred_vak": p.preferred_vak,
+            "total_saved_sessions": user_shifts_count,
+            "created_at": p.created_at.strftime("%Y-%m-%d %H:%M:%S") if p.created_at else None
+        })
+
     return {
         "status": "success",
         "total_active_testers": len(profiles),
         "total_saved_sessions": len(shifts),
         "total_feedback_ratings": len(feedbacks),
+        "testers": testers_detail,
         "feedbacks": [
             {
                 "id": f.id,
