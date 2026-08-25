@@ -172,6 +172,46 @@ THEMATIC_DOMAINS = [
             "Chiudi gli occhi e visualizza un'onda calda di sicurezza che rilassa il bacino e il plesso solare.",
             "Ripeti dentro di te: 'Io sono presente nel piacere, qui e ora'."
         ]
+    },
+    {
+        "domain": "bridge_giochi_strategici",
+        "keywords": ["bridge", "licita", "licite", "atout", "smazzata", "prese", "carta", "carte", "morto", "dichiarazione", "torneo", "compagno", "tavolo", "avversari", "contratto", "fiori", "quadri", "cuori", "picche"],
+        "context_reframe": "La tua precisione e l'esigenza di calcolo nel Bridge dimostrano profonda intelligenza strategica e rispetto per il gioco della carta. L'imprevisto al tavolo non è un errore, ma il momento esatto in cui inizia la vera partita di deduzione probabilistica.",
+        "meaning_reframe": "Una carta inaspettata o una licita complessa non distruggono il tuo piano di gioco: ti forniscono nuove informazioni preziose sulla distribuzione delle mani avversarie. Adattare la linea di gioco alla realtà del tavolo è il massimo livello di maestria del bridgista.",
+        "identity_reframe": "Non sei un calcolatore rigido legato a uno schema fisso: sei un Navigatore Strategico delle Probabilità, capace di leggere la smazzata, valorizzare le atout e mantenere la lucidità tattica presa dopo presa.",
+        "socratic_question": "Cosa accadrebbe se accogliessi ogni carta imprevista come un indizio prezioso sulla distribuzione avversaria, trasformando l'adattamento nel tuo vantaggio competitivo?",
+        "action_2min": "Chiudi gli occhi per 60 secondi: visualizza il tavolo verde, fai un respiro profondo e immagina il tuo piano di gioco che diventa fluido come l'acqua, pronto ad aggirare qualsiasi mossa avversaria.",
+        "action_24h": "Gioca o analizza 3 mani di Bridge applicando la regola del 'Piano Liquido': al terzo giro di atout, fai un check-point consapevole e aggiorna la stima della distribuzione senza alcun giudizio.",
+        "action_7days": "Adotta il rituale di centratura al tavolo: prima di ogni attacco o licita cruciale, tocca il dorso delle carte con calma ed espira per mantenere il focus sulla singola presa presente.",
+        "mantra": "Ogni carta rivelata è la mappa che si compone: io domino il tavolo con lucidità, calma e strategia fluida.",
+        "anchor_title": "Ancoraggio del Tavolo Verde e della Mente Fluida",
+        "anchor_technique": "Ri-centratura Visivo-Spaziale e Respirazione Tattica",
+        "anchor_steps": [
+            "Poggia le mani piatte sul tavolo sentendo il contatto solido.",
+            "Fai un respiro lento rilasciando le tensioni delle spalle e della mandibola.",
+            "Visualizza il tuo compagno e il morto con occhi di fiducia e cooperazione.",
+            "Pronuncia dentro di te: 'Una carta alla volta, con totale presenza strategica'."
+        ]
+    },
+    {
+        "domain": "attivita_fisica_salute",
+        "keywords": ["sarcopenia", "fisica", "fisico", "esercizi", "allenamento", "palestra", "muscoli", "sport", "movimento", "pigrizia", "pesi", "camminata", "corsa", "salute", "invecchiare", "età", "pensione", "corpo"],
+        "context_reframe": "La resistenza iniziale ad allenarti non è pigrizia: è il naturale meccanismo di risparmio energetico del cervello. Riconoscerlo ti permette di aggirare l'attrito con micro-abitudini senza dover fare affidamento sulla sola forza di volontà.",
+        "meaning_reframe": "Il movimento fisico e il mantenimento muscolare non sono un dovere punitivo, ma il carburante che preserva la tua autonomia, la tua forza e la tua lucidità mentale. Ogni singola serie di esercizi è un deposito diretto nel tuo conto della longevità.",
+        "identity_reframe": "Non sei una persona che combatte contro il proprio corpo: sei il Custode Consapevole della tua Vitalità, capace di onorare la tua salute attraverso scelte quotidiane di eccellenza e rispetto per te stesso.",
+        "socratic_question": "Qual è il più piccolo movimento o esercizio di 2 minuti che puoi compiere adesso, sapendo che una volta iniziato il corpo troverà il piacere naturale dell'energia in movimento?",
+        "action_2min": "Alzati subito in piedi, fai 5 circonduzioni delle spalle, distendi le braccia verso l'alto e fai 3 respiri profondi sentendo il sangue che riprende a circolare nei muscoli.",
+        "action_24h": "Applica la 'Regola dei 5 Minuti': prima di iniziare qualsiasi commissione della giornata, completa esattamente 5 minuti di riscaldamento o esercizi a corpo libero.",
+        "action_7days": "Installa il trigger 'Prima la Salute': associa l'attività fisica al caffè del mattino, completando 15 minuti di routine di mobilità e forza prima di uscire di casa.",
+        "mantra": "Mentre il mio corpo si muove, la mia energia si moltiplica: la mia forza è la mia libertà quotidiana.",
+        "anchor_title": "Ancoraggio di Vitalità Corporea e Potenza Muscolare",
+        "anchor_technique": "Attivazione Posturale e Fisiologia Dinamica",
+        "anchor_steps": [
+            "Mettiti in piedi a schiena dritta con i piedi ben saldi a terra.",
+            "Contrai i muscoli delle gambe e dell'addome per 3 secondi e poi rilascia con un'espirazione potente.",
+            "Senti il calore e la vitalità che si diffondono in tutto il corpo.",
+            "Ripeti dentro di te: 'Il mio corpo è forte, vitale e pronto ad agire'."
+        ]
     }
 ]
 

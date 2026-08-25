@@ -152,7 +152,18 @@ class GeminiPNLClient:
         self.preferred_model = settings.GEMINI_MODEL
 
     def _call_gemini_rest_sync(self, prompt: str, model_name: str) -> dict:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={self.api_key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
+        headers = {
+            "Content-Type": "application/json",
+            "x-goog-api-key": self.api_key
+        }
+        if self.api_key.startswith("AIzaSy"):
+            url = f"{url}?key={self.api_key}"
+        elif self.api_key.startswith("AQ.") or self.api_key.startswith("ya29."):
+            headers["Authorization"] = f"Bearer {self.api_key}"
+        else:
+            url = f"{url}?key={self.api_key}"
+
         payload = {
             "contents": [
                 {
@@ -168,7 +179,7 @@ class GeminiPNLClient:
         req = urllib.request.Request(
             url,
             data=json.dumps(payload).encode("utf-8"),
-            headers={"Content-Type": "application/json"},
+            headers=headers,
             method="POST"
         )
         with urllib.request.urlopen(req, timeout=10) as resp:
