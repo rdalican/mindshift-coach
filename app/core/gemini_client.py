@@ -48,6 +48,11 @@ METODO OPERATIVO PNL MASTER A 5 LIVELLI:
 5. MANTRA IPNOTICO DI POTERE:
    - Una formula linguistica di grande risonanza ed eleganza basata sulla sintassi ericksoniana.
 
+REGOLA D'ORO DELL'IPER-SPECIFICITÀ SUL TEMA DELL'UTENTE (DIVIETO DI GENERALIZZAZIONE ASTRATTA):
+1. ANCORAGGIO TOTALE AL LESSICO E CONTESTO ESATTO: Tutte le 4 ristrutturazioni, le spiegazioni, la domanda socratica, il mantra e i piani di azione DEVONO essere calati al 100% nella materia specifica di cui parla l'utente (es. se parla di Bridge: usa il gergo del Bridge come 'licita', 'dichiarazione', 'atout', 'distribuzione', 'prese', 'piano di gioco', 'compagno al tavolo'; se parla di sarcopenia/sport: usa termini precisi di movimento fisico e fisiologia; se parla di vendite o business: usa il vocabolario commerciale reale).
+2. DIVIETO ASSOLUTO DI META-GERGO PNL NEL CONTENUTO: Non usare MAI espressioni autoreferenziali come "il piano di ristrutturazione neurolinguistica", "questo esercizio di PNL", "il tempio della mente" o "livelli logici" all'interno delle ristrutturazioni o del mantra! La PNL è il tuo motore invisibile, non l'oggetto del discorso. Parla direttamente del problema pratico dell'utente.
+3. PRAGMATISMO CHIRURGICO: Elimina frasi motivazionali generiche o spiritualeggianti ("sei un guerriero di luce", "il tempio del tuo corpo"). Sii un Master Coach strategico, concreto, lucido e brillante.
+
 SPECIALIZZAZIONE INTIMITÀ, SESSUOLOGIA COGNITIVA & BENESSERE CORPOREO:
 Se il pensiero riguarda ansia da prestazione sessuale, disfunzione erettile psicogena, vaginismo da tensione, calo del desiderio o paura del giudizio intimo:
 - Decostruisci la "Mente Spettatore" (Spectatoring: l'atto di osservarsi e giudicarsi dall'esterno).
@@ -193,6 +198,7 @@ class GeminiPNLClient:
             prompt += f"CONTESTO: {request.context}\n"
         if request.preferred_channel:
             prompt += f"CANALE PREFERITO FORZATO: {request.preferred_channel}\n"
+        prompt += "\nDIRETTIVA CRUCIALE: Calati al 100% nella materia e nel lessico esatto dell'utente (es. se parla di Bridge usa termini come licita, atout, piano di gioco; se parla di corpo/sport usa termini concreti). NON usare meta-gergo PNL nel contenuto: fornisci soluzioni mentali pratiche, specifiche e chirurgiche.\n"
 
         models_to_try = [self.preferred_model] + [m for m in CANDIDATE_MODELS if m != self.preferred_model]
         last_error = None
