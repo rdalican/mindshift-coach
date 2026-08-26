@@ -43,7 +43,9 @@ from app.core.models import (
     RoadmapResponse,
     RoadmapStepToggleRequest,
     SessionStepRequest,
-    SessionStepResponse
+    SessionStepResponse,
+    TTSSynthesizeRequest,
+    AudioTrackInfo
 )
 from app.core.gemini_client import gemini_pnl_client
 from app.core.stripe_client import stripe_manager
@@ -275,6 +277,77 @@ async def perform_session_step(req: SessionStepRequest, db: Session = Depends(ge
         return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Errore durante la seduta PNL: {str(e)}")
+
+# ==========================================
+# AUDIO COACH NEURALE & TRACCE MASTER (MP3)
+# ==========================================
+MASTER_AUDIO_TRACKS = [
+    AudioTrackInfo(
+        id="ancoraggio_parasimpatico",
+        title="🌿 Rilassamento Parasimpatico 4-8",
+        description="Respirazione vago-mediata e rilassamento somatico profondo per intimità, ansia da prestazione e centratura.",
+        category="Intimità & Corpo",
+        duration_label="2:30 min",
+        voice_name="Diego (Voce Neurale Studio)",
+        audio_url="/static/audio/ancoraggio_parasimpatico.mp3"
+    ),
+    AudioTrackInfo(
+        id="mente_strategica",
+        title="🧠 Mente Fluida & Centratura Strategica",
+        description="Ancoraggio visivo-spaziale al tavolo verde per Bridge, scacchi e giochi decisionali complessi.",
+        category="Performance & Bridge",
+        duration_label="1:45 min",
+        voice_name="Diego (Voce Neurale Studio)",
+        audio_url="/static/audio/mente_strategica.mp3"
+    ),
+    AudioTrackInfo(
+        id="reset_stress_90s",
+        title="⚡ Reset Neurale Istantaneo (90s)",
+        description="Protocollo di emergenza per defusione cognitiva e sblocco rapido degli stati di panico o blocco mentale.",
+        category="Emergenza SOS",
+        duration_label="1:15 min",
+        voice_name="Elsa (Voce Neurale Serena)",
+        audio_url="/static/audio/reset_stress_90s.mp3"
+    ),
+    AudioTrackInfo(
+        id="riprogrammazione_identita",
+        title="💎 Riprogrammazione di Identità & Autostima",
+        description="Ipnosi ericksoniana sui 5 Livelli di Robert Dilts per rilasciare i giudizi e installare sicurezza incrollabile.",
+        category="Identità & Autostima",
+        duration_label="1:30 min",
+        voice_name="Diego (Voce Neurale Studio)",
+        audio_url="/static/audio/riprogrammazione_identita.mp3"
+    )
+]
+
+@app.get("/api/audio/tracks", response_model=List[AudioTrackInfo])
+async def get_master_audio_tracks():
+    """Restituisce le tracce audio neurali Master pre-renderizzate in studio."""
+    return MASTER_AUDIO_TRACKS
+
+@app.post("/api/tts/synthesize")
+async def synthesize_neural_speech(req: TTSSynthesizeRequest):
+    """Sintetizza qualsiasi testo in tempo reale con voci neurali studio ad alta definizione."""
+    try:
+        import edge_tts
+        communicate = edge_tts.Communicate(
+            req.text,
+            voice=req.voice or "it-IT-DiegoNeural",
+            rate=req.rate or "-10%",
+            pitch=req.pitch or "+0Hz"
+        )
+        audio_chunks = []
+        async for chunk in communicate.stream():
+            if chunk["type"] == "audio":
+                audio_chunks.append(chunk["data"])
+        
+        audio_bytes = b"".join(audio_chunks)
+        return Response(content=audio_bytes, media_type="audio/mpeg", headers={
+            "Content-Disposition": "inline; filename=speech.mp3",
+            "Cache-Control": "public, max-age=3600"
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Errore nella sintesi vocale neurale: {str(e)}")
 
 # ==========================================
 # ANALYTICS & VAK TRENDS

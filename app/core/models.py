@@ -214,3 +214,20 @@ class SessionStepResponse(BaseModel):
     investigation_questions: List[str] = []
     clinical_insight: Optional[str] = None
     final_shift: Optional[MindShiftResponse] = None
+
+# --- MODELLI TTS NEURALE MASTER & AUDIO COACH ---
+class TTSSynthesizeRequest(BaseModel):
+    text: str = Field(..., min_length=1, max_length=5000, description="Testo da sintetizzare con voce neurale")
+    voice: Optional[str] = Field("it-IT-DiegoNeural", description="Voce neurale italiana (es. it-IT-DiegoNeural, it-IT-ElsaNeural)")
+    rate: Optional[str] = Field("-10%", description="Velocità audio")
+    pitch: Optional[str] = Field("+0Hz", description="Tonalità audio")
+
+class AudioTrackInfo(BaseModel):
+    id: str
+    title: str
+    description: str
+    category: str
+    duration_label: str
+    voice_name: str
+    audio_url: str
+

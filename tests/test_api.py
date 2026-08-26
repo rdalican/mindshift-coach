@@ -111,3 +111,23 @@ def test_session_step_endpoints_flow():
     assert d4["final_shift"] is not None
     assert len(d4["final_shift"]["reframes"]) >= 3
 
+def test_master_audio_tracks_endpoint():
+    response = client.get("/api/audio/tracks")
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) >= 4
+    assert any("ancoraggio_parasimpatico" in t["id"] for t in data)
+
+def test_tts_synthesize_endpoint():
+    payload = {
+        "text": "Respira profondamente e ascolta questa guida.",
+        "voice": "it-IT-DiegoNeural",
+        "rate": "-10%",
+        "pitch": "+0Hz"
+    }
+    response = client.post("/api/tts/synthesize", json=payload)
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "audio/mpeg"
+    assert len(response.content) > 100
+
+

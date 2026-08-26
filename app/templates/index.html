@@ -120,6 +120,9 @@
       <button data-target="cloud-sync-section" class="nav-tab-btn px-4 py-2 text-xs md:text-sm font-semibold rounded-lg text-slate-300 hover:bg-slate-800 transition whitespace-nowrap">
         ☁️ Sync Windows ↔ Android
       </button>
+      <button data-target="audio-tracks-section" class="nav-tab-btn px-4 py-2 text-xs md:text-sm font-semibold rounded-lg text-slate-300 hover:bg-slate-800 transition whitespace-nowrap">
+        🎧 Audio Master PNL
+      </button>
       <button data-target="pnl-guide-section" class="nav-tab-btn px-4 py-2 text-xs md:text-sm font-semibold rounded-lg text-slate-300 hover:bg-slate-800 transition whitespace-nowrap">
         🎯 Metodo PNL & Dilts
       </button>
@@ -341,8 +344,11 @@
 
           <!-- AUDIO COACH & PRINT BUTTONS -->
           <div class="flex flex-wrap items-center gap-2 no-print">
-            <button id="audio-coach-btn" onclick="toggleAudioCoach()" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-purple-600/30 transition flex items-center gap-2">
-              <span id="audio-icon">🎧</span> <span id="audio-btn-text">Ascolta Sessione Guidata</span>
+            <button id="audio-coach-btn" onclick="toggleNeuralOrWebAudioCoach()" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-purple-600/30 transition flex items-center gap-2">
+              <span id="audio-icon">🎙️</span> <span id="audio-btn-text">Ascolta Voce Neurale Studio HQ</span>
+            </button>
+            <button onclick="playMatchingSomaticAudioTrack()" class="px-3.5 py-2 bg-teal-950 hover:bg-teal-900 text-teal-300 font-bold text-xs rounded-xl border border-teal-700/60 transition flex items-center gap-1.5 shadow-md">
+              🧘 Ancoraggio Somatico MP3
             </button>
             <button onclick="window.print()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl border border-slate-700 transition flex items-center gap-1.5">
               🖨️ Stampa / Salva PDF
@@ -748,6 +754,65 @@
               <li>• <strong>Cartella Clinica PDF/Stampa</strong> per tenere traccia di ogni evoluzione.</li>
             </ul>
           </div>
+        </div>
+      </div>
+    </section>
+ 
+    <!-- ========================================== -->
+    <!-- SECTION 7: AUDIO MASTER PNL & MEDITAZIONI  -->
+    <!-- ========================================== -->
+    <section id="audio-tracks-section" class="app-section hidden space-y-6">
+      <div class="glass-panel rounded-2xl p-6 md:p-8 border border-slate-700 space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-5">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-purple-500/20 text-purple-300 border border-purple-500/40">Studio Neurale HQ</span>
+              <span class="text-xs text-slate-400">Voci ad Alta Definizione (Diego & Elsa)</span>
+            </div>
+            <h2 class="text-2xl font-bold text-white">🎧 Master Audio Room • Ancoraggi & Ipnosi PNL</h2>
+            <p class="text-xs text-slate-400">Tracce audio guidate con cadenza ericksoniana, respirazione vago-mediata e ancoraggi somatici.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-emerald-400 font-bold bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800">
+              ✓ 4 Sessioni Master Disponibili
+            </span>
+          </div>
+        </div>
+
+        <!-- Master Audio Player Active Banner -->
+        <div id="active-master-audio-player" class="hidden p-4 rounded-2xl bg-gradient-to-r from-purple-950/60 via-slate-900 to-indigo-950/60 border border-purple-600/50 shadow-xl flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-purple-600/30 flex items-center justify-center text-xl animate-pulse">
+              🎙️
+            </div>
+            <div>
+              <span class="text-[10px] font-black uppercase text-purple-400 tracking-wider">In Riproduzione</span>
+              <h4 id="active-audio-title" class="text-sm font-bold text-white">Traccia Selezionata</h4>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 flex-grow max-w-md">
+            <button id="player-play-pause-btn" onclick="toggleActiveMasterAudio()" class="w-10 h-10 rounded-full bg-purple-600 hover:bg-purple-500 text-white flex items-center justify-center font-bold text-base transition shadow-lg shrink-0">
+              ▶
+            </button>
+            <div class="flex-grow">
+              <div class="flex justify-between text-[10px] text-slate-400 font-mono mb-1">
+                <span id="player-current-time">0:00</span>
+                <span id="player-duration">0:00</span>
+              </div>
+              <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden cursor-pointer" onclick="seekActiveMasterAudio(event)">
+                <div id="player-progress-bar" class="bg-purple-500 h-full rounded-full w-0 transition-all"></div>
+              </div>
+            </div>
+            <button onclick="stopActiveMasterAudio()" class="p-2 text-slate-400 hover:text-white text-xs transition">
+              ⏹️ Stop
+            </button>
+          </div>
+        </div>
+
+        <!-- Elenco Card Tracce Audio Master -->
+        <div id="master-audio-tracks-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Popolato dinamicamente da app.js -->
         </div>
       </div>
     </section>

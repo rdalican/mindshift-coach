@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   loadSavedShifts();
   loadAnalytics();
   loadRoadmap();
+  loadMasterAudioTracks();
   checkPaymentStatus();
 });
 
@@ -692,8 +693,133 @@ function playChunkedHypnoticSession(shiftData, onFinishCallback) {
   speakChunk(0);
 }
 
-// --- AUDIO COACH VOCALE (SPEECH SYNTHESIS CALDO, MODULATO & FLUIDO) ---
-function toggleAudioCoach() {
+// --- AUDIO COACH MASTER HQ & SINTESI NEURALE ---
+let activeMasterAudio = null;
+let activeMasterAudioData = null;
+let neuralAudioStream = null;
+
+async function loadMasterAudioTracks() {
+  const container = document.getElementById('master-audio-tracks-container');
+  if (!container) return;
+
+  try {
+    const res = await fetch('/api/audio/tracks');
+    if (!res.ok) return;
+    const tracks = await res.json();
+
+    container.innerHTML = tracks.map(t => `
+      <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-purple-500/50 transition shadow-lg flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-purple-950 text-purple-300 border border-purple-800">
+              ${t.category}
+            </span>
+            <span class="text-xs font-mono text-slate-400">⏱️ ${t.duration_label}</span>
+          </div>
+          <h4 class="text-base font-extrabold text-white mb-2">${t.title}</h4>
+          <p class="text-xs text-slate-300 leading-relaxed mb-4">${t.description}</p>
+        </div>
+
+        <div class="pt-3 border-t border-slate-800 flex items-center justify-between">
+          <div class="text-[11px] text-slate-400">
+            <span>🎙️ ${t.voice_name}</span>
+          </div>
+          <button onclick="playMasterAudioTrack('${t.id}', '${t.audio_url}', '${escapeJs(t.title)}')" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-1.5">
+            ▶ Riproduci Traccia
+          </button>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    console.warn("Errore caricamento tracce audio:", e);
+  }
+}
+
+function playMasterAudioTrack(id, audioUrl, title) {
+  stopAudioCoach();
+  stopActiveMasterAudio();
+
+  const playerBanner = document.getElementById('active-master-audio-player');
+  const titleEl = document.getElementById('active-audio-title');
+  if (playerBanner) playerBanner.classList.remove('hidden');
+  if (titleEl) titleEl.textContent = title;
+
+  activeMasterAudio = new Audio(audioUrl);
+  activeMasterAudioData = { id, audioUrl, title };
+
+  const playBtn = document.getElementById('player-play-pause-btn');
+  const curTimeEl = document.getElementById('player-current-time');
+  const durEl = document.getElementById('player-duration');
+  const progBar = document.getElementById('player-progress-bar');
+
+  if (playBtn) playBtn.textContent = '⏸';
+
+  activeMasterAudio.play();
+
+  activeMasterAudio.ontimeupdate = () => {
+    if (!activeMasterAudio) return;
+    const cur = activeMasterAudio.currentTime;
+    const dur = activeMasterAudio.duration || 1;
+    const pct = (cur / dur) * 100;
+    if (progBar) progBar.style.width = `${pct}%`;
+    if (curTimeEl) curTimeEl.textContent = formatTime(cur);
+    if (durEl && !isNaN(dur)) durEl.textContent = formatTime(dur);
+  };
+
+  activeMasterAudio.onended = () => {
+    if (playBtn) playBtn.textContent = '▶';
+    if (progBar) progBar.style.width = '0%';
+  };
+}
+
+function toggleActiveMasterAudio() {
+  if (!activeMasterAudio) return;
+  const playBtn = document.getElementById('player-play-pause-btn');
+  if (activeMasterAudio.paused) {
+    activeMasterAudio.play();
+    if (playBtn) playBtn.textContent = '⏸';
+  } else {
+    activeMasterAudio.pause();
+    if (playBtn) playBtn.textContent = '▶';
+  }
+}
+
+function seekActiveMasterAudio(e) {
+  if (!activeMasterAudio || !activeMasterAudio.duration) return;
+  const rect = e.currentTarget.getBoundingClientRect();
+  const clickX = e.clientX - rect.left;
+  const width = rect.width;
+  const seekTime = (clickX / width) * activeMasterAudio.duration;
+  activeMasterAudio.currentTime = seekTime;
+}
+
+function stopActiveMasterAudio() {
+  if (activeMasterAudio) {
+    activeMasterAudio.pause();
+    activeMasterAudio.currentTime = 0;
+    activeMasterAudio = null;
+  }
+  const playerBanner = document.getElementById('active-master-audio-player');
+  if (playerBanner) playerBanner.classList.add('hidden');
+}
+
+function formatTime(secs) {
+  const m = Math.floor(secs / 60);
+  const s = Math.floor(secs % 60);
+  return `${m}:${s < 10 ? '0' : ''}${s}`;
+}
+
+async function toggleNeuralOrWebAudioCoach() {
+  if (neuralAudioStream && !neuralAudioStream.paused) {
+    neuralAudioStream.pause();
+    neuralAudioStream = null;
+    const btnText = document.getElementById('audio-btn-text');
+    const icon = document.getElementById('audio-icon');
+    if (btnText) btnText.textContent = "Ascolta Voce Neurale Studio HQ";
+    if (icon) icon.textContent = "🎙️";
+    return;
+  }
+
   if (isAudioPlaying) {
     stopAudioCoach();
     return;
@@ -701,7 +827,84 @@ function toggleAudioCoach() {
 
   if (!currentShiftData) return;
 
-  playChunkedHypnoticSession(currentShiftData);
+  const meaning = currentShiftData.meaning_reframe || currentShiftData.context_reframe || "";
+  const identity = currentShiftData.identity_reframe || "";
+  const mantra = currentShiftData.anchoring_mantra || "";
+  const socratic = currentShiftData.socratic_question || "";
+
+  const fullHypnoticText = `Fai un respiro lento e profondo, e rilassa le spalle. Ascolta questa nuova prospettiva: ${meaning}. A livello della tua identità profonda, ricorda: ${identity}. Ora chiediti: ${socratic}. Ripeti dentro di te la tua formula di potere: ${mantra}. Senti questa sicurezza stabilizzarsi in tutto il tuo corpo.`;
+
+  const btnText = document.getElementById('audio-btn-text');
+  const icon = document.getElementById('audio-icon');
+  if (btnText) btnText.textContent = "Caricamento Voce Neurale...";
+  if (icon) icon.textContent = "⏳";
+
+  try {
+    const res = await fetch('/api/tts/synthesize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: fullHypnoticText,
+        voice: "it-IT-DiegoNeural",
+        rate: "-10%",
+        pitch: "+0Hz"
+      })
+    });
+
+    if (!res.ok) throw new Error("TTS endpoint fallback");
+
+    const blob = await res.blob();
+    const audioUrl = URL.createObjectURL(blob);
+
+    neuralAudioStream = new Audio(audioUrl);
+    if (btnText) btnText.textContent = "Ferma Voce Neurale Studio";
+    if (icon) icon.textContent = "⏹️";
+
+    neuralAudioStream.play();
+    neuralAudioStream.onended = () => {
+      neuralAudioStream = null;
+      if (btnText) btnText.textContent = "Ascolta Voce Neurale Studio HQ";
+      if (icon) icon.textContent = "🎙️";
+    };
+  } catch (err) {
+    console.warn("Fallback su WebSpeech:", err);
+    if (btnText) btnText.textContent = "Ascolta Sessione Guidata";
+    if (icon) icon.textContent = "🎧";
+    playChunkedHypnoticSession(currentShiftData);
+  }
+}
+
+function playMatchingSomaticAudioTrack() {
+  if (!currentShiftData) return;
+  const thought = (currentShiftData.thought || "").toLowerCase();
+  const context = (currentShiftData.context || "").toLowerCase();
+
+  let trackId = "riprogrammazione_identita";
+  let title = "💎 Riprogrammazione di Identità & Autostima";
+  let url = "/static/audio/riprogrammazione_identita.mp3";
+
+  if (thought.includes("erezione") || thought.includes("sesso") || thought.includes("intim") || thought.includes("prestazione") || context.includes("intim")) {
+    trackId = "ancoraggio_parasimpatico";
+    title = "🌿 Rilassamento Parasimpatico 4-8";
+    url = "/static/audio/ancoraggio_parasimpatico.mp3";
+  } else if (thought.includes("bridge") || thought.includes("licita") || thought.includes("tavolo") || context.includes("bridge")) {
+    trackId = "mente_strategica";
+    title = "🧠 Mente Fluida & Centratura Strategica";
+    url = "/static/audio/mente_strategica.mp3";
+  } else if (thought.includes("panico") || thought.includes("ansia") || thought.includes("blocco") || thought.includes("stress")) {
+    trackId = "reset_stress_90s";
+    title = "⚡ Reset Neurale Istantaneo (90s)";
+    url = "/static/audio/reset_stress_90s.mp3";
+  }
+
+  // Passa alla tab Audio Master e avvia la traccia
+  const audioTabBtn = document.querySelector('[data-target="audio-tracks-section"]');
+  if (audioTabBtn) audioTabBtn.click();
+  playMasterAudioTrack(trackId, url, title);
+}
+
+function toggleAudioCoach() {
+  toggleNeuralOrWebAudioCoach();
 }
 
 // --- TIMER ANCORAGGIO FISIOLOGICO 90 SECONDI ---
