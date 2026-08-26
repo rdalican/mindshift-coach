@@ -157,22 +157,27 @@ THEMATIC_DOMAINS = [
     },
     {
         "domain": "intimita_sessualita",
-        "keywords": ["sesso", "sessuale", "intimità", "prestazione", "erezione", "letto", "partner", "desiderio", "orgasmo", "corpo", "vergogna", "defaillance", "fallire"],
-        "context_reframe": "La tua vulnerabilità e la sensibilità corporea non sono debolezze: indicano che tieni profondamente alla connessione con il partner. Trasformiamo questa attenzione da un giudice severo in un radar di sintonizzazione ed empatia.",
-        "meaning_reframe": "Il corpo nell'intimità non è una macchina a comando digitale con un compito da svolgere, ma uno strumento a corda che risponde alla presenza e alla complicità. Rallentare apre lo spazio al piacere cinestesico profondo invece della fretta.",
-        "identity_reframe": "Non sei una prestazione da valutare con un voto: sei una persona intera capace di dare e ricevere piacere attraverso tutti i sensi, in totale libertà e sicurezza emotiva.",
-        "socratic_question": "Cosa accadrebbe se durante l'intimità spegnessi il dialogo interno di controllo e lasciassi che sia il contatto della pelle e il respiro a guidare ogni secondo?",
-        "action_2min": "Esegui 4 cicli di respirazione 4-8 (inspira 4 secondi dal naso, espira 8 secondi a labbra socchiuse) per attivare all'istante il sistema nervoso parasimpatico e sciogliere il diaframma.",
-        "action_24h": "Condividi con il partner un momento di coccole o massaggio sensoriale di 15 minuti con l'accordo esplicito di focalizzarsi solo sul piacere tattile, senza alcun obiettivo prestazionale.",
-        "action_7days": "Installa la pratica del 'Sensory Grounding': ogni volta che avverti un pensiero di giudizio sul tuo corpo o sulla prestazione, ri-ancora l'attenzione su 3 sensazioni tattili fisiche dirette (il calore, il respiro, il contatto).",
-        "mantra": "Io abito il mio corpo con gioia e sicurezza: il piacere nasce dalla mia presenza, non dalla perfezione.",
+        "keywords": [
+            "sesso", "sessuale", "intimità", "prestazione", "erezione", "erettile", "letto", "partner",
+            "desiderio", "orgasmo", "corpo", "vergogna", "defaillance", "fallire", "prostata", "prostatica",
+            "ipertrofia", "tadalafil", "serenoa", "repens", "urologo", "moglie", "shock", "incinta",
+            "tradimento", "tradimenti", "missionaria", "penetrazione", "eiaculazione", "eccitazione"
+        ],
+        "context_reframe": "La risposta del tuo corpo non è un guasto meccanico, ma il riflesso di un sistema nervoso che è andato in allarme (iperattivazione simpatica) per proteggerti da antichi traumi e timori di giudizio. Riconoscere la componente psicogena e medica insieme permette di disinnescare la pressione e ristabilire la normale risposta fisiologica.",
+        "meaning_reframe": "L'erezione non è un test di valore o un dovere esecutivo a comando, ma un processo involontario regolato dal sistema parasimpatico che fiorisce solo quando c'è assenza di giudizio, calma e piacere sensoriale puro. Il farmaco e l'integratore offrono il supporto biologico, ma la vera liberazione avviene quando disinneschi la 'Mente Spettatore'.",
+        "identity_reframe": "Non sei un 'uomo con un problema di prestazione': sei un uomo con una ricca storia emotiva, degno di intimità autentica, piacere e accoglienza, capace di vivere la propria sensualità senza dover dimostrare nulla a nessuno.",
+        "socratic_question": "Cosa accadrebbe se durante l'intimità smettessi di monitorare la tua risposta fisica dall'esterno e ti concedessi di essere semplicemente presente nel contatto della pelle, nel respiro e nel piacere condiviso?",
+        "action_2min": "Esegui 4 cicli di respirazione 4-8 (inspira 4 secondi dal naso espandendo l'addome, espira 8 secondi a labbra socchiuse): questo attiva istantaneamente il nervo vago e riduce l'adrenalina nel sangue.",
+        "action_24h": "Condividi un momento di intimità non orientato al coito o alla penetrazione (es. carezze, massaggio, contatto pelle a pelle), concordando preventivamente che l'unico scopo è il rilassamento e la sintonia sensoriale.",
+        "action_7days": "Installa il protocollo di 'Defusione dello Spectatoring': ogni volta che durante un incontro intimo ti accorgi di osservarti dall'alto o giudicarti, di' mentalmente 'Stop' e sposta il 100% dell'attenzione su 3 sensazioni tattili fisiche (il calore della pelle, il battito, il respiro del partner).",
+        "mantra": "Io lascio andare ogni controllo e pretesa: il mio corpo è al sicuro e risponde con naturalezza alla calma e al piacere.",
         "anchor_title": "Ancoraggio di Presenza Sensoriale e Calma Parasimpatica",
         "anchor_technique": "Ri-associazione Cinestesica & Respirazione Vago-Mediata",
         "anchor_steps": [
             "Fai un respiro diaframmatico profondo espirando lentamente a labbra socchiuse.",
-            "Porta tutta la tua attenzione sensoriale sul contatto dei tuoi piedi a terra e sul calore delle tue mani.",
-            "Chiudi gli occhi e visualizza un'onda calda di sicurezza che rilassa il bacino e il plesso solare.",
-            "Ripeti dentro di te: 'Io sono presente nel piacere, qui e ora'."
+            "Porta tutta la tua attenzione sensoriale sul contatto del tuo corpo e sul calore delle mani.",
+            "Chiudi gli occhi e visualizza un'onda calda di sicurezza che rilassa il bacino, la prostata e il plesso solare.",
+            "Ripeti dentro di te: 'Il mio corpo sa come rilassarsi. Io sono al sicuro nel piacere'."
         ]
     },
     {
@@ -382,7 +387,11 @@ class PNLEngine:
 
         if step == 1:
             # Fase 1: Chiarimento del Contesto & Calibrazione
-            if matched and matched["domain"] == "bridge_giochi_strategici":
+            if matched and matched["domain"] == "intimita_sessualita":
+                q1 = "Nel momento in cui ti avvicini all'intimità, in che modo la tua attenzione si sposta dal piacere dei sensi e dalla complicità alla paura del giudizio o del monitoraggio della risposta fisica (Mente Spettatore)?"
+                q2 = "Cosa noti a livello corporeo (respiro, tensione pelvica, battito cardiaco) nei minuti precedenti all'incontro intimo?"
+                insight = "Identificazione dell'iperattivazione simpatica e dello Spectatoring che blocca la naturale risposta erettile."
+            elif matched and matched["domain"] == "bridge_giochi_strategici":
                 q1 = "In quale momento esatto della partita o del torneo si manifesta questo blocco (es. durante la licita o al gioco della carta)?"
                 q2 = "Cosa noti nel tuo stato d'animo al tavolo non appena si verifica un imprevisto o un errore del compagno?"
                 insight = "Stiamo focalizzando la dinamica percettiva al tavolo da Bridge."
@@ -401,41 +410,53 @@ class PNLEngine:
                 next_step=2,
                 is_final_step=False,
                 step_title="Fase 1: Accoglienza Empatica & Chiarimento del Contesto",
-                coach_message="Ti ringrazio per aver condiviso questo pensiero. Nella nostra seduta non cercheremo risposte affrettate, ma esploreremo insieme la struttura profonda di questa esperienza per comprenderne la dinamica precisa nel tuo quotidiano.",
+                coach_message="Ti ringrazio per la profonda fiducia e sincerità nel condividere questo vissuto intimo. Nella nostra seduta non daremo giudizi né risposte affrettate, ma esploreremo insieme come la mente e il corpo interagiscono in questo momento.",
                 investigation_questions=[q1, q2],
                 clinical_insight=insight
             )
 
         elif step == 2:
             # Fase 2: Esplorazione Storica & Radici Pregresse (Time-Line & Imprinting)
+            if matched and matched["domain"] == "intimita_sessualita":
+                q1 = "In che modo lo shock emotivo vissuto a 23 anni ha installato nell'inconscio la convinzione che lasciarsi andare all'intimità comporti una perdita di controllo o conseguenze gravose?"
+                q2 = "Come si è strutturata nel tempo la ricerca di forti emozioni o di situazioni esterne come tentativo di aggirare questa paura profonda e forzare l'eccitazione?"
+                insight = "Indagine della Time-Line sull'evento di primo imprinting e sull'ancoraggio negativo tra sesso e perdita di controllo."
+            else:
+                q1 = "Da quanto tempo porti con te questo schema o questa specifica preoccupazione?"
+                q2 = "Se guardi indietro lungo la tua storia personale, qual è il primo episodio (anche anni fa o in gioventù) in cui ricordi di aver provato esattamente la stessa sensazione?"
+                insight = "Tracciamento della Time-Line per individuare l'evento di primo imprinting emotivo e la convinzione radice."
+
             return SessionStepResponse(
                 session_id=session_id,
                 current_step=2,
                 next_step=3,
                 is_final_step=False,
                 step_title="Fase 2: Esplorazione Storica & Radici Pregresse (Time-Line)",
-                coach_message="Questo chiarimento sul presente è fondamentale. I nostri schemi mentali ed emotivi raramente nascono dal nulla: spesso sono reazioni apprese nel passato che continuano a ripetersi come un pilota automatico.",
-                investigation_questions=[
-                    "Da quanto tempo porti con te questo schema o questa specifica preoccupazione?",
-                    "Se guardi indietro lungo la tua storia personale, qual è il primo episodio (anche anni fa o in gioventù) in cui ricordi di aver provato esattamente la stessa sensazione?"
-                ],
-                clinical_insight="Tracciamento della Time-Line per individuare l'evento di primo imprinting emotivo e la convinzione radice."
+                coach_message="Questo chiarimento è cruciale. I nostri schemi emotivi e fisici raramente nascono per caso: spesso sono risposte biologiche di allarme apprese in un momento di forte impatto emotivo del passato.",
+                investigation_questions=[q1, q2],
+                clinical_insight=insight
             )
 
         elif step == 3:
             # Fase 3: Influenze Esterne, Relazioni & Vantaggi Secondari
+            if matched and matched["domain"] == "intimita_sessualita":
+                q1 = "Quali aspettative (reali o immaginate) senti gravare su di te durante un incontro intimo, e cosa temi accada se ti mostri vulnerabile senza dover per forza 'performare'?"
+                q2 = "A livello inconscio, in che modo la defaillance o l'ansia sta cercando di 'proteggerti' dal rischio di un coinvolgimento emotivo profondo o dal timore di un nuovo fallimento?"
+                insight = "Mappatura dei vantaggi secondari inconsci e delle dinamiche relazionali sistemiche."
+            else:
+                q1 = "Ci sono persone, aspettative esterne o dinamiche relazionali attorno a te che alimentano o mantengono viva questa tensione?"
+                q2 = "A livello profondo e inconscio, da quale rischio, fallimento o sofferenza questa parte di te sta cercando di proteggerti?"
+                insight = "Mappatura dei fattori sistemici ambientali e dell'intenzione positiva inconscia di protezione."
+
             return SessionStepResponse(
                 session_id=session_id,
                 current_step=3,
                 next_step=4,
                 is_final_step=False,
                 step_title="Fase 3: Influenze Esterne, Relazioni & Vantaggi Secondari",
-                coach_message="Riconoscere l'origine storica di questo vissuto permette di iniziare a separare chi eri allora da chi sei oggi. Ora allarghiamo lo sguardo al tuo ambiente e alle tue relazioni attuali.",
-                investigation_questions=[
-                    "Ci sono persone, aspettative esterne o dinamiche relazionali attorno a te che alimentano o mantengono viva questa tensione?",
-                    "A livello profondo e inconscio, da quale rischio, fallimento o sofferenza questa parte di te sta cercando di proteggerti?"
-                ],
-                clinical_insight="Mappatura dei fattori sistemici ambientali e dell'intenzione positiva inconscia di protezione."
+                coach_message="Riconoscere l'origine storica di questo vissuto permette di iniziare a separare chi eri allora da chi sei oggi. Ora allarghiamo lo sguardo al tuo ambiente, alle aspettative e alle tue relazioni.",
+                investigation_questions=[q1, q2],
+                clinical_insight=insight
             )
 
         else:

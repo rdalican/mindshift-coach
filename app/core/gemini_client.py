@@ -153,7 +153,7 @@ class GeminiPNLClient:
         self.api_key = settings.GEMINI_API_KEY.strip() if settings.GEMINI_API_KEY else ""
         self.preferred_model = settings.GEMINI_MODEL
 
-    def _call_gemini_rest_sync(self, prompt: str, model_name: str) -> dict:
+    def _call_gemini_rest_sync(self, prompt: str, model_name: str, system_instruction: Optional[str] = None) -> dict:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
         headers = {
             "Content-Type": "application/json",
@@ -166,16 +166,18 @@ class GeminiPNLClient:
         else:
             url = f"{url}?key={self.api_key}"
 
+        full_text = f"{system_instruction}\n\n{prompt}" if system_instruction else prompt
+
         payload = {
             "contents": [
                 {
                     "role": "user",
-                    "parts": [{"text": f"{GEMINI_SYSTEM_INSTRUCTION_V4}\n\n{prompt}"}]
+                    "parts": [{"text": full_text}]
                 }
             ],
             "generationConfig": {
                 "responseMimeType": "application/json",
-                "temperature": 0.75
+                "temperature": 0.7
             }
         }
         req = urllib.request.Request(
@@ -184,7 +186,7 @@ class GeminiPNLClient:
             headers=headers,
             method="POST"
         )
-        with urllib.request.urlopen(req, timeout=10) as resp:
+        with urllib.request.urlopen(req, timeout=25) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             raw_text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
             
@@ -211,7 +213,7 @@ class GeminiPNLClient:
             prompt += f"CONTESTO: {request.context}\n"
         if request.preferred_channel:
             prompt += f"CANALE PREFERITO FORZATO: {request.preferred_channel}\n"
-        prompt += "\nDIRETTIVA CRUCIALE: Calati al 100% nella materia e nel lessico esatto dell'utente (es. se parla di Bridge usa termini come licita, atout, piano di gioco; se parla di corpo/sport usa termini concreti). NON usare meta-gergo PNL nel contenuto: fornisci soluzioni mentali pratiche, specifiche e chirurgiche.\n"
+        prompt += "\nDIRETTIVA CRUCIALE: Calati al 100% nella materia e nel lessico esatto dell'utente (es. se parla di Bridge usa termini come licita, atout, piano di gioco; se parla di sessuologia/intimità/urologia usa termini precisi come 'Spectatoring', sistema parasimpatico, Tadalafil, Serenoa Repens, ri-associazione cinestesica). NON usare meta-gergo PNL nel contenuto: fornisci soluzioni mentali pratiche, specifiche e chirurgiche.\n"
 
         models_to_try = [self.preferred_model] + [m for m in CANDIDATE_MODELS if m != self.preferred_model]
         last_error = None
@@ -219,7 +221,7 @@ class GeminiPNLClient:
         for model in models_to_try:
             try:
                 loop = asyncio.get_running_loop()
-                data = await loop.run_in_executor(None, self._call_gemini_rest_sync, prompt, model)
+                data = await loop.run_in_executor(None, self._call_gemini_rest_sync, prompt, model, GEMINI_SYSTEM_INSTRUCTION_V4)
 
                 raw_ch = data.get("detected_channel", "")
                 if "visivo" in raw_ch.lower():
