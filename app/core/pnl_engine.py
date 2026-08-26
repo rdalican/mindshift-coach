@@ -98,7 +98,7 @@ META_MODEL_PATTERNS = [
 THEMATIC_DOMAINS = [
     {
         "domain": "tempo",
-        "keywords": ["tempo", "tardi", "orari", "giornata", "fretta", "ritardo", "scadenza", "anno", "mese", "ora", "anni"],
+        "keywords": ["non ho tempo", "manca il tempo", "senza tempo", "scadenza", "scadenze", "fretta", "ritardo", "procrastinazione", "giornata corta", "troppe cose da fare", "agenda piena"],
         "context_reframe": "La sensazione di non avere tempo è il miglior filtro naturale per eliminare il 80% delle distrazioni inutili e concentrarsi solo sull'azione essenziale che muove davvero l'ago.",
         "meaning_reframe": "Il tempo non è una misura che si subisce, ma una risorsa che si genera stabilendo priorità chiare. Un'ora di lavoro iper-focalizzato vale più di una settimana di dispersione.",
         "identity_reframe": "Non sei una persona 'sopraffatta dal tempo': sei un architetto strategico che impara a padroneggiare la concentrazione estrema.",
@@ -274,11 +274,14 @@ class PNLEngine:
     @classmethod
     def match_thematic_domain(cls, text: str) -> Optional[Dict[str, str]]:
         t_low = text.lower()
+        best_domain = None
+        max_matches = 0
         for domain_data in THEMATIC_DOMAINS:
-            for kw in domain_data["keywords"]:
-                if re.search(rf"\b{re.escape(kw)}\b", t_low):
-                    return domain_data
-        return None
+            count = sum(1 for kw in domain_data["keywords"] if re.search(rf"\b{re.escape(kw)}\b", t_low))
+            if count > max_matches:
+                max_matches = count
+                best_domain = domain_data
+        return best_domain if max_matches > 0 else None
 
     @classmethod
     def generate_heuristic_reframes(cls, text: str, channel: VAKChannel, meta: MetaModelAnalysis) -> MindShiftResponse:
