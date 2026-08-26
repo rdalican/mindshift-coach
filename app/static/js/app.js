@@ -159,12 +159,43 @@ function initTabs() {
   });
 }
 
+// --- INTERACTIVE DIALOGUE SESSION STATE ---
+let currentInteractiveSession = {
+  active: false,
+  sessionId: null,
+  currentStep: 1,
+  initialThought: '',
+  context: '',
+  history: []
+};
+
+function updateSessionModeUI() {
+  const isInteractive = document.querySelector('input[name="session-mode-radio"]:checked')?.value === 'interactive';
+  const submitBtnText = document.getElementById('main-submit-btn-text');
+  const submitBtn = document.getElementById('main-submit-btn');
+  
+  if (isInteractive) {
+    if (submitBtnText) submitBtnText.textContent = 'Inizia Seduta con Psicologo/Coach (Anamnesi)';
+    if (submitBtn) {
+      submitBtn.querySelector('span').textContent = '🌿';
+      submitBtn.className = 'w-full sm:w-auto px-8 py-3.5 rounded-xl font-black text-sm bg-gradient-to-r from-teal-500 via-cyan-500 to-emerald-400 hover:from-teal-400 hover:to-cyan-300 text-slate-950 shadow-lg shadow-teal-500/25 transition transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer';
+    }
+  } else {
+    if (submitBtnText) submitBtnText.textContent = 'Avvia Sblocco Rapido SOS (90s)';
+    if (submitBtn) {
+      submitBtn.querySelector('span').textContent = '⚡';
+      submitBtn.className = 'w-full sm:w-auto px-8 py-3.5 rounded-xl font-black text-sm bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-400 text-white shadow-lg shadow-orange-500/25 transition transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer';
+    }
+  }
+}
+
 // --- FORM SUBMISSION & MASTER SESSION GENERATION ---
 function initForm() {
   const form = document.getElementById('mindshift-form');
   const thoughtInput = document.getElementById('thought-input');
   const quickPills = document.querySelectorAll('.quick-thought-pill');
   const resultsContainer = document.getElementById('results-container');
+  const sessionContainer = document.getElementById('interactive-session-container');
   const loadingState = document.getElementById('loading-state');
 
   quickPills.forEach(pill => {
@@ -181,41 +212,208 @@ function initForm() {
 
     const context = document.getElementById('context-select').value;
     const preferredChannel = document.getElementById('channel-select').value;
+    const isInteractive = document.querySelector('input[name="session-mode-radio"]:checked')?.value === 'interactive';
 
     resultsContainer.classList.add('hidden');
-    loadingState.classList.remove('hidden');
-    loadingState.scrollIntoView({ behavior: 'smooth' });
 
-    try {
-      const response = await fetch('/api/reframe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          thought: thought,
-          context: context || null,
-          preferred_channel: preferredChannel || null,
-          sync_key: currentSyncKey
-        })
-      });
-
-      if (!response.ok) throw new Error(`Errore HTTP: ${response.status}`);
-
-      const data = await response.json();
-      currentShiftData = data;
-      renderMasterProtocol(data);
-
-      resultsContainer.classList.remove('hidden');
-      resultsContainer.scrollIntoView({ behavior: 'smooth' });
+    if (isInteractive) {
+      // Inizia la seduta a 4 fasi
+      currentInteractiveSession.active = true;
+      currentInteractiveSession.sessionId = 'SESS-' + Date.now();
+      currentInteractiveSession.initialThought = thought;
+      currentInteractiveSession.context = context;
+      currentInteractiveSession.currentStep = 1;
+      currentInteractiveSession.history = [];
       
-      loadSavedShifts();
-      loadAnalytics();
-    } catch (err) {
-      alert(`Si è verificato un errore: ${err.message}`);
-    } finally {
-      loadingState.classList.add('hidden');
+      if (sessionContainer) sessionContainer.classList.add('hidden');
+      executeSessionStep(1, '');
+    } else {
+      // Modalità sblocco rapido one-shot
+      if (sessionContainer) sessionContainer.classList.add('hidden');
+      loadingState.classList.remove('hidden');
+      loadingState.scrollIntoView({ behavior: 'smooth' });
+
+      try {
+        const response = await fetch('/api/reframe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            thought: thought,
+            context: context || null,
+            preferred_channel: preferredChannel || null,
+            sync_key: currentSyncKey
+          })
+        });
+
+        if (!response.ok) throw new Error(`Errore HTTP: ${response.status}`);
+
+        const data = await response.json();
+        currentShiftData = data;
+        renderMasterProtocol(data);
+
+        resultsContainer.classList.remove('hidden');
+        resultsContainer.scrollIntoView({ behavior: 'smooth' });
+        
+        loadSavedShifts();
+        loadAnalytics();
+      } catch (err) {
+        alert(`Si è verificato un errore: ${err.message}`);
+      } finally {
+        loadingState.classList.add('hidden');
+      }
     }
   });
 }
+
+// --- ESECUZIONE STEP DELLA SEDUTA INTERATTIVA ---
+async function executeSessionStep(step, userResponse) {
+  const loadingState = document.getElementById('loading-state');
+  const loadingTitle = document.getElementById('loading-title');
+  const loadingDesc = document.getElementById('loading-desc');
+  const sessionContainer = document.getElementById('interactive-session-container');
+  const resultsContainer = document.getElementById('results-container');
+
+  if (loadingState) loadingState.classList.remove('hidden');
+  if (loadingTitle) {
+    if (step === 1) loadingTitle.textContent = "Fase 1: Accoglienza Empatica & Calibrazione del Contesto...";
+    else if (step === 2) loadingTitle.textContent = "Fase 2: Esplorazione Storica & Cause Passate...";
+    else if (step === 3) loadingTitle.textContent = "Fase 3: Mappatura Influenze Esterne & Relazioni...";
+    else loadingTitle.textContent = "Fase 4: Sintesi Clinica Finale & Generazione Scheda Master...";
+  }
+  if (loadingDesc) {
+    loadingDesc.textContent = "Il Master Coach PNL sta integrando l'anamnesi con ascolto empatico e domande socratiche mirate.";
+  }
+  if (loadingState) loadingState.scrollIntoView({ behavior: 'smooth' });
+
+  try {
+    const res = await fetch('/api/session/step', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        session_id: currentInteractiveSession.sessionId,
+        current_step: step,
+        initial_thought: currentInteractiveSession.initialThought,
+        context: currentInteractiveSession.context || null,
+        history: currentInteractiveSession.history,
+        latest_user_response: userResponse || null,
+        sync_key: currentSyncKey
+      })
+    });
+
+    if (!res.ok) throw new Error(`Errore HTTP: ${res.status}`);
+    const data = await res.json();
+
+    if (data.is_final_step && data.final_shift) {
+      // Sintesi finale raggiunta!
+      if (sessionContainer) sessionContainer.classList.add('hidden');
+      currentShiftData = data.final_shift;
+      renderMasterProtocol(data.final_shift);
+      if (resultsContainer) {
+        resultsContainer.classList.remove('hidden');
+        resultsContainer.scrollIntoView({ behavior: 'smooth' });
+      }
+      loadSavedShifts();
+      loadAnalytics();
+    } else {
+      // Step intermedio: renderizza le domande del coach
+      currentInteractiveSession.currentStep = data.next_step;
+      currentInteractiveSession.history.push({
+        role: 'coach',
+        content: `${data.coach_message}\nDomande: ${(data.investigation_questions || []).join(' ')}`
+      });
+
+      renderSessionStepUI(data);
+      if (sessionContainer) {
+        sessionContainer.classList.remove('hidden');
+        sessionContainer.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  } catch (err) {
+    alert(`Si è verificato un errore durante la seduta: ${err.message}`);
+  } finally {
+    if (loadingState) loadingState.classList.add('hidden');
+  }
+}
+
+function renderSessionStepUI(data) {
+  const stepLabel = document.getElementById('session-step-label');
+  const stepPct = document.getElementById('session-step-pct');
+  const stepBar = document.getElementById('session-step-bar');
+  const stepTag = document.getElementById('session-step-tag');
+  const coachMsg = document.getElementById('coach-message-text');
+  const insightBox = document.getElementById('clinical-insight-box');
+  const insightText = document.getElementById('clinical-insight-text');
+  const questionsList = document.getElementById('investigation-questions-list');
+  const userRespInput = document.getElementById('session-user-response-input');
+  const nextBtnText = document.getElementById('session-next-btn-text');
+
+  const step = data.current_step;
+  const pct = Math.min(step * 25, 75);
+
+  if (stepLabel) stepLabel.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-teal-400 animate-ping"></span> ${data.step_title}`;
+  if (stepPct) stepPct.textContent = `${pct}%`;
+  if (stepBar) stepBar.style.width = `${pct}%`;
+  if (stepTag) stepTag.textContent = `Fase ${step}`;
+  if (coachMsg) coachMsg.textContent = data.coach_message;
+
+  if (insightText && data.clinical_insight) {
+    insightText.textContent = data.clinical_insight;
+    if (insightBox) insightBox.classList.remove('hidden');
+  } else if (insightBox) {
+    insightBox.classList.add('hidden');
+  }
+
+  if (questionsList) {
+    questionsList.innerHTML = '';
+    (data.investigation_questions || []).forEach(q => {
+      const li = document.createElement('li');
+      li.className = 'text-teal-200 font-medium leading-relaxed';
+      li.textContent = q;
+      questionsList.appendChild(li);
+    });
+  }
+
+  if (userRespInput) {
+    userRespInput.value = '';
+    userRespInput.focus();
+  }
+
+  if (nextBtnText) {
+    if (step === 3) {
+      nextBtnText.textContent = 'Completa Anamnesi & Genera Ristrutturazione Clinica (Fase 4)';
+    } else {
+      nextBtnText.textContent = `Approfondisci (Passa a Fase ${step + 1})`;
+    }
+  }
+}
+
+function submitSessionStepResponse() {
+  const input = document.getElementById('session-user-response-input');
+  const val = input ? input.value.trim() : '';
+  if (!val) {
+    alert('Per favore, condividi qualche dettaglio in risposta alle domande del coach per proseguire l\'indagine clinica.');
+    if (input) input.focus();
+    return;
+  }
+
+  currentInteractiveSession.history.push({
+    role: 'user',
+    content: val
+  });
+
+  executeSessionStep(currentInteractiveSession.currentStep, val);
+}
+
+function resetInteractiveSession() {
+  const sessionContainer = document.getElementById('interactive-session-container');
+  const resultsContainer = document.getElementById('results-container');
+  if (sessionContainer) sessionContainer.classList.add('hidden');
+  if (resultsContainer) resultsContainer.classList.add('hidden');
+  currentInteractiveSession.active = false;
+  document.getElementById('thought-input')?.focus();
+  document.getElementById('mindshift-form')?.scrollIntoView({ behavior: 'smooth' });
+}
+
 
 // --- RENDER COMPLETO DEL PROTOCOLLO MASTER PNL A 5 MODULI ---
 function renderMasterProtocol(data) {

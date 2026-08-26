@@ -16,7 +16,9 @@ from app.core.models import (
     ReframeOption,
     AnchoringProtocol,
     ActionPlan,
-    MindShiftResponse
+    MindShiftResponse,
+    SessionStepRequest,
+    SessionStepResponse
 )
 
 # DIZIONARI SENSORIALI VAK
@@ -369,3 +371,87 @@ class PNLEngine:
             anchoring_mantra=mantra,
             engine_used="PNL Master Heuristic Protocol v4.0"
         )
+
+    @classmethod
+    def generate_heuristic_session_step(cls, req: SessionStepRequest) -> SessionStepResponse:
+        """Eroga lo step maieutico euristico corrispondente alla fase della seduta."""
+        step = req.current_step
+        session_id = req.session_id or "SESSION-HEURISTIC"
+        text = req.initial_thought
+        matched = cls.match_thematic_domain(text)
+
+        if step == 1:
+            # Fase 1: Chiarimento del Contesto & Calibrazione
+            if matched and matched["domain"] == "bridge_giochi_strategici":
+                q1 = "In quale momento esatto della partita o del torneo si manifesta questo blocco (es. durante la licita o al gioco della carta)?"
+                q2 = "Cosa noti nel tuo stato d'animo al tavolo non appena si verifica un imprevisto o un errore del compagno?"
+                insight = "Stiamo focalizzando la dinamica percettiva al tavolo da Bridge."
+            elif matched and matched["domain"] == "attivita_fisica_salute":
+                q1 = "Cosa fai concretamente nei minuti precedenti al momento in cui dovresti iniziare gli esercizi fisici?"
+                q2 = "Qual è la conversazione interna che fai con te stesso quando scegli di dare priorità ad altre commissioni?"
+                insight = "Stiamo mappando i rituali di innesco e l'attrito iniziale del corpo."
+            else:
+                q1 = "In quali situazioni o momenti specifici della giornata si presenta con maggiore intensità questa sensazione?"
+                q2 = "Cosa noti nel tuo corpo o nel tuo dialogo interno subito prima che questo blocco si attivi?"
+                insight = "Calibrazione del contesto operativo e dei trigger primari."
+
+            return SessionStepResponse(
+                session_id=session_id,
+                current_step=1,
+                next_step=2,
+                is_final_step=False,
+                step_title="Fase 1: Accoglienza Empatica & Chiarimento del Contesto",
+                coach_message="Ti ringrazio per aver condiviso questo pensiero. Nella nostra seduta non cercheremo risposte affrettate, ma esploreremo insieme la struttura profonda di questa esperienza per comprenderne la dinamica precisa nel tuo quotidiano.",
+                investigation_questions=[q1, q2],
+                clinical_insight=insight
+            )
+
+        elif step == 2:
+            # Fase 2: Esplorazione Storica & Radici Pregresse (Time-Line & Imprinting)
+            return SessionStepResponse(
+                session_id=session_id,
+                current_step=2,
+                next_step=3,
+                is_final_step=False,
+                step_title="Fase 2: Esplorazione Storica & Radici Pregresse (Time-Line)",
+                coach_message="Questo chiarimento sul presente è fondamentale. I nostri schemi mentali ed emotivi raramente nascono dal nulla: spesso sono reazioni apprese nel passato che continuano a ripetersi come un pilota automatico.",
+                investigation_questions=[
+                    "Da quanto tempo porti con te questo schema o questa specifica preoccupazione?",
+                    "Se guardi indietro lungo la tua storia personale, qual è il primo episodio (anche anni fa o in gioventù) in cui ricordi di aver provato esattamente la stessa sensazione?"
+                ],
+                clinical_insight="Tracciamento della Time-Line per individuare l'evento di primo imprinting emotivo e la convinzione radice."
+            )
+
+        elif step == 3:
+            # Fase 3: Influenze Esterne, Relazioni & Vantaggi Secondari
+            return SessionStepResponse(
+                session_id=session_id,
+                current_step=3,
+                next_step=4,
+                is_final_step=False,
+                step_title="Fase 3: Influenze Esterne, Relazioni & Vantaggi Secondari",
+                coach_message="Riconoscere l'origine storica di questo vissuto permette di iniziare a separare chi eri allora da chi sei oggi. Ora allarghiamo lo sguardo al tuo ambiente e alle tue relazioni attuali.",
+                investigation_questions=[
+                    "Ci sono persone, aspettative esterne o dinamiche relazionali attorno a te che alimentano o mantengono viva questa tensione?",
+                    "A livello profondo e inconscio, da quale rischio, fallimento o sofferenza questa parte di te sta cercando di proteggerti?"
+                ],
+                clinical_insight="Mappatura dei fattori sistemici ambientali e dell'intenzione positiva inconscia di protezione."
+            )
+
+        else:
+            # Fase 4: Sintesi Clinica & Master PNL Protocol Finale
+            channel, vak_kw = cls.detect_vak_channel(text)
+            meta = cls.analyze_meta_model(text)
+            shift = cls.generate_heuristic_reframes(text, channel, meta)
+            shift.vak_keywords = vak_kw
+
+            return SessionStepResponse(
+                session_id=session_id,
+                current_step=4,
+                next_step=4,
+                is_final_step=True,
+                step_title="Fase 4: Sintesi Clinica & Ristrutturazione Profonda",
+                coach_message="Abbiamo completato l'anamnesi approfondita. Avendo ora chiaro il contesto attuale, le radici storiche e le dinamiche relazionali, ecco la tua Scheda Clinica di Trasformazione personalizzata.",
+                clinical_insight="Sintesi maieutica completata con successo: transizione verso l'ancoraggio e il piano operativo in 3 fasi.",
+                final_shift=shift
+            )

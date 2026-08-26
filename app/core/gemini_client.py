@@ -21,7 +21,9 @@ from app.core.models import (
     MetaModelAnalysis,
     ReframeOption,
     AnchoringProtocol,
-    ActionPlan
+    ActionPlan,
+    SessionStepRequest,
+    SessionStepResponse
 )
 from app.core.pnl_engine import PNLEngine
 
@@ -303,4 +305,125 @@ class GeminiPNLClient:
         resp.engine_used = "PNL Master Heuristic Protocol v4.0 (Multi-Domain Fallback)"
         return resp
 
+    async def generate_session_step(self, req: SessionStepRequest) -> SessionStepResponse:
+        """Esegue uno step della Seduta Interattiva di Psico-Coaching PNL (Fasi 1-4)."""
+        session_id = req.session_id or f"SESS-{req.current_step}"
+        req.session_id = session_id
+        
+        if not self.api_key:
+            return PNLEngine.generate_heuristic_session_step(req)
+
+        step = req.current_step
+        
+        # Costruzione del prompt per la fase specifica
+        if step == 1:
+            instruction = """SEI: Un Master Coach PNL & Psicoterapeuta Ericksoniano empatico e caloroso.
+L'utente sta iniziando una seduta e ha espresso questo pensiero/blocco iniziale:
+"{initial_thought}" (Contesto: {context})
+
+OBIETTIVO FASE 1 (Accoglienza Empatica & Chiarimento del Contesto):
+1. Formula una risposta empatica di ascolto attivo (in 'coach_message') per validare l'esperienza senza giudizio e senza dare soluzioni premature.
+2. Poni esattamente 2 domande di chiarimento chirurgiche (in 'investigation_questions') per comprendere come il blocco si manifesta concretamente nel presente e nel corpo dell'utente (lessico specifico sul tema).
+3. Fornisci un'osservazione clinica (in 'clinical_insight') sui meccanismi percettivi in gioco.
+
+OUTPUT JSON OBBLIGATORIO (senza markdown o testo prima/dopo):
+{
+  "step_title": "Fase 1: Accoglienza Empatica & Chiarimento del Contesto",
+  "coach_message": "...",
+  "investigation_questions": ["domanda 1", "domanda 2"],
+  "clinical_insight": "..."
+}"""
+            prompt = instruction.replace("{initial_thought}", req.initial_thought).replace("{context}", req.context or "Generale")
+
+        elif step == 2:
+            history_text = "\n".join([f"- {m.role.upper()}: {m.content}" for m in req.history])
+            instruction = """SEI: Un Master Coach PNL & Psicoterapeuta Ericksoniano.
+Pensiero iniziale: "{initial_thought}"
+Cronologia seduta finora:
+{history_text}
+Ultima risposta dell'utente sul contesto: "{user_resp}"
+
+OBIETTIVO FASE 2 (Esplorazione Storica & Cause Passate / Time-Line):
+1. In 'coach_message', rifletti con calore su quanto emerso nel contesto e introduci l'importanza di comprendere l'origine passata dello schema.
+2. In 'investigation_questions', poni esattamente 2 domande sulle origini storiche e sul primo imprinting emotivo ("Da quanto tempo porti con te questo schema?", "Qual è il primo ricordo o episodio del passato in cui hai provato la stessa sensazione?").
+3. In 'clinical_insight', offri una riflessione clinica sulla Time-Line del pattern.
+
+OUTPUT JSON OBBLIGATORIO:
+{
+  "step_title": "Fase 2: Esplorazione Storica & Radici Pregresse (Time-Line)",
+  "coach_message": "...",
+  "investigation_questions": ["domanda 1", "domanda 2"],
+  "clinical_insight": "..."
+}"""
+            prompt = instruction.replace("{initial_thought}", req.initial_thought).replace("{history_text}", history_text).replace("{user_resp}", req.latest_user_response or "")
+
+        elif step == 3:
+            history_text = "\n".join([f"- {m.role.upper()}: {m.content}" for m in req.history])
+            instruction = """SEI: Un Master Coach PNL & Psicoterapeuta Ericksoniano.
+Pensiero iniziale: "{initial_thought}"
+Cronologia seduta finora:
+{history_text}
+Ultima risposta dell'utente sulla storia passata: "{user_resp}"
+
+OBIETTIVO FASE 3 (Influenze Esterne, Relazioni & Vantaggi Secondari):
+1. In 'coach_message', integra le radici storiche emerse con empatia e sposta l'attenzione sull'ambiente relazionale attuale.
+2. In 'investigation_questions', poni esattamente 2 domande sull'ambiente esterno, persone che mantengono vivo il blocco (partner, colleghi, famiglia) e sull'intenzione positiva inconscia (vantaggio secondario di autoprotezione).
+3. In 'clinical_insight', fornisci una sintesi sistemica.
+
+OUTPUT JSON OBBLIGATORIO:
+{
+  "step_title": "Fase 3: Influenze Esterne, Relazioni & Vantaggi Secondari",
+  "coach_message": "...",
+  "investigation_questions": ["domanda 1", "domanda 2"],
+  "clinical_insight": "..."
+}"""
+            prompt = instruction.replace("{initial_thought}", req.initial_thought).replace("{history_text}", history_text).replace("{user_resp}", req.latest_user_response or "")
+
+        else:
+            # Fase 4: Sintesi finale terapeutica completa
+            history_text = "\n".join([f"- {m.role.upper()}: {m.content}" for m in req.history])
+            full_thought_context = f"PENSIERO DI PARTENZA: \"{req.initial_thought}\"\nANAMNESI COMPLETA RACCOLTA DURANTE LA SEDUTA:\n{history_text}\nULTIMA CONDIVISIONE: \"{req.latest_user_response or ''}\""
+            
+            shift_req = MindShiftRequest(thought=full_thought_context, context=req.context, sync_key=req.sync_key)
+            final_shift = await self.generate_shift(shift_req)
+            final_shift.original_thought = req.initial_thought
+
+            return SessionStepResponse(
+                session_id=session_id,
+                current_step=4,
+                next_step=4,
+                is_final_step=True,
+                step_title="Fase 4: Sintesi Clinica & Ristrutturazione Profonda",
+                coach_message="Abbiamo completato l'anamnesi approfondita. Avendo ora chiaro il contesto attuale, le radici storiche e le dinamiche relazionali, ecco la tua Scheda Clinica di Trasformazione personalizzata.",
+                clinical_insight="Sintesi terapeutica completata con successo: transizione verso l'ancoraggio e il piano operativo in 3 fasi.",
+                final_shift=final_shift
+            )
+
+        models_to_try = [self.preferred_model] + [m for m in CANDIDATE_MODELS if m != self.preferred_model]
+        last_error = None
+
+        for model in models_to_try:
+            try:
+                loop = asyncio.get_running_loop()
+                data = await loop.run_in_executor(None, self._call_gemini_rest_sync, prompt, model)
+                
+                return SessionStepResponse(
+                    session_id=session_id,
+                    current_step=step,
+                    next_step=step + 1,
+                    is_final_step=False,
+                    step_title=data.get("step_title", f"Fase {step}"),
+                    coach_message=data.get("coach_message", "Grazie per aver approfondito."),
+                    investigation_questions=data.get("investigation_questions", []),
+                    clinical_insight=data.get("clinical_insight", "")
+                )
+            except Exception as err:
+                last_error = err
+                logger.warning(f"Tentativo sessione con modello {model} fallito: {err}. Provo successivo...")
+                continue
+
+        logger.error(f"Tutti i modelli Gemini hanno fallito per session step ({last_error}). Fallback euristico.")
+        return PNLEngine.generate_heuristic_session_step(req)
+
 gemini_pnl_client = GeminiPNLClient()
+

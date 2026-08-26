@@ -166,6 +166,18 @@
           </div>
         </div>
 
+        <!-- MODE SELECTOR -->
+        <div class="mb-4 p-2 rounded-xl bg-slate-900/90 border border-slate-700/80 flex flex-wrap items-center justify-center gap-3">
+          <label class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-teal-950/80 border border-teal-500/50 cursor-pointer shadow-sm transition hover:bg-teal-900/80">
+            <input type="radio" name="session-mode-radio" value="interactive" checked class="accent-teal-400" onchange="updateSessionModeUI()">
+            <span class="text-xs md:text-sm font-bold text-teal-300">🌿 Seduta Completa con Coach (Anamnesi in 4 Fasi)</span>
+          </label>
+          <label class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700 cursor-pointer hover:border-slate-600 transition">
+            <input type="radio" name="session-mode-radio" value="fast" class="accent-amber-400" onchange="updateSessionModeUI()">
+            <span class="text-xs md:text-sm font-semibold text-slate-300">⚡ Sblocco Rapido SOS (90 Secondi)</span>
+          </label>
+        </div>
+
         <!-- FORM -->
         <form id="mindshift-form" class="space-y-4">
           <div>
@@ -189,11 +201,14 @@
               </label>
               <select id="context-select" class="w-full bg-slate-900 text-slate-200 rounded-lg p-2.5 text-xs border border-slate-700 focus:border-teal-500 outline-none font-medium">
                 <option value="">Generale / Personale</option>
+                <option value="Bridge & Giochi Strategici">Bridge & Giochi Strategici</option>
+                <option value="Attività Fisica & Salute">Attività Fisica & Salute</option>
                 <option value="Business & Micro-SaaS">Business & Progetti Digitali</option>
                 <option value="Lavoro & Carriera">Lavoro & Carriera Professionale</option>
                 <option value="Denaro & Tariffe">Denaro, Vendite & Tariffe</option>
                 <option value="Autostima & Performance">Autostima & Performance Personale</option>
                 <option value="Relazioni & Comunicazione">Relazioni & Comunicazione</option>
+                <option value="Intimità & Sessualità">Intimità, Sessuologia & Benessere Corporeo</option>
               </select>
             </div>
 
@@ -214,21 +229,100 @@
           <div class="pt-2 flex justify-end">
             <button 
               type="submit" 
+              id="main-submit-btn"
               class="w-full sm:w-auto px-8 py-3.5 rounded-xl font-black text-sm bg-gradient-to-r from-teal-500 via-cyan-500 to-emerald-400 hover:from-teal-400 hover:to-cyan-300 text-slate-950 shadow-lg shadow-teal-500/25 transition transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
             >
-              <span>⚡</span> Avvia Protocollo Master PNL
+              <span>🌿</span> <span id="main-submit-btn-text">Inizia Seduta con Psicologo/Coach (Anamnesi)</span>
             </button>
           </div>
         </form>
 
       </div>
 
+      <!-- INTERACTIVE DIALOGUE SESSION WORKFLOW CONTAINER -->
+      <div id="interactive-session-container" class="hidden glass-panel rounded-2xl p-5 md:p-8 mb-8 border border-teal-600/70 shadow-2xl no-print">
+        
+        <!-- STEP PROGRESS BAR -->
+        <div class="mb-6">
+          <div class="flex items-center justify-between text-xs font-bold text-slate-300 mb-2">
+            <span id="session-step-label" class="text-teal-300 flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-teal-400 animate-ping"></span>
+              Fase 1 di 4 • Accoglienza & Chiarimento del Contesto
+            </span>
+            <span id="session-step-pct" class="font-mono text-teal-400">25%</span>
+          </div>
+          <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden border border-slate-700">
+            <div id="session-step-bar" class="bg-gradient-to-r from-teal-500 to-emerald-400 h-2.5 transition-all duration-500 rounded-full" style="width: 25%"></div>
+          </div>
+        </div>
+
+        <!-- COACH MESSAGE BUBBLE -->
+        <div class="flex items-start gap-4 mb-6 bg-slate-900/90 p-5 rounded-2xl border border-teal-800/50 shadow-xl">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-teal-600 to-emerald-400 flex-shrink-0 flex items-center justify-center text-2xl shadow-lg shadow-teal-500/20">
+            🧙‍♂️
+          </div>
+          <div class="flex-grow">
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <h4 class="text-sm font-bold text-teal-300 flex items-center gap-1.5">
+                Master Coach PNL & Psicoterapeuta
+              </h4>
+              <span id="session-step-tag" class="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-teal-950 text-teal-300 border border-teal-800">Fase 1</span>
+            </div>
+            <p id="coach-message-text" class="text-sm md:text-base text-slate-100 leading-relaxed font-normal mb-3 whitespace-pre-line">
+              ...
+            </p>
+            
+            <!-- CLINICAL INSIGHT -->
+            <div id="clinical-insight-box" class="p-3 rounded-xl bg-slate-800/80 border-l-4 border-amber-500 text-xs text-amber-200 mb-3">
+              <span class="font-bold">🔎 Osservazione Clinica:</span> <span id="clinical-insight-text">...</span>
+            </div>
+
+            <!-- QUESTIONS CONTAINER -->
+            <div id="investigation-questions-box" class="bg-teal-950/40 p-4 rounded-xl border border-teal-800/60 space-y-2">
+              <span class="text-xs font-black uppercase text-teal-300 tracking-wider block flex items-center gap-1.5">
+                <span>🎯</span> Domande di Approfondimento per Chiarire il Quadro:
+              </span>
+              <ul id="investigation-questions-list" class="text-xs md:text-sm text-slate-200 space-y-2 list-disc list-inside">
+                <!-- Verranno inserite via JS -->
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- USER ANSWER FORM -->
+        <div id="session-user-input-area" class="space-y-3 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+          <label for="session-user-response-input" class="block text-xs font-bold uppercase tracking-wider text-slate-300">
+            La tua risposta per approfondire questa fase:
+          </label>
+          <textarea 
+            id="session-user-response-input" 
+            rows="3" 
+            placeholder="Rispondi descrivendo le situazioni, le cause storiche passate o le relazioni coinvolte..."
+            class="w-full bg-slate-900/90 text-white rounded-xl p-4 text-sm md:text-base border border-slate-700 focus:border-teal-400 focus:ring-2 focus:ring-teal-500/20 outline-none transition placeholder:text-slate-500 shadow-inner"
+          ></textarea>
+
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+            <button type="button" onclick="resetInteractiveSession()" class="text-xs text-slate-400 hover:text-slate-200 font-medium transition flex items-center gap-1">
+              <span>🔄</span> Annulla e Ricomincia
+            </button>
+            <button 
+              type="button" 
+              id="session-next-btn"
+              onclick="submitSessionStepResponse()"
+              class="px-6 py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-teal-500 via-cyan-500 to-emerald-400 hover:from-teal-400 text-slate-950 shadow-lg shadow-teal-500/25 transition transform active:scale-95 flex items-center gap-2 cursor-pointer"
+            >
+              <span>💬</span> <span id="session-next-btn-text">Approfondisci (Passa alla Fase Successiva)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- LOADING STATE -->
       <div id="loading-state" class="hidden py-16 text-center no-print">
         <div class="inline-block w-14 h-14 rounded-full border-4 border-teal-500/20 border-t-teal-400 animate-spin mb-4"></div>
-        <h3 class="text-lg font-bold text-white">Generazione Sessione Clinica Master in corso...</h3>
-        <p class="text-xs text-slate-400 mt-1.5 max-w-md mx-auto">
-          Google Gemini AI e il motore PNL stanno elaborando la diagnosi del Meta-Modello, il salto logico di Dilts, l'ancoraggio corporeo e il piano d'azione in 3 fasi.
+        <h3 id="loading-title" class="text-lg font-bold text-white">Analisi Clinica in corso...</h3>
+        <p id="loading-desc" class="text-xs text-slate-400 mt-1.5 max-w-md mx-auto">
+          Il Master Coach PNL sta calibrando le domande di chiarimento e la mappa sensoriale dell'esperienza.
         </p>
       </div>
 

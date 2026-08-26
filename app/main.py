@@ -41,7 +41,9 @@ from app.core.models import (
     ReframeFeedbackRequest,
     ReframeFeedbackResponse,
     RoadmapResponse,
-    RoadmapStepToggleRequest
+    RoadmapStepToggleRequest,
+    SessionStepRequest,
+    SessionStepResponse
 )
 from app.core.gemini_client import gemini_pnl_client
 from app.core.stripe_client import stripe_manager
@@ -192,6 +194,81 @@ async def perform_reframe(req: MindShiftRequest, db: Session = Depends(get_db)):
         return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Errore durante l'elaborazione PNL: {str(e)}")
+
+@app.post("/api/session/step", response_model=SessionStepResponse)
+async def perform_session_step(req: SessionStepRequest, db: Session = Depends(get_db)):
+    """Esegue uno step interattivo della Seduta di Psico-Coaching PNL (Fasi 1-4)."""
+    try:
+        response = await gemini_pnl_client.generate_session_step(req)
+        
+        # Se è lo step finale ed è stato generato il final_shift, salvalo nel DB
+        if response.is_final_step and response.final_shift and req.sync_key:
+            sync_key = req.sync_key.strip().upper()
+            final_shift = response.final_shift
+            shift_id = final_shift.id or str(uuid.uuid4())
+            final_shift.id = shift_id
+            
+            reframes_json = json.dumps([r.model_dump() for r in final_shift.reframes])
+            protocol_json = json.dumps(final_shift.anchoring_protocol.model_dump()) if final_shift.anchoring_protocol else None
+            action_plan_json = json.dumps(final_shift.action_plan.model_dump()) if final_shift.action_plan else None
+
+            existing = db.query(SavedMindShift).filter(
+                (SavedMindShift.id == shift_id) |
+                ((SavedMindShift.sync_key == sync_key) & (SavedMindShift.original_thought == final_shift.original_thought))
+            ).first()
+
+            if existing:
+                existing.original_thought = final_shift.original_thought
+                existing.context = req.context
+                existing.detected_channel = final_shift.detected_channel.value
+                existing.meta_category = final_shift.meta_model.category
+                existing.meta_subtype = final_shift.meta_model.subtype
+                existing.meta_explanation = final_shift.meta_model.explanation
+                existing.context_reframe = final_shift.context_reframe
+                existing.meaning_reframe = final_shift.meaning_reframe
+                existing.identity_reframe = final_shift.identity_reframe
+                existing.socratic_question = final_shift.socratic_question
+                existing.empowering_micro_action = final_shift.empowering_micro_action
+                existing.anchoring_mantra = final_shift.anchoring_mantra
+                existing.reframes_json = reframes_json
+                existing.protocol_json = protocol_json
+                existing.action_plan_json = action_plan_json
+                db.commit()
+            else:
+                db_shift = SavedMindShift(
+                    id=shift_id,
+                    sync_key=sync_key,
+                    original_thought=final_shift.original_thought,
+                    context=req.context,
+                    detected_channel=final_shift.detected_channel.value,
+                    meta_category=final_shift.meta_model.category,
+                    meta_subtype=final_shift.meta_model.subtype,
+                    meta_explanation=final_shift.meta_model.explanation,
+                    context_reframe=final_shift.context_reframe,
+                    meaning_reframe=final_shift.meaning_reframe,
+                    identity_reframe=final_shift.identity_reframe,
+                    socratic_question=final_shift.socratic_question,
+                    empowering_micro_action=final_shift.empowering_micro_action,
+                    anchoring_mantra=final_shift.anchoring_mantra,
+                    reframes_json=reframes_json,
+                    protocol_json=protocol_json,
+                    action_plan_json=action_plan_json
+                )
+                db.add(db_shift)
+                
+                existing_profile = db.query(UserSyncProfile).filter(UserSyncProfile.sync_key == sync_key).first()
+                if not existing_profile:
+                    db.add(UserSyncProfile(
+                        sync_key=sync_key,
+                        device_name="Web Tester",
+                        preferred_vak=final_shift.detected_channel.value,
+                        plan_status="trial"
+                    ))
+                db.commit()
+
+        return response
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Errore durante la seduta PNL: {str(e)}")
 
 # ==========================================
 # ANALYTICS & VAK TRENDS

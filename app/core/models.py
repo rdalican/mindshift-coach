@@ -188,3 +188,29 @@ class RoadmapResponse(BaseModel):
 class RoadmapStepToggleRequest(BaseModel):
     step_id: str
     status: RoadmapStepStatus
+
+# --- MODELLI SEDUTA INTERATTIVA DI PSICO-COACHING PNL (ANAMNESI A 4 FASI) ---
+class DialogueMessage(BaseModel):
+    role: str = Field(..., description="'coach' o 'user'")
+    content: str
+    timestamp: Optional[str] = None
+
+class SessionStepRequest(BaseModel):
+    session_id: Optional[str] = None
+    current_step: int = Field(1, ge=1, le=4, description="1: Chiarimento Contesto, 2: Cause Storiche & Time-Line, 3: Influenze Esterne, 4: Sintesi Terapeutica Finale")
+    initial_thought: str
+    context: Optional[str] = None
+    history: List[DialogueMessage] = []
+    latest_user_response: Optional[str] = None
+    sync_key: Optional[str] = None
+
+class SessionStepResponse(BaseModel):
+    session_id: str
+    current_step: int
+    next_step: int
+    is_final_step: bool = False
+    step_title: str
+    coach_message: str
+    investigation_questions: List[str] = []
+    clinical_insight: Optional[str] = None
+    final_shift: Optional[MindShiftResponse] = None
