@@ -135,6 +135,9 @@ async def perform_reframe(req: MindShiftRequest, db: Session = Depends(get_db)):
             protocol_json = json.dumps(response.anchoring_protocol.model_dump()) if response.anchoring_protocol else None
             action_plan_json = json.dumps(response.action_plan.model_dump()) if response.action_plan else None
 
+            ch_val = str(response.detected_channel.value if hasattr(response.detected_channel, 'value') else response.detected_channel)
+            meta_cat_val = str(response.meta_model.category.value if hasattr(response.meta_model.category, 'value') else response.meta_model.category)
+
             existing = db.query(SavedMindShift).filter(
                 (SavedMindShift.id == shift_id) |
                 ((SavedMindShift.sync_key == sync_key) & (SavedMindShift.original_thought == response.original_thought))
@@ -143,8 +146,8 @@ async def perform_reframe(req: MindShiftRequest, db: Session = Depends(get_db)):
             if existing:
                 existing.original_thought = response.original_thought
                 existing.context = req.context
-                existing.detected_channel = response.detected_channel.value
-                existing.meta_category = response.meta_model.category
+                existing.detected_channel = ch_val
+                existing.meta_category = meta_cat_val
                 existing.meta_subtype = response.meta_model.subtype
                 existing.meta_explanation = response.meta_model.explanation
                 existing.context_reframe = response.context_reframe
@@ -164,8 +167,8 @@ async def perform_reframe(req: MindShiftRequest, db: Session = Depends(get_db)):
                     sync_key=sync_key,
                     original_thought=response.original_thought,
                     context=req.context,
-                    detected_channel=response.detected_channel.value,
-                    meta_category=response.meta_model.category,
+                    detected_channel=ch_val,
+                    meta_category=meta_cat_val,
                     meta_subtype=response.meta_model.subtype,
                     meta_explanation=response.meta_model.explanation,
                     context_reframe=response.context_reframe,
@@ -186,7 +189,7 @@ async def perform_reframe(req: MindShiftRequest, db: Session = Depends(get_db)):
                     db.add(UserSyncProfile(
                         sync_key=sync_key,
                         device_name="Web Tester",
-                        preferred_vak=response.detected_channel.value,
+                        preferred_vak=ch_val,
                         plan_status="trial"
                     ))
                 db.commit()
@@ -212,6 +215,9 @@ async def perform_session_step(req: SessionStepRequest, db: Session = Depends(ge
             protocol_json = json.dumps(final_shift.anchoring_protocol.model_dump()) if final_shift.anchoring_protocol else None
             action_plan_json = json.dumps(final_shift.action_plan.model_dump()) if final_shift.action_plan else None
 
+            ch_val = str(final_shift.detected_channel.value if hasattr(final_shift.detected_channel, 'value') else final_shift.detected_channel)
+            meta_cat_val = str(final_shift.meta_model.category.value if hasattr(final_shift.meta_model.category, 'value') else final_shift.meta_model.category)
+
             existing = db.query(SavedMindShift).filter(
                 (SavedMindShift.id == shift_id) |
                 ((SavedMindShift.sync_key == sync_key) & (SavedMindShift.original_thought == final_shift.original_thought))
@@ -220,8 +226,8 @@ async def perform_session_step(req: SessionStepRequest, db: Session = Depends(ge
             if existing:
                 existing.original_thought = final_shift.original_thought
                 existing.context = req.context
-                existing.detected_channel = final_shift.detected_channel.value
-                existing.meta_category = final_shift.meta_model.category
+                existing.detected_channel = ch_val
+                existing.meta_category = meta_cat_val
                 existing.meta_subtype = final_shift.meta_model.subtype
                 existing.meta_explanation = final_shift.meta_model.explanation
                 existing.context_reframe = final_shift.context_reframe
@@ -240,8 +246,8 @@ async def perform_session_step(req: SessionStepRequest, db: Session = Depends(ge
                     sync_key=sync_key,
                     original_thought=final_shift.original_thought,
                     context=req.context,
-                    detected_channel=final_shift.detected_channel.value,
-                    meta_category=final_shift.meta_model.category,
+                    detected_channel=ch_val,
+                    meta_category=meta_cat_val,
                     meta_subtype=final_shift.meta_model.subtype,
                     meta_explanation=final_shift.meta_model.explanation,
                     context_reframe=final_shift.context_reframe,
@@ -261,7 +267,7 @@ async def perform_session_step(req: SessionStepRequest, db: Session = Depends(ge
                     db.add(UserSyncProfile(
                         sync_key=sync_key,
                         device_name="Web Tester",
-                        preferred_vak=final_shift.detected_channel.value,
+                        preferred_vak=ch_val,
                         plan_status="trial"
                     ))
                 db.commit()

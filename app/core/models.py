@@ -40,7 +40,7 @@ class ActionPlan(BaseModel):
     phase_7days_habit: str
 
 class MindShiftRequest(BaseModel):
-    thought: str = Field(..., min_length=3, max_length=1500, description="Il pensiero limitante o blocco emotivo da ristrutturare.")
+    thought: str = Field(..., min_length=3, max_length=10000, description="Il pensiero limitante o anamnesi completa da ristrutturare.")
     context: Optional[str] = Field(None, description="Contesto opzionale (business, lavoro, denaro, relazioni, salute).")
     preferred_channel: Optional[str] = Field(None, description="Canale sensoriale preferito opzionale.")
     sync_key: Optional[str] = Field(None, description="Sync Key per sincronizzare immediatamente il risultato nel Cloud.")
