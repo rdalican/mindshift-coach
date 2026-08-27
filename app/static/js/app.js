@@ -160,6 +160,30 @@ function initTabs() {
   });
 }
 
+// --- MANUAL SUB-TAB SWITCHER ---
+function switchManualSubtab(subtabId) {
+  const contents = document.querySelectorAll('.manual-subtab-content');
+  const buttons = document.querySelectorAll('.manual-subtab-btn');
+
+  contents.forEach(c => {
+    if (c.id === `subtab-${subtabId}`) {
+      c.classList.remove('hidden');
+    } else {
+      c.classList.add('hidden');
+    }
+  });
+
+  buttons.forEach(btn => {
+    if (btn.id === `tab-btn-${subtabId}`) {
+      btn.classList.add('bg-teal-700', 'text-white');
+      btn.classList.remove('bg-slate-800', 'text-slate-300', 'hover:bg-slate-700');
+    } else {
+      btn.classList.remove('bg-teal-700', 'text-white');
+      btn.classList.add('bg-slate-800', 'text-slate-300', 'hover:bg-slate-700');
+    }
+  });
+}
+
 // --- INTERACTIVE DIALOGUE SESSION STATE ---
 let currentInteractiveSession = {
   active: false,

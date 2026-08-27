@@ -124,7 +124,7 @@
         🎧 Audio Master PNL
       </button>
       <button data-target="pnl-guide-section" class="nav-tab-btn px-4 py-2 text-xs md:text-sm font-semibold rounded-lg text-slate-300 hover:bg-slate-800 transition whitespace-nowrap">
-        🎯 Metodo PNL & Dilts
+        📖 Manuale & Deontologia PNL
       </button>
     </div>
   </header>
@@ -723,38 +723,358 @@
       </div>
     </section>
 
-    <!-- ========================================== -->
-    <!-- SECTION 6: METODO PNL & LIVELLI DILTS      -->
-    <!-- ========================================== -->
-    <section id="pnl-guide-section" class="app-section hidden">
+    <!-- ======================================================= -->
+    <!-- SECTION 6: MANUALE D'USO & GUIDA CLINICO-DEONTOLOGICA   -->
+    <!-- ======================================================= -->
+    <section id="pnl-guide-section" class="app-section hidden space-y-6">
       <div class="glass-panel rounded-2xl p-6 md:p-8 border border-slate-700 space-y-6">
-        <div>
-          <h2 class="text-2xl font-bold text-white mb-1">🧠 Architettura PNL Master a 5 Livelli</h2>
-          <p class="text-xs text-slate-400">Fondamenti scientifici della Programmazione Neuro-Linguistica e dei Livelli Logici di Robert Dilts.</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
-            <h3 class="text-sm font-bold text-teal-400 mb-2">💎 I 5 Livelli di Robert Dilts</h3>
-            <ul class="text-xs text-slate-300 space-y-2 leading-relaxed">
-              <li>• <strong>1. Ambiente & Contesto</strong>: Il dove e il quando.</li>
-              <li>• <strong>2. Comportamento</strong>: L'azione fisica compiuta.</li>
-              <li>• <strong>3. Capacità & Competenze</strong>: Il 'come' fare qualcosa.</li>
-              <li>• <strong>4. Convinzioni & Valori</strong>: Il 'perché' profondo.</li>
-              <li>• <strong>5. Identità</strong>: 'Chi sono io' (la chiave di sblocco).</li>
-            </ul>
+        
+        <!-- HEADER MANUALE & STAMPA -->
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-5">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-teal-500/20 text-teal-300 border border-teal-500/40">Guida Ufficiale & Standard Scientifico</span>
+              <span class="text-xs text-slate-400">GEM Gemini Esperto PNL Master Protocol v4.0</span>
+            </div>
+            <h2 class="text-2xl md:text-3xl font-black text-white">📖 Manuale d'Uso, Letteratura Scientifica & Deontologia PNL</h2>
+            <p class="text-xs text-slate-400 max-w-3xl leading-relaxed mt-1">
+              Guida operativa alle funzionalità, protocolli di applicazione delle risultanze nel tempo, riferimenti della letteratura accademica presa in considerazione dal GEM e rispetto deontologico della disciplina PNL.
+            </p>
           </div>
-
-          <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
-            <h3 class="text-sm font-bold text-cyan-400 mb-2">💻 Valore dell'Abbonamento 9,99€/m</h3>
-            <ul class="text-xs text-slate-300 space-y-2 leading-relaxed">
-              <li>• <strong>Sessioni Cliniche Illimitate</strong> con Google Gemini AI.</li>
-              <li>• <strong>Audio Coach Vocale</strong> con lettura guidata dei reframing e rilassamento.</li>
-              <li>• <strong>Protocolli di Ancoraggio Guidati</strong> con animazione del respiro e timer 90s.</li>
-              <li>• <strong>Cartella Clinica PDF/Stampa</strong> per tenere traccia di ogni evoluzione.</li>
-            </ul>
+          <div class="flex items-center gap-2 no-print">
+            <button onclick="window.print()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl border border-slate-700 transition flex items-center gap-2 shadow-md">
+              🖨️ Stampa / Salva Manuale in PDF
+            </button>
           </div>
         </div>
+
+        <!-- SUB-TAB SWITCHER INTERATTIVO -->
+        <div class="flex flex-wrap gap-2 border-b border-slate-800/80 pb-3 no-print">
+          <button onclick="switchManualSubtab('man-usage')" id="tab-btn-man-usage" class="manual-subtab-btn px-4 py-2 rounded-xl text-xs font-bold bg-teal-700 text-white transition flex items-center gap-1.5 shadow-sm">
+            📱 1. Guida all'Uso dell'App
+          </button>
+          <button onclick="switchManualSubtab('man-application')" id="tab-btn-man-application" class="manual-subtab-btn px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center gap-1.5 shadow-sm">
+            ⏳ 2. Come Applicare le Risultanze
+          </button>
+          <button onclick="switchManualSubtab('man-literature')" id="tab-btn-man-literature" class="manual-subtab-btn px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center gap-1.5 shadow-sm">
+            🎓 3. Letteratura Scientifica & GEM
+          </button>
+          <button onclick="switchManualSubtab('man-ethics')" id="tab-btn-man-ethics" class="manual-subtab-btn px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center gap-1.5 shadow-sm">
+            ⚖️ 4. Codice Deontologico & Etica
+          </button>
+        </div>
+
+        <!-- ==================================================== -->
+        <!-- SOTTO-MODULO 1: GUIDA OPERATIVA ALL'USO DELL'APP     -->
+        <!-- ==================================================== -->
+        <div id="subtab-man-usage" class="manual-subtab-content space-y-6">
+          
+          <div>
+            <h3 class="text-lg font-black text-teal-400 mb-2 flex items-center gap-2">
+              <span>📱</span> Guida Operativa alle Funzionalità di MindShift Coach
+            </h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              MindShift Coach è una piattaforma di <strong>Psico-Coaching Cognitivo e Riprogrammazione Neuro-Linguistica</strong> progettata per guidare l'utente dalla decostruzione di un blocco mentale fino all'installazione di uno stato di risorsa corporeo e comportamentale.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            <!-- Passo 1: Formulazione del Pensiero -->
+            <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-full bg-teal-600/30 text-teal-400 font-black text-xs flex items-center justify-center border border-teal-500/40">1</span>
+                <h4 class="text-sm font-bold text-white">Inserimento del Pensiero Limitante</h4>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Descrivi nel campo testuale il pensiero, l'ansia o l'esitazione che stai vivendo.
+              </p>
+              <div class="p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-[11px] text-slate-400 space-y-1">
+                <strong class="text-teal-400 block font-semibold">💡 Consiglio di Formulazione:</strong>
+                <span>Più sei specifico e sincero (inclusi orari, sensazioni fisiche, reazioni relazionali o contesti come Bridge o Intimità), più il motore PNL sarà chirurgico nel ristrutturare la causa radice.</span>
+              </div>
+            </div>
+
+            <!-- Passo 2: Selezione Modalità -->
+            <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-full bg-teal-600/30 text-teal-400 font-black text-xs flex items-center justify-center border border-teal-500/40">2</span>
+                <h4 class="text-sm font-bold text-white">Scelta della Modalità di Sessione</h4>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Puoi scegliere tra due percorsi prima di avviare:
+              </p>
+              <ul class="text-xs text-slate-300 space-y-1.5">
+                <li>• 🌿 <strong>Seduta Completa con Coach (Anamnesi in 4 Fasi)</strong>: <em>Consigliata per problemi complessi.</em> Il Coach ti pone 2 domande per esplorare il contesto, la storia passata e le relazioni prima di generare la soluzione.</li>
+                <li>• ⚡ <strong>Sblocco Rapido SOS (90s)</strong>: <em>Per urgenze sul campo.</em> Genera all'istante le ristrutturazioni e l'ancoraggio in un click.</li>
+              </ul>
+            </div>
+
+            <!-- Passo 3: La Cartella Clinica a 5 Moduli -->
+            <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-full bg-teal-600/30 text-teal-400 font-black text-xs flex items-center justify-center border border-teal-500/40">3</span>
+                <h4 class="text-sm font-bold text-white">La Cartella Clinica a 5 Moduli</h4>
+              </div>
+              <ul class="text-xs text-slate-300 space-y-1.5">
+                <li>• <strong>1. Shift Neuro-Biologico</strong>: Mappatura del canale VAK (Visivo, Uditivo, Cinestesico) e transizione dallo stato di allarme a quello di risorsa.</li>
+                <li>• <strong>2. Le 4 Ristrutturazioni</strong>: Contesto, Significato Milton Model, Identità (Robert Dilts) e Domanda Socratica di sblocco.</li>
+                <li>• <strong>3. Ancoraggio Fisiologico</strong>: Sequenza corporea con timer animato da 90 secondi.</li>
+                <li>• <strong>4. Piano d'Azione in 3 Fasi</strong>: Subito (2 min) / Entro 24 ore / Abitudine a 7 giorni.</li>
+                <li>• <strong>5. Mantra di Potere</strong>: Formula ipnotica di ancoraggio quotidiano.</li>
+              </ul>
+            </div>
+
+            <!-- Passo 4: Audio Coach & Sincronizzazione -->
+            <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-full bg-teal-600/30 text-teal-400 font-black text-xs flex items-center justify-center border border-teal-500/40">4</span>
+                <h4 class="text-sm font-bold text-white">Audio Neurale Studio & Sync Cloud</h4>
+              </div>
+              <ul class="text-xs text-slate-300 space-y-1.5">
+                <li>• 🎙️ <strong>Audio Coach Neurale</strong>: Ascolta la lettura personalizzata della tua seduta con voci studio ad alta definizione (Diego/Elsa).</li>
+                <li>• 🎧 <strong>Master Audio Room</strong>: Accedi in ogni momento alle 4 tracce master di meditazione e rilassamento somatico.</li>
+                <li>• ☁️ <strong>Sync Windows ↔ Android</strong>: Con la tua <em>Sync Key</em> personale, tutte le sessioni e i progressi sono istantaneamente sincronizzati su tutti i tuoi dispositivi.</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ==================================================== -->
+        <!-- SOTTO-MODULO 2: COME APPLICARE LE RISULTANZE         -->
+        <!-- ==================================================== -->
+        <div id="subtab-man-application" class="manual-subtab-content hidden space-y-6">
+          
+          <div>
+            <h3 class="text-lg font-black text-amber-400 mb-2 flex items-center gap-2">
+              <span>⏳</span> Protocollo di Applicazione: Nel Momento e Nel Tempo
+            </h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Il vero potere della Programmazione Neuro-Linguistica non risiede nella comprensione intellettuale, ma nella <strong>frequenza di applicazione neurologica e corporea</strong>. Ecco la guida temporale per massimizzare i risultati:
+            </p>
+          </div>
+
+          <div class="space-y-4">
+            
+            <!-- Fase 1: Nel Momento (I primi 2-10 Minuti) -->
+            <div class="p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-emerald-950/30 to-slate-900 border border-emerald-800/60 space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="text-xl">⚡</span>
+                  <h4 class="text-base font-extrabold text-emerald-400">1. Nel Momento • I Primi 2 - 10 Minuti (Disinnesco Fisiologico)</h4>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-950 text-emerald-300 border border-emerald-700">Immediato</span>
+              </div>
+              <p class="text-xs text-slate-200 leading-relaxed">
+                Appena terminata la seduta, la tua mente si trova in uno stato di <em>plasticità ricettiva</em> (apertura cognitiva).
+              </p>
+              <ul class="text-xs text-slate-300 space-y-2">
+                <li>• <strong>Ascolto dell'Audio Neurale</strong>: Clicca su <em>"Ascolta Voce Neurale Studio HQ"</em>, chiudi gli occhi e lascia che la cadenza ipnotica rallenti le onde cerebrali dallo stato Beta allo stato Alpha/Theta.</li>
+                <li>• <strong>Esecuzione dell'Ancoraggio Somatico (Timer 90s)</strong>: Premi <em>"Avvia Timer Ancoraggio (90s)"</em> ed esegui fisicamente la sequenza corporea (respirazione diaframmatica 4-8, rilassamento delle spalle e gesto di ancoraggio come la pressione del pollice). Questo abbassa istantaneamente l'adrenalina nel sangue e attiva il sistema nervoso parasimpatico.</li>
+                <li>• <strong>Compi la Micro-Azione di 2 Minuti (Fase 1)</strong>: Esegui subito la micro-azione prescritta nel Modulo 4. Rompere l'attrito nei primi 120 secondi distrugge il pattern di evitamento inconscio.</li>
+              </ul>
+            </div>
+
+            <!-- Fase 2: Nel Breve Termine (Entro 24-48 Ore) -->
+            <div class="p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-cyan-950/30 to-slate-900 border border-cyan-800/60 space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="text-xl">🎯</span>
+                  <h4 class="text-base font-extrabold text-cyan-400">2. Nel Breve Termine • Entro 24 - 48 Ore (Validazione Esperienziale)</h4>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-cyan-950 text-cyan-300 border border-cyan-700">24-48 Ore</span>
+              </div>
+              <p class="text-xs text-slate-200 leading-relaxed">
+                Il cervello consolida le nuove sinapsi durante il sonno e attraverso le prime interazioni con l'ambiente reale.
+              </p>
+              <ul class="text-xs text-slate-300 space-y-2">
+                <li>• <strong>Esecuzione del Compito nel Mondo Reale (Fase 2)</strong>: Realizza il compito pratico prescritto entro 24 ore. Trattalo come un <em>"esperimento di esplorazione"</em> privo di ansia da giudizio: non sei lì per essere perfetto, ma per raccogliere nuovo feedback sensoriale.</li>
+                <li>• <strong>Richiamo del Mantra nei Momenti di Trigger</strong>: Se avverti riaffiorare la vecchia tensione (es. prima di giocare una mano a Bridge o prima dell'intimità), fermati per 3 secondi, riattiva il gesto di ancoraggio corporeo e pronuncia mentalmente la tua formula di potere.</li>
+              </ul>
+            </div>
+
+            <!-- Fase 3: Nel Medio-Lungo Termine (7-30 Giorni & Oltre) -->
+            <div class="p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-amber-950/30 to-slate-900 border border-amber-800/60 space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="text-xl">💎</span>
+                  <h4 class="text-base font-extrabold text-amber-400">3. Nel Medio-Lungo Termine • 7 - 30 Giorni (Riprogrammazione Neurologica)</h4>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-950 text-amber-300 border border-amber-700">Consolidamento</span>
+              </div>
+              <p class="text-xs text-slate-200 leading-relaxed">
+                Secondo le neuroscienze e la PNL, l'installazione di una nuova convinzione identitaria richiede dai 21 ai 30 giorni di ripetizione ecologica.
+              </p>
+              <ul class="text-xs text-slate-300 space-y-2">
+                <li>• <strong>Mantenimento dell'Abitudine a 7 Giorni (Fase 3)</strong>: Associa la nuova abitudine a un trigger quotidiano già esistente (es. il caffè del mattino, l'ingresso nella stanza o la preparazione al tavolo).</li>
+                <li>• <strong>Revisione nel Diario & Analytics VAK</strong>: Consulta periodicamente il tuo Diario delle Sessioni. Monitora l'<em>Empowerment Index</em> e verifica se la tua mappa sensoriale (Visivo, Uditivo, Cinestesico) sta diventando più flessibile ed equilibrata.</li>
+                <li>• <strong>Igiene Mentale Preventiva</strong>: Utilizza la <em>Master Audio Room</em> una volta a settimana per mantenere puliti i canali di risorsa ed evitare l'accumulo di nuovo stress reattivo.</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ==================================================== -->
+        <!-- SOTTO-MODULO 3: LETTERATURA SCIENTIFICA & GEM PNL    -->
+        <!-- ==================================================== -->
+        <div id="subtab-man-literature" class="manual-subtab-content hidden space-y-6">
+          
+          <div>
+            <h3 class="text-lg font-black text-purple-400 mb-2 flex items-center gap-2">
+              <span>🎓</span> Letteratura Scientifica & Fondamenti del GEM Esperto PNL
+            </h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Il motore analitico e generativo del <strong>GEM di Gemini Esperto PNL</strong> è rigorosamente ancorato alla letteratura accademica classica e contemporanea della Programmazione Neuro-Linguistica, della Terapia Ericksoniana e della Sessuologia Cognitiva:
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            <!-- Bandler & Grinder -->
+            <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3">
+              <div class="flex items-center gap-2">
+                <span class="text-xl">📚</span>
+                <div>
+                  <h4 class="text-sm font-bold text-white">Richard Bandler & John Grinder</h4>
+                  <span class="text-[10px] text-teal-400 font-mono">The Structure of Magic (1975), Frogs into Princes (1979)</span>
+                </div>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                <strong>Il Meta-Modello Linguistico</strong>: La base diagnostica di MindShift Coach. Analizza le violazioni della struttura superficiale del linguaggio:
+              </p>
+              <ul class="text-xs text-slate-400 space-y-1">
+                <li>• <em>Cancellazioni</em> (Indici referenziali mancanti, omissioni).</li>
+                <li>• <em>Generalizzazioni</em> (Quantificatori universali, operatori modali di necessità).</li>
+                <li>• <em>Deformazioni</em> (Causa-Effetto arbitrari, Lettura del pensiero).</li>
+              </ul>
+            </div>
+
+            <!-- Robert Dilts -->
+            <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3">
+              <div class="flex items-center gap-2">
+                <span class="text-xl">👑</span>
+                <div>
+                  <h4 class="text-sm font-bold text-white">Robert Dilts</h4>
+                  <span class="text-[10px] text-cyan-400 font-mono">Changing Belief Systems (1990), Sleight of Mouth (1999)</span>
+                </div>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                <strong>I Livelli Logici Neuro-Logici & Sleight of Mouth</strong>:
+              </p>
+              <ul class="text-xs text-slate-400 space-y-1">
+                <li>• <em>Gerarchia dei Livelli</em>: Ambiente ➔ Comportamento ➔ Capacità ➔ Convinzioni/Valori ➔ Identità ➔ Visione. Il cambiamento reale avviene riprogrammando il livello identitario.</li>
+                <li>• <em>Re-Imprinting Protocol</em>: Risoluzione dei traumi pregressi lungo la Time-Line biografica per liberare risorse bloccate nel passato.</li>
+              </ul>
+            </div>
+
+            <!-- Milton H. Erickson -->
+            <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3">
+              <div class="flex items-center gap-2">
+                <span class="text-xl">🌀</span>
+                <div>
+                  <h4 class="text-sm font-bold text-white">Milton H. Erickson & Ernest Rossi</h4>
+                  <span class="text-[10px] text-amber-400 font-mono">Hypnotic Realities (1976), Patterns of Hypnotic Techniques (1977)</span>
+                </div>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                <strong>Il Milton Model & Ipnosi Conversazionale</strong>:
+              </p>
+              <ul class="text-xs text-slate-400 space-y-1">
+                <li>• Utilizzo del linguaggio indiretto e delle metafore maieutiche.</li>
+                <li>• <em>Doppi Legami Terapeutici</em> e semina di risorse per aggirare le resistenze della mente conscia.</li>
+                <li>• Presupposizioni linguistiche di guarigione e padronanza emotiva naturale.</li>
+              </ul>
+            </div>
+
+            <!-- Sessuologia & Masters-Johnson -->
+            <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3">
+              <div class="flex items-center gap-2">
+                <span class="text-xl">🌿</span>
+                <div>
+                  <h4 class="text-sm font-bold text-white">Sessuologia Cognitiva & Modello Masters-Johnson</h4>
+                  <span class="text-[10px] text-emerald-400 font-mono">Human Sexual Inadequacy (1970) & Neurofisiologia Vago-Mediata</span>
+                </div>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                <strong>Defusione dello "Spectatoring" & Modulazione Parasimpatica</strong>:
+              </p>
+              <ul class="text-xs text-slate-400 space-y-1">
+                <li>• <em>Mente Spettatore</em>: Disattivazione del monitoraggio ansioso della performance che innesca l'adrenalina (blocco dell'erezione).</li>
+                <li>• <em>Integrazione Urologico-Cognitiva</em>: Coordinamento tra supporto biologico (Tadalafil 5mg, Serenoa Repens 320mg) e ri-associazione al piacere sensoriale cinestesico puro.</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ==================================================== -->
+        <!-- SOTTO-MODULO 4: CODICE DEONTOLOGICO & ETICA PNL      -->
+        <!-- ==================================================== -->
+        <div id="subtab-man-ethics" class="manual-subtab-content hidden space-y-6">
+          
+          <div>
+            <h3 class="text-lg font-black text-emerald-400 mb-2 flex items-center gap-2">
+              <span>⚖️</span> Codice Deontologico & Rispetto Etico della Disciplina PNL
+            </h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Il sistema MindShift Coach opera in conformità con i codici etici e deontologici internazionali stabiliti dalle principali associazioni professionali di PNL e Coaching (AIPNL, ICF, ANP):
+            </p>
+          </div>
+
+          <div class="space-y-4">
+            
+            <!-- I 5 Presupposti Etici Fondamentali -->
+            <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3">
+              <h4 class="text-sm font-bold text-teal-400 uppercase tracking-wider">💎 I 5 Presupposti Epistemologici della PNL</h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-slate-300">
+                <div class="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+                  <strong class="text-white block mb-1">1. La Mappa non è il Territorio</strong>
+                  <span>Le nostre percezioni sono rappresentazioni soggettive della realtà. Ristrutturare la mappa mentale amplia le scelte disponibili senza alterare i fatti oggettivi.</span>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+                  <strong class="text-white block mb-1">2. Intenzione Positiva Inconscia</strong>
+                  <span>Ogni comportamento e ogni sintomo (anche l'ansia o l'esitazione) nasce come tentativo dell'inconscio di proteggere l'individuo da un dolore o rischio pregresso.</span>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+                  <strong class="text-white block mb-1">3. Le Risorse Risiedono nell'Individuo</strong>
+                  <span>Il Coach non "insegna" o impone verità, ma guida l'utente a risvegliare le risorse biologiche, cognitive ed emotive già presenti nel proprio sistema.</span>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+                  <strong class="text-white block mb-1">4. Non c'è Fallimento, solo Feedback</strong>
+                  <span>Ogni risultato inaspettato è un dato prezioso per calibrare e perfezionare la strategia d'azione verso l'eccellenza.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Confini Deontologici & Distinzione Medica -->
+            <div class="p-5 rounded-2xl bg-amber-950/20 border border-amber-800/60 space-y-2">
+              <div class="flex items-center gap-2 text-amber-400">
+                <span class="text-lg">⚠️</span>
+                <h4 class="text-sm font-bold uppercase tracking-wider">Confini Deontologici & Dichiarazione di Non-Sostituzione Medica</h4>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                MindShift Coach è uno strumento di <strong>Self-Help, Mental Training e Coaching Cognitivo-Comportamentale</strong>.
+                Non costituisce, non sostituisce e non intende surrogare la diagnosi medica, la psicoterapia clinica o il consulto con uno specialista medico o psichiatra. 
+                In presenza di patologie organiche o disturbi psichiatrici diagnosticati, l'utente è tenuto a fare sempre riferimento al proprio medico curante o specialista di fiducia.
+              </p>
+            </div>
+
+            <!-- Privacy e Tutela dei Dati -->
+            <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
+              <div class="flex items-center gap-2 text-teal-400">
+                <span class="text-lg">🔒</span>
+                <h4 class="text-sm font-bold uppercase tracking-wider">Privacy by Design & Sovranità Totale dell'Utente</h4>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Tutte le sessioni, i pensieri e le risposte dialogiche rimangono di esclusiva proprietà dell'utente. Il sistema consente l'eliminazione permanente e istantanea di ogni dato dal Cloud tramite un semplice click nell'interfaccia di gestione.
+              </p>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </section>
  
@@ -916,6 +1236,6 @@
   </footer>
 
   <!-- App Script with Cache Buster -->
-  <script src="/static/js/app.js?v=5.0"></script>
+  <script src="/static/js/app.js?v=5.1"></script>
 </body>
 </html>
