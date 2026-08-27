@@ -76,12 +76,12 @@
         </div>
       </div>
 
-      <!-- Actions: Onboarding, Cloud Sync, Pro Badge, PWA Install -->
+      <!-- Actions: Manuale, Cloud Sync, Pro Badge, PWA Install -->
       <div class="flex flex-wrap items-center gap-2">
         
-        <!-- Onboarding Quick Start Button -->
-        <button onclick="openOnboardingModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-teal-950 hover:bg-teal-900 text-teal-300 border border-teal-700/60 shadow-sm transition">
-          <span>🧙‍♂️</span> Guida 2 Min
+        <!-- Manuale & Deontologia Direct Header Button -->
+        <button onclick="openManualSection('man-usage')" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black bg-gradient-to-r from-purple-700 via-indigo-600 to-purple-800 hover:from-purple-600 hover:to-indigo-500 text-white shadow-md shadow-purple-600/30 border border-purple-400/40 transition">
+          <span>📖</span> Manuale & Deontologia
         </button>
 
         <!-- Cloud Sync Pill -->
@@ -103,28 +103,28 @@
 
     </div>
 
-    <!-- NAVIGATION TABS -->
-    <div class="max-w-6xl mx-auto px-4 flex space-x-1 overflow-x-auto py-1 border-t border-slate-800/60 scrollbar-none">
-      <button data-target="live-shift-section" class="nav-tab-btn px-4 py-2 text-xs md:text-sm font-bold rounded-lg bg-teal-700 text-white transition whitespace-nowrap">
+    <!-- NAVIGATION TABS (FLEX-WRAP PER VISIBILITA' TOTALE SU OGNI SCHERMO) -->
+    <div class="max-w-6xl mx-auto px-4 flex flex-wrap items-center gap-1.5 py-2 border-t border-slate-800/60">
+      <button data-target="live-shift-section" class="nav-tab-btn flex-1 min-w-[140px] text-center px-3.5 py-2 text-xs md:text-sm font-bold rounded-xl bg-teal-700 text-white transition">
         ⚡ Sessione Master PNL
       </button>
-      <button data-target="saved-shifts-section" class="nav-tab-btn px-4 py-2 text-xs md:text-sm font-semibold rounded-lg text-slate-300 hover:bg-slate-800 transition whitespace-nowrap">
-        📖 Diario Sessioni (<span id="saved-shifts-count">0</span>)
+      <button data-target="saved-shifts-section" class="nav-tab-btn flex-1 min-w-[130px] text-center px-3.5 py-2 text-xs md:text-sm font-semibold rounded-xl text-slate-300 hover:bg-slate-800 transition">
+        📖 Diario (<span id="saved-shifts-count">0</span>)
       </button>
-      <button data-target="analytics-section" class="nav-tab-btn px-4 py-2 text-xs md:text-sm font-semibold rounded-lg text-slate-300 hover:bg-slate-800 transition whitespace-nowrap">
-        📊 Analytics & Mappa VAK
+      <button data-target="analytics-section" class="nav-tab-btn flex-1 min-w-[130px] text-center px-3.5 py-2 text-xs md:text-sm font-semibold rounded-xl text-slate-300 hover:bg-slate-800 transition">
+        📊 Mappa VAK
       </button>
-      <button data-target="roadmap-section" class="nav-tab-btn px-4 py-2 text-xs md:text-sm font-semibold rounded-lg text-slate-300 hover:bg-slate-800 transition whitespace-nowrap">
-        🚀 Roadmap Micro-SaaS
+      <button data-target="roadmap-section" class="nav-tab-btn flex-1 min-w-[120px] text-center px-3.5 py-2 text-xs md:text-sm font-semibold rounded-xl text-slate-300 hover:bg-slate-800 transition">
+        🚀 Roadmap
       </button>
-      <button data-target="cloud-sync-section" class="nav-tab-btn px-4 py-2 text-xs md:text-sm font-semibold rounded-lg text-slate-300 hover:bg-slate-800 transition whitespace-nowrap">
-        ☁️ Sync Windows ↔ Android
+      <button data-target="cloud-sync-section" class="nav-tab-btn flex-1 min-w-[120px] text-center px-3.5 py-2 text-xs md:text-sm font-semibold rounded-xl text-slate-300 hover:bg-slate-800 transition">
+        ☁️ Sync Cloud
       </button>
-      <button data-target="audio-tracks-section" class="nav-tab-btn px-4 py-2 text-xs md:text-sm font-semibold rounded-lg text-slate-300 hover:bg-slate-800 transition whitespace-nowrap">
-        🎧 Audio Master PNL
+      <button data-target="audio-tracks-section" class="nav-tab-btn flex-1 min-w-[130px] text-center px-3.5 py-2 text-xs md:text-sm font-semibold rounded-xl text-slate-300 hover:bg-slate-800 transition">
+        🎧 Audio Master
       </button>
-      <button data-target="pnl-guide-section" class="nav-tab-btn px-4 py-2 text-xs md:text-sm font-semibold rounded-lg text-slate-300 hover:bg-slate-800 transition whitespace-nowrap">
-        📖 Manuale & Deontologia PNL
+      <button data-target="pnl-guide-section" class="nav-tab-btn flex-1 min-w-[160px] text-center px-3.5 py-2 text-xs md:text-sm font-black rounded-xl text-purple-300 hover:bg-purple-950/60 border border-purple-700/60 transition shadow-sm">
+        📚 Manuale & Deontologia
       </button>
     </div>
   </header>
@@ -145,6 +145,20 @@
         <p class="text-xs md:text-sm text-slate-300 mt-2">
           Protocollo Clinico di Trasformazione Cognitiva a 5 Dimensioni: Diagnosi Submodalità, 4 Ristrutturazioni di Livello Dilts, Sessione Vocale Guidata, Ancoraggio Corporeo 90s e Piano di Azione in 3 Fasi.
         </p>
+        <div class="mt-3.5 flex flex-wrap items-center justify-center gap-2">
+          <button onclick="openManualSection('man-usage')" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-purple-950/80 hover:bg-purple-900 text-purple-200 border border-purple-700/80 transition shadow-sm">
+            <span>📚</span> <strong>Guida all'Uso dell'App</strong>
+          </button>
+          <button onclick="openManualSection('man-application')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800/90 hover:bg-slate-700 text-amber-300 border border-slate-700 transition shadow-sm">
+            <span>⏳</span> Come Usare le Risultanze
+          </button>
+          <button onclick="openManualSection('man-literature')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800/90 hover:bg-slate-700 text-cyan-300 border border-slate-700 transition shadow-sm">
+            <span>🎓</span> Letteratura & GEM PNL
+          </button>
+          <button onclick="openManualSection('man-ethics')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800/90 hover:bg-slate-700 text-emerald-300 border border-emerald-800/80 transition shadow-sm">
+            <span>⚖️</span> Deontologia & Etica
+          </button>
+        </div>
       </div>
 
       <!-- INPUT CARD -->
@@ -1236,6 +1250,6 @@
   </footer>
 
   <!-- App Script with Cache Buster -->
-  <script src="/static/js/app.js?v=5.1"></script>
+  <script src="/static/js/app.js?v=5.2"></script>
 </body>
 </html>

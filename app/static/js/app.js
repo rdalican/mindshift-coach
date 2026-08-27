@@ -125,6 +125,15 @@ function openSyncModal() {
   if (targetBtn) targetBtn.click();
 }
 
+function openManualSection(subtabId) {
+  const manualBtn = document.querySelector('[data-target="pnl-guide-section"]');
+  if (manualBtn) manualBtn.click();
+  if (subtabId) {
+    switchManualSubtab(subtabId);
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 // --- TAB SWITCHING ---
 function initTabs() {
   const navBtns = document.querySelectorAll('.nav-tab-btn');
