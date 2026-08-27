@@ -451,59 +451,92 @@ function resetInteractiveSession() {
 
 // --- RENDER COMPLETO DEL PROTOCOLLO MASTER PNL A 5 MODULI ---
 function renderMasterProtocol(data) {
+  if (!data) return;
+
   // Engine Badge
-  document.getElementById('res-engine-badge').textContent = data.engine_used;
+  const engineBadge = document.getElementById('res-engine-badge');
+  if (engineBadge) {
+    engineBadge.textContent = data.engine_used || 'Master PNL Protocol';
+  }
 
   // QUADRO PRIMA VS DOPO
-  if (data.before_state && data.before_state.stato) {
-    document.getElementById('res-before-state').textContent = `${data.before_state.stato} (Fisiologia: ${data.before_state.fisiologia || 'Contratta'})`;
+  const beforeEl = document.getElementById('res-before-state');
+  if (beforeEl) {
+    const bState = data.before_state && data.before_state.stato ? data.before_state.stato : 'Contratto / Reattivo';
+    const bFisio = data.before_state && data.before_state.fisiologia ? data.before_state.fisiologia : 'Contratta';
+    beforeEl.textContent = `${bState} (Fisiologia: ${bFisio})`;
   }
-  if (data.after_state && data.after_state.stato) {
-    document.getElementById('res-after-state').textContent = `${data.after_state.stato} (Fisiologia: ${data.after_state.fisiologia || 'Aperta e Stabile'})`;
+
+  const afterEl = document.getElementById('res-after-state');
+  if (afterEl) {
+    const aState = data.after_state && data.after_state.stato ? data.after_state.stato : 'Espanso / Centrato';
+    const aFisio = data.after_state && data.after_state.fisiologia ? data.after_state.fisiologia : 'Aperta e Stabile';
+    afterEl.textContent = `${aState} (Fisiologia: ${aFisio})`;
   }
 
   // MODULO 1: DIAGNOSI VAK & SUBMODALITÀ
   const vakBadge = document.getElementById('res-vak-badge');
   const vakKeywords = document.getElementById('res-vak-keywords');
-  const ch = data.detected_channel;
+  const ch = data.detected_channel || 'Visivo / Dinamico';
 
-  vakBadge.className = 'px-3 py-1 rounded-full text-xs font-bold';
-  if (ch.includes('Visivo')) {
-    vakBadge.classList.add('badge-visual');
-    vakBadge.innerHTML = '👁️ ' + ch;
-  } else if (ch.includes('Uditivo')) {
-    vakBadge.classList.add('badge-auditory');
-    vakBadge.innerHTML = '👂 ' + ch;
-  } else if (ch.includes('Cinestesico')) {
-    vakBadge.classList.add('badge-kinesthetic');
-    vakBadge.innerHTML = '🖐️ ' + ch;
-  } else {
-    vakBadge.classList.add('badge-mixed');
-    vakBadge.innerHTML = '⚖️ ' + ch;
+  if (vakBadge) {
+    vakBadge.className = 'px-3 py-1 rounded-full text-xs font-bold';
+    if (ch.includes('Visivo')) {
+      vakBadge.classList.add('badge-visual');
+      vakBadge.innerHTML = '👁️ ' + ch;
+    } else if (ch.includes('Uditivo')) {
+      vakBadge.classList.add('badge-auditory');
+      vakBadge.innerHTML = '👂 ' + ch;
+    } else if (ch.includes('Cinestesico')) {
+      vakBadge.classList.add('badge-kinesthetic');
+      vakBadge.innerHTML = '🖐️ ' + ch;
+    } else {
+      vakBadge.classList.add('badge-mixed');
+      vakBadge.innerHTML = '⚖️ ' + ch;
+    }
   }
 
-  if (data.vak_keywords && data.vak_keywords.length > 0) {
-    vakKeywords.innerHTML = data.vak_keywords.map(kw => 
-      `<span class="bg-slate-800 text-slate-200 text-xs px-2 py-0.5 rounded border border-slate-700 font-mono">${kw}</span>`
-    ).join(' ');
-  } else {
-    vakKeywords.innerHTML = '<span class="text-slate-400 text-xs italic">Predicati integrati</span>';
+  if (vakKeywords) {
+    if (data.vak_keywords && data.vak_keywords.length > 0) {
+      vakKeywords.innerHTML = data.vak_keywords.map(kw => 
+        `<span class="bg-slate-800 text-slate-200 text-xs px-2 py-0.5 rounded border border-slate-700 font-mono">${kw}</span>`
+      ).join(' ');
+    } else {
+      vakKeywords.innerHTML = '<span class="text-slate-400 text-xs italic">Predicati integrati</span>';
+    }
   }
 
-  document.getElementById('res-submodalities-insight').textContent = 
-    data.meta_model.submodalities_insight || "Riorganizzazione delle submodalità sensoriali e spostamento del punto focale percettivo.";
+  const meta = data.meta_model || {
+    category: data.meta_category || 'Generalizzazione / Deformazione',
+    subtype: data.meta_subtype || 'Regola Limitante Inconscia',
+    explanation: 'Decostruzione della struttura superficiale della convinzione.',
+    submodalities_insight: 'Riorganizzazione delle submodalità sensoriali e spostamento del punto focale percettivo.',
+    detected_trigger_words: []
+  };
 
-  document.getElementById('res-meta-category').textContent = data.meta_model.category;
-  document.getElementById('res-meta-subtype').textContent = data.meta_model.subtype;
-  document.getElementById('res-meta-explanation').textContent = data.meta_model.explanation;
+  const submodEl = document.getElementById('res-submodalities-insight');
+  if (submodEl) {
+    submodEl.textContent = meta.submodalities_insight || 'Riorganizzazione delle submodalità sensoriali e spostamento del punto focale percettivo.';
+  }
+
+  const catEl = document.getElementById('res-meta-category');
+  if (catEl) catEl.textContent = meta.category || data.meta_category || 'Generalizzazione';
+
+  const subEl = document.getElementById('res-meta-subtype');
+  if (subEl) subEl.textContent = meta.subtype || data.meta_subtype || 'Regola Limitante Inconscia';
+
+  const expEl = document.getElementById('res-meta-explanation');
+  if (expEl) expEl.textContent = meta.explanation || 'Analisi delle strutture linguistiche e delle presupposizioni.';
   
   const triggerContainer = document.getElementById('res-meta-triggers');
-  if (data.meta_model.detected_trigger_words && data.meta_model.detected_trigger_words.length > 0) {
-    triggerContainer.innerHTML = data.meta_model.detected_trigger_words.map(tw => 
-      `<span class="bg-red-950/60 text-red-300 text-xs px-2 py-0.5 rounded border border-red-800/50">"${tw}"</span>`
-    ).join(' ');
-  } else {
-    triggerContainer.innerHTML = '';
+  if (triggerContainer) {
+    if (meta.detected_trigger_words && meta.detected_trigger_words.length > 0) {
+      triggerContainer.innerHTML = meta.detected_trigger_words.map(tw => 
+        `<span class="bg-red-950/60 text-red-300 text-xs px-2 py-0.5 rounded border border-red-800/50">"${tw}"</span>`
+      ).join(' ');
+    } else {
+      triggerContainer.innerHTML = '';
+    }
   }
 
   // MODULO 2: LE 4 RISTRUTTURAZIONI COGNITIVE PROFONDE
@@ -1152,12 +1185,44 @@ function reloadSavedShiftIntoMainView(shiftId) {
   const shift = cachedShifts.find(s => s.id === shiftId);
   if (!shift) return;
 
-  currentShiftData = shift;
-  renderMasterProtocol(shift);
+  const normalizedData = {
+    ...shift,
+    engine_used: shift.engine_used || "Google Gemini AI (Sessione Salvata)",
+    detected_channel: shift.detected_channel || "Visivo / Dinamico",
+    vak_keywords: shift.vak_keywords || [],
+    meta_model: shift.meta_model || {
+      category: shift.meta_category || "Generalizzazione / Deformazione",
+      subtype: shift.meta_subtype || "Regola Limitante Inconscia",
+      explanation: "Decostruzione della struttura superficiale della convinzione.",
+      submodalities_insight: "Riorganizzazione delle submodalità sensoriali e spostamento del punto focale percettivo.",
+      detected_trigger_words: []
+    },
+    before_state: shift.before_state || {
+      stato: "Contratto / Reattivo",
+      fisiologia: "Spalle contratte, respiro corto"
+    },
+    after_state: shift.after_state || {
+      stato: "Espanso / Centrato",
+      fisiologia: "Diaframma rilassato, postura eretta e fluida"
+    }
+  };
 
-  // Switch to Protocol Tab
-  const mainTabBtn = document.querySelector('[data-tab="reframe"]');
-  if (mainTabBtn) mainTabBtn.click();
+  currentShiftData = normalizedData;
+  renderMasterProtocol(normalizedData);
+
+  // Switch to Session Tab (data-target="live-shift-section")
+  const sessionTabBtn = document.querySelector('[data-target="live-shift-section"]');
+  if (sessionTabBtn) sessionTabBtn.click();
+
+  // Reset interactive session steps card if open
+  const sessionStepCard = document.getElementById('session-step-card');
+  if (sessionStepCard) sessionStepCard.classList.add('hidden');
+
+  // Populate input box with original thought
+  const thoughtInput = document.getElementById('thought-input');
+  if (thoughtInput && normalizedData.original_thought) {
+    thoughtInput.value = normalizedData.original_thought;
+  }
 
   const resultsContainer = document.getElementById('results-container');
   if (resultsContainer) {
