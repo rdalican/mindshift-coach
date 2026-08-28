@@ -26,6 +26,7 @@ from app.core.models import (
     SessionStepResponse
 )
 from app.core.pnl_engine import PNLEngine
+from app.core.guardrails import SemanticTopicGuardrail
 
 logger = logging.getLogger("mindshift.gemini")
 
@@ -50,17 +51,15 @@ METODO OPERATIVO PNL MASTER A 5 LIVELLI:
 5. MANTRA IPNOTICO DI POTERE:
    - Una formula linguistica di grande risonanza ed eleganza basata sulla sintassi ericksoniana.
 
-REGOLA D'ORO DELL'IPER-SPECIFICITÀ SUL TEMA DELL'UTENTE (DIVIETO DI GENERALIZZAZIONE ASTRATTA):
-1. ANCORAGGIO TOTALE AL LESSICO E CONTESTO ESATTO: Tutte le 4 ristrutturazioni, le spiegazioni, la domanda socratica, il mantra e i piani di azione DEVONO essere calati al 100% nella materia specifica di cui parla l'utente (es. se parla di Bridge: usa il gergo del Bridge come 'licita', 'dichiarazione', 'atout', 'distribuzione', 'prese', 'piano di gioco', 'compagno al tavolo'; se parla di sarcopenia/sport: usa termini precisi di movimento fisico e fisiologia; se parla di vendite o business: usa il vocabolario commerciale reale).
-2. DIVIETO ASSOLUTO DI META-GERGO PNL NEL CONTENUTO: Non usare MAI espressioni autoreferenziali come "il piano di ristrutturazione neurolinguistica", "questo esercizio di PNL", "il tempio della mente" o "livelli logici" all'interno delle ristrutturazioni o del mantra! La PNL è il tuo motore invisibile, non l'oggetto del discorso. Parla direttamente del problema pratico dell'utente.
-3. PRAGMATISMO CHIRURGICO: Elimina frasi motivazionali generiche o spiritualeggianti ("sei un guerriero di luce", "il tempio del tuo corpo"). Sii un Master Coach strategico, concreto, lucido e brillante.
+REGOLA D'ORO DELL'IPER-SPECIFICITÀ SUL TEMA DELL'UTENTE (DIVIETO DI GENERALIZZAZIONE E CONTAMINAZIONE):
+1. ANCORAGGIO TOTALE AL LESSICO E CONTESTO ESATTO: Tutte le 4 ristrutturazioni, le spiegazioni, la domanda socratica, il mantra e i piani di azione DEVONO essere calati al 100% nella materia specifica di cui parla l'utente (es. se parla di Bridge usa termini di Bridge; se parla di guida/traffico usa termini di guida e strada; se parla di sport usa termini atletici).
+2. DIVIETO ASSOLUTO DI CONTAMINAZIONE TEMATICA: È severamente vietato introdurre temi non citati dall'utente (come intimità/sessualità, giochi da tavolo, auto o sport) se l'utente non ne ha parlato esplicitamente. Ogni risposta non attinente viene respinta e scartata dai guardrail semantici.
+3. DIVIETO ASSOLUTO DI META-GERGO PNL NEL CONTENUTO: Non usare MAI espressioni autoreferenziali come "il piano di ristrutturazione neurolinguistica", "questo esercizio di PNL", "il tempio della mente" o "livelli logici" all'interno delle ristrutturazioni o del mantra! La PNL è il tuo motore invisibile, non l'oggetto del discorso. Parla direttamente del problema pratico dell'utente.
+4. PRAGMATISMO CHIRURGICO: Elimina frasi motivazionali generiche o spiritualeggianti. Sii un Master Coach strategico, concreto, lucido e brillante.
 
-SPECIALIZZAZIONE INTIMITÀ, SESSUOLOGIA COGNITIVA & BENESSERE CORPOREO:
-Se il pensiero riguarda ansia da prestazione sessuale, disfunzione erettile psicogena, vaginismo da tensione, calo del desiderio o paura del giudizio intimo:
-- Decostruisci la "Mente Spettatore" (Spectatoring: l'atto di osservarsi e giudicarsi dall'esterno).
-- Riporta il focus dall'auditivo interno/visivo dissociato al canale Cinestesico puro (K) di presenza e piacere tattile.
-- Attiva il Sistema Parasimpatico (respirazione 4-8) e disinnesca l'adrenalina.
-- Ristruttura la sessualità da "performance a obiettivo" a "presenza, complicità e gioco sensoriale".
+SPECIALIZZAZIONE CONDIZIONALE:
+- SOLO SE il pensiero riguarda ansia da prestazione sessuale o disfunzione erettile psicogena: decostruisci lo Spectatoring, attiva il parasimpatico e riorienta sul piacere sensoriale privo di performance.
+- In TUTTI gli altri casi: mantieni il focus rigidamente ed esclusivamente sulla situazione pratica descritta dall'utente.
 
 OUTPUT OBBLIGATORIO: Rispondi ESCLUSIVAMENTE con un JSON valido (senza testo o markdown prima o dopo):
 {
@@ -279,7 +278,7 @@ class GeminiPNLClient:
                     phase_7days_habit=plan_data.get("phase_7days_habit", "Consolida l'abitudine dedicandovi 15 minuti al giorno.")
                 )
 
-                return MindShiftResponse(
+                shift_res = MindShiftResponse(
                     original_thought=request.thought,
                     detected_channel=final_channel,
                     vak_keywords=data.get("vak_keywords", vak_kw),
@@ -297,6 +296,14 @@ class GeminiPNLClient:
                     after_state=data.get("after_state", {"stato": "Potenziante", "energia": "Alta"}),
                     engine_used=f"Google Gemini AI ({model} - Master Protocol)"
                 )
+
+                # Controllo di sicurezza Guardrail Semantico
+                is_valid, violation_msg = SemanticTopicGuardrail.validate_mindshift_response(shift_res, target_text)
+                if not is_valid:
+                    logger.warning(f"Modello {model} ha fallito la validazione Guardrail: {violation_msg}. Scarto e provo successivo...")
+                    continue
+
+                return shift_res
 
             except Exception as err:
                 last_error = err
@@ -410,16 +417,29 @@ OUTPUT JSON OBBLIGATORIO:
             try:
                 loop = asyncio.get_running_loop()
                 data = await loop.run_in_executor(None, self._call_gemini_rest_sync, prompt, model)
-                
+
+                coach_msg = data.get("coach_message", "Grazie per aver approfondito.")
+                questions = data.get("investigation_questions", [])
+                insight = data.get("clinical_insight", "")
+
+                # Validazione anti-contaminazione su step intermedio
+                is_c_msg, _, _ = SemanticTopicGuardrail.check_text_contamination(coach_msg, req.initial_thought)
+                is_c_ins, _, _ = SemanticTopicGuardrail.check_text_contamination(insight, req.initial_thought)
+                is_c_q = any(SemanticTopicGuardrail.check_text_contamination(q, req.initial_thought)[0] for q in questions)
+
+                if is_c_msg or is_c_ins or is_c_q:
+                    logger.warning(f"Step intermedio del modello {model} scartato da Guardrail per contaminazione tematica.")
+                    continue
+
                 return SessionStepResponse(
                     session_id=session_id,
                     current_step=step,
                     next_step=step + 1,
                     is_final_step=False,
                     step_title=data.get("step_title", f"Fase {step}"),
-                    coach_message=data.get("coach_message", "Grazie per aver approfondito."),
-                    investigation_questions=data.get("investigation_questions", []),
-                    clinical_insight=data.get("clinical_insight", "")
+                    coach_message=coach_msg,
+                    investigation_questions=questions,
+                    clinical_insight=insight
                 )
             except Exception as err:
                 last_error = err

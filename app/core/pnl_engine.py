@@ -8,6 +8,7 @@ Comprende:
 """
 
 import re
+import logging
 from typing import List, Tuple, Dict, Optional
 from app.core.models import (
     VAKChannel,
@@ -20,6 +21,9 @@ from app.core.models import (
     SessionStepRequest,
     SessionStepResponse
 )
+from app.core.guardrails import SemanticTopicGuardrail
+
+logger = logging.getLogger("mindshift.pnl_engine")
 
 # DIZIONARI SENSORIALI VAK
 VAK_DICTIONARY = {
@@ -206,7 +210,7 @@ THEMATIC_DOMAINS = [
     },
     {
         "domain": "bridge_giochi_strategici",
-        "keywords": ["bridge", "licita", "licite", "atout", "smazzata", "prese", "carta", "carte", "morto", "dichiarazione", "torneo", "compagno", "tavolo", "avversari", "contratto", "fiori", "quadri", "cuori", "picche"],
+        "keywords": ["bridge", "licita", "licite", "atout", "smazzata", "smazzate", "prese al bridge", "gioco della carta", "tavolo da bridge", "contratto di bridge", "morto al bridge"],
         "context_reframe": "La tua precisione e l'esigenza di calcolo nel Bridge dimostrano profonda intelligenza strategica e rispetto per il gioco della carta. L'imprevisto al tavolo non è un errore, ma il momento esatto in cui inizia la vera partita di deduzione probabilistica.",
         "meaning_reframe": "Una carta inaspettata o una licita complessa non distruggono il tuo piano di gioco: ti forniscono nuove informazioni preziose sulla distribuzione delle mani avversarie. Adattare la linea di gioco alla realtà del tavolo è il massimo livello di maestria del bridgista.",
         "identity_reframe": "Non sei un calcolatore rigido legato a uno schema fisso: sei un Navigatore Strategico delle Probabilità, capace di leggere la smazzata, valorizzare le atout e mantenere la lucidità tattica presa dopo presa.",
@@ -310,6 +314,14 @@ class PNLEngine:
     @classmethod
     def generate_heuristic_reframes(cls, text: str, channel: VAKChannel, meta: MetaModelAnalysis) -> MindShiftResponse:
         matched = cls.match_thematic_domain(text)
+        if matched:
+            # Barriera deterministica del Guardrail Semantico
+            is_contam_ctx, _, _ = SemanticTopicGuardrail.check_text_contamination(matched["context_reframe"], text)
+            is_contam_mean, _, _ = SemanticTopicGuardrail.check_text_contamination(matched["meaning_reframe"], text)
+            if is_contam_ctx or is_contam_mean:
+                logger.warning(f"Matching euristico per '{matched['domain']}' respinto da Guardrail per incompatibilità lessicale.")
+                matched = None
+
         trigger = meta.detected_trigger_words[0] if meta.detected_trigger_words else "questo"
 
         if matched:
@@ -338,7 +350,7 @@ class PNLEngine:
             anchor_steps = [
                 "Porta le spalle indietro e in basso, aprendo il torace.",
                 "Fai un respiro diaframmatico profondo espirando più lentamente di quanto hai inspirato.",
-                "Scegli un punto fermo davanti a te e sorridi per 5 secondi attivando i muscoli zigomatici.",
+                "Scegli un punto fermo davanti a te e sorridi per 5 secondi distendendo il viso e rilasciando le tensioni facciali.",
                 "Senti l'ondata di lucidità mentale che si diffonde nel corpo."
             ]
 
