@@ -54,3 +54,18 @@ def test_generate_heuristic_reframes():
     assert response.anchoring_protocol is not None
     assert response.action_plan is not None
     assert len(response.anchoring_mantra) > 5
+
+def test_thematic_domain_driving_anger():
+    text = "quando sono al volante monto su tutte le furie se qualcuno vuole fare il furbo. Monto su tutte le furie e non riesco a lasciare andare"
+    matched = PNLEngine.match_thematic_domain(text)
+    assert matched is not None
+    assert matched["domain"] == "guida_rabbia_traffico"
+    assert "volante" in matched["keywords"] or "furie" in matched["keywords"]
+
+def test_thematic_domain_isolation():
+    driving_text = "Monto su tutte le furie se qualcuno mi taglia la strada in macchina"
+    matched = PNLEngine.match_thematic_domain(driving_text)
+    assert matched is not None
+    assert matched["domain"] == "guida_rabbia_traffico"
+    assert matched["domain"] != "intimita_sessualita"
+

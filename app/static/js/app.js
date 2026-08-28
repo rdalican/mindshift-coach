@@ -444,6 +444,10 @@ function resetInteractiveSession() {
   if (sessionContainer) sessionContainer.classList.add('hidden');
   if (resultsContainer) resultsContainer.classList.add('hidden');
   currentInteractiveSession.active = false;
+  currentInteractiveSession.history = [];
+  currentInteractiveSession.initialThought = '';
+  currentInteractiveSession.context = '';
+  currentInteractiveSession.currentStep = 1;
   document.getElementById('thought-input')?.focus();
   document.getElementById('mindshift-form')?.scrollIntoView({ behavior: 'smooth' });
 }

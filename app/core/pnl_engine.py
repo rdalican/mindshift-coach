@@ -158,26 +158,50 @@ THEMATIC_DOMAINS = [
     {
         "domain": "intimita_sessualita",
         "keywords": [
-            "sesso", "sessuale", "intimità", "prestazione", "erezione", "erettile", "letto", "partner",
-            "desiderio", "orgasmo", "corpo", "vergogna", "defaillance", "fallire", "prostata", "prostatica",
-            "ipertrofia", "tadalafil", "serenoa", "repens", "urologo", "moglie", "shock", "incinta",
-            "tradimento", "tradimenti", "missionaria", "penetrazione", "eiaculazione", "eccitazione"
+            "sesso", "sessuale", "sessualità", "intimità", "erezione", "erettile", "disfunzione erettile",
+            "insufficienza erettile", "ansia da prestazione", "prostata", "prostatica", "ipertrofia prostatica",
+            "tadalafil", "serenoa repens", "urologo", "spectatoring", "vaginismo", "eiaculazione precoce",
+            "penetrazione", "coito", "calo del desiderio"
         ],
-        "context_reframe": "La risposta del tuo corpo non è un guasto meccanico, ma il riflesso di un sistema nervoso che è andato in allarme (iperattivazione simpatica) per proteggerti da antichi traumi e timori di giudizio. Riconoscere la componente psicogena e medica insieme permette di disinnescare la pressione e ristabilire la normale risposta fisiologica.",
-        "meaning_reframe": "L'erezione non è un test di valore o un dovere esecutivo a comando, ma un processo involontario regolato dal sistema parasimpatico che fiorisce solo quando c'è assenza di giudizio, calma e piacere sensoriale puro. Il farmaco e l'integratore offrono il supporto biologico, ma la vera liberazione avviene quando disinneschi la 'Mente Spettatore'.",
+        "context_reframe": "La risposta del tuo corpo non è un guasto meccanico, ma il riflesso di un sistema nervoso che è andato in allarme (iperattivazione simpatica) per proteggerti da antichi timori di giudizio. Riconoscere la componente psicogena e medica insieme permette di disinnescare la pressione e ristabilire la normale risposta fisiologica.",
+        "meaning_reframe": "L'intimità non è un test di valore o un dovere esecutivo a comando, ma un processo involontario regolato dal sistema parasimpatico che fiorisce solo quando c'è assenza di giudizio, calma e piacere sensoriale puro. Disinnescare la 'Mente Spettatore' apre la via alla vera serenità.",
         "identity_reframe": "Non sei un 'uomo con un problema di prestazione': sei un uomo con una ricca storia emotiva, degno di intimità autentica, piacere e accoglienza, capace di vivere la propria sensualità senza dover dimostrare nulla a nessuno.",
-        "socratic_question": "Cosa accadrebbe se durante l'intimità smettessi di monitorare la tua risposta fisica dall'esterno e ti concedessi di essere semplicemente presente nel contatto della pelle, nel respiro e nel piacere condiviso?",
+        "socratic_question": "Cosa accadrebbe se durante l'intimità smettessi di monitorare la tua risposta fisica dall'esterno e ti concedessi di essere semplicemente presente nel contatto, nel respiro e nel piacere condiviso?",
         "action_2min": "Esegui 4 cicli di respirazione 4-8 (inspira 4 secondi dal naso espandendo l'addome, espira 8 secondi a labbra socchiuse): questo attiva istantaneamente il nervo vago e riduce l'adrenalina nel sangue.",
-        "action_24h": "Condividi un momento di intimità non orientato al coito o alla penetrazione (es. carezze, massaggio, contatto pelle a pelle), concordando preventivamente che l'unico scopo è il rilassamento e la sintonia sensoriale.",
-        "action_7days": "Installa il protocollo di 'Defusione dello Spectatoring': ogni volta che durante un incontro intimo ti accorgi di osservarti dall'alto o giudicarti, di' mentalmente 'Stop' e sposta il 100% dell'attenzione su 3 sensazioni tattili fisiche (il calore della pelle, il battito, il respiro del partner).",
+        "action_24h": "Condividi un momento di intimità non orientato alla prestazione (es. carezze, massaggio, contatto pelle a pelle), concordando preventivamente che l'unico scopo è il rilassamento e la sintonia sensoriale.",
+        "action_7days": "Installa il protocollo di 'Defusione dello Spectatoring': ogni volta che ti accorgi di osservarti dall'alto o giudicarti, di' mentalmente 'Stop' e sposta il 100% dell'attenzione su 3 sensazioni tattili fisiche (il calore della pelle, il battito, il respiro).",
         "mantra": "Io lascio andare ogni controllo e pretesa: il mio corpo è al sicuro e risponde con naturalezza alla calma e al piacere.",
         "anchor_title": "Ancoraggio di Presenza Sensoriale e Calma Parasimpatica",
         "anchor_technique": "Ri-associazione Cinestesica & Respirazione Vago-Mediata",
         "anchor_steps": [
             "Fai un respiro diaframmatico profondo espirando lentamente a labbra socchiuse.",
             "Porta tutta la tua attenzione sensoriale sul contatto del tuo corpo e sul calore delle mani.",
-            "Chiudi gli occhi e visualizza un'onda calda di sicurezza che rilassa il bacino, la prostata e il plesso solare.",
+            "Chiudi gli occhi e visualizza un'onda calda di sicurezza che rilassa il bacino e il plesso solare.",
             "Ripeti dentro di te: 'Il mio corpo sa come rilassarsi. Io sono al sicuro nel piacere'."
+        ]
+    },
+    {
+        "domain": "guida_rabbia_traffico",
+        "keywords": [
+            "volante", "guidare", "guida", "traffico", "macchina", "auto", "strada", "furbo", "furbi",
+            "sorpasso", "precedenza", "rabbia", "furie", "monto su tutte le furie", "clacson", "litigare",
+            "ingiustizia", "stradale", "furia", "arrabbio", "arrabbiare", "incazzo", "incazzare", "corsia"
+        ],
+        "context_reframe": "La tua reazione di rabbia al volante non è cattivo carattere, ma un riflesso protettivo di alto senso di giustizia e prontezza di riflessi che entra in allarme quando percepisci un pericolo o una scorrettezza. Incanalare questa energia ti dà il potere della totale padronanza e lucidità sulla strada.",
+        "meaning_reframe": "Il comportamento scorretto o aggressivo degli altri guidatori è solo la proiezione della loro fretta, distrazione o stress personale: non ha nulla a che fare con te. Non concedere a uno sconosciuto il potere di determinare il tuo battito cardiaco o il tuo stato d'animo.",
+        "identity_reframe": "Non sei un guidatore reattivo che si fa trascinare nelle provocazioni: sei il Sovrano Lucido e Imperturbabile del tuo Spazio al volante, capace di viaggiare in una bolla di totale sicurezza e calma strategica.",
+        "socratic_question": "Se considerassi ogni auto che fa il furbo semplicemente come un ostacolo naturale mobile (come una pozzanghera o una foglia al vento), quale profonda calma proveresti nel lasciarla sfilare via senza alterare la tua serenità?",
+        "action_2min": "Mentre sei seduto o al volante, posiziona le mani rilassate a ore 9:15, rilascia completamente la mandibola e le spalle, e fai 3 respiri profondi prolungando l'espirazione per 8 secondi.",
+        "action_24h": "Durante il prossimo tragitto in auto, adotta la 'Regola del Distacco Regale': se qualcuno commette un'infrazione o cerca di fare il furbo, fai un sorriso interiore, pronuncia a mente 'Ti lascio andare alla tua fretta' e mantieni la tua traiettoria in totale calma.",
+        "action_7days": "Installa il rituale di bordo: appena entri in auto e chiudi la portiera, tocca il volante con consapevolezza, fai un respiro profondo e ripeti il mantra prima di avviare il motore.",
+        "mantra": "Al volante domino il mio spazio interiore: lascio scorrere la fretta altrui e mantengo la mia calma regale.",
+        "anchor_title": "Ancoraggio del Volante e della Calma Regale",
+        "anchor_technique": "Ancoraggio Tattile alle Mani & Dissociazione Strategica",
+        "anchor_steps": [
+            "Afferra il volante con una presa morbida ma presente a ore 9:15.",
+            "Espira lentamente rilasciando ogni tensione dal collo, dalla fronte e dalle spalle.",
+            "Visualizza l'abitacolo della tua auto come una fortezza di serenità e lucidità inviolabile.",
+            "Ripeti mentalmente: 'Io sono il padrone della mia calma: nulla dall'esterno può turbare il mio viaggio'."
         ]
     },
     {
@@ -398,6 +422,10 @@ class PNLEngine:
                 q1 = "In quale momento esatto della partita o del torneo si manifesta questo blocco (es. durante la licita o al gioco della carta)?"
                 q2 = "Cosa noti nel tuo stato d'animo al tavolo non appena si verifica un imprevisto o un errore del compagno?"
                 insight = "Stiamo focalizzando la dinamica percettiva al tavolo da Bridge."
+            elif matched and matched["domain"] == "guida_rabbia_traffico":
+                q1 = "Cosa provi fisicamente al volante (tensione alle braccia, battito accelerato, calore) subito prima che la rabbia prenda il sopravvento?"
+                q2 = "Qual è la specifica mossa dell'altro guidatore che scatena in te la reazione più incontrollabile?"
+                insight = "Indagine sull'iperattivazione adrenergica e sul riflesso di reattività automatica al volante."
             elif matched and matched["domain"] == "attivita_fisica_salute":
                 q1 = "Cosa fai concretamente nei minuti precedenti al momento in cui dovresti iniziare gli esercizi fisici?"
                 q2 = "Qual è la conversazione interna che fai con te stesso quando scegli di dare priorità ad altre commissioni?"
@@ -413,7 +441,7 @@ class PNLEngine:
                 next_step=2,
                 is_final_step=False,
                 step_title="Fase 1: Accoglienza Empatica & Chiarimento del Contesto",
-                coach_message="Ti ringrazio per la profonda fiducia e sincerità nel condividere questo vissuto intimo. Nella nostra seduta non daremo giudizi né risposte affrettate, ma esploreremo insieme come la mente e il corpo interagiscono in questo momento.",
+                coach_message="Ti ringrazio per la fiducia e sincerità nel condividere questa situazione. Nella nostra seduta esploreremo insieme come la tua mente e le tue reazioni interagiscono in questo momento, senza alcun giudizio.",
                 investigation_questions=[q1, q2],
                 clinical_insight=insight
             )
@@ -424,6 +452,10 @@ class PNLEngine:
                 q1 = "In che modo lo shock emotivo vissuto a 23 anni ha installato nell'inconscio la convinzione che lasciarsi andare all'intimità comporti una perdita di controllo o conseguenze gravose?"
                 q2 = "Come si è strutturata nel tempo la ricerca di forti emozioni o di situazioni esterne come tentativo di aggirare questa paura profonda e forzare l'eccitazione?"
                 insight = "Indagine della Time-Line sull'evento di primo imprinting e sull'ancoraggio negativo tra sesso e perdita di controllo."
+            elif matched and matched["domain"] == "guida_rabbia_traffico":
+                q1 = "Ricordi qual è stato il primo episodio al volante o nella tua storia in cui hai provato questo forte senso di ingiustizia verso chi si comporta in modo scorretto?"
+                q2 = "Da quanto tempo noti che l'auto è diventata un catalizzatore di tensione emotiva o di sfida con gli altri?"
+                insight = "Esplorazione della Time-Line sui primi episodi di rabbia reattiva al volante."
             else:
                 q1 = "Da quanto tempo porti con te questo schema o questa specifica preoccupazione?"
                 q2 = "Se guardi indietro lungo la tua storia personale, qual è il primo episodio (anche anni fa o in gioventù) in cui ricordi di aver provato esattamente la stessa sensazione?"
@@ -446,6 +478,10 @@ class PNLEngine:
                 q1 = "Quali aspettative (reali o immaginate) senti gravare su di te durante un incontro intimo, e cosa temi accada se ti mostri vulnerabile senza dover per forza 'performare'?"
                 q2 = "A livello inconscio, in che modo la defaillance o l'ansia sta cercando di 'proteggerti' dal rischio di un coinvolgimento emotivo profondo o dal timore di un nuovo fallimento?"
                 insight = "Mappatura dei vantaggi secondari inconsci e delle dinamiche relazionali sistemiche."
+            elif matched and matched["domain"] == "guida_rabbia_traffico":
+                q1 = "Quando guidi da solo rispetto a quando hai passeggeri a bordo con te, noti se il bisogno di farti rispettare o la rabbia cambiano di intensità?"
+                q2 = "A livello profondo e inconscio, quale sensazione di potere o di protezione ti dà il rifiutarti di lasciar passare chi fa il furbo?"
+                insight = "Analisi del bisogno di controllo del territorio e dell'intenzione positiva di protezione."
             else:
                 q1 = "Ci sono persone, aspettative esterne o dinamiche relazionali attorno a te che alimentano o mantengono viva questa tensione?"
                 q2 = "A livello profondo e inconscio, da quale rischio, fallimento o sofferenza questa parte di te sta cercando di proteggerti?"

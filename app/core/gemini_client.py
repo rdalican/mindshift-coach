@@ -154,17 +154,14 @@ class GeminiPNLClient:
         self.preferred_model = settings.GEMINI_MODEL
 
     def _call_gemini_rest_sync(self, prompt: str, model_name: str, system_instruction: Optional[str] = None) -> dict:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={self.api_key}"
         headers = {
             "Content-Type": "application/json",
             "x-goog-api-key": self.api_key
         }
-        if self.api_key.startswith("AIzaSy"):
-            url = f"{url}?key={self.api_key}"
-        elif self.api_key.startswith("AQ.") or self.api_key.startswith("ya29."):
+        if self.api_key.startswith("ya29."):
             headers["Authorization"] = f"Bearer {self.api_key}"
-        else:
-            url = f"{url}?key={self.api_key}"
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
 
         full_text = f"{system_instruction}\n\n{prompt}" if system_instruction else prompt
 
@@ -200,11 +197,16 @@ class GeminiPNLClient:
             return json.loads(raw_text)
 
     async def generate_shift(self, request: MindShiftRequest) -> MindShiftResponse:
-        channel, vak_kw = PNLEngine.detect_vak_channel(request.thought)
-        meta = PNLEngine.analyze_meta_model(request.thought)
+        target_text = request.thought
+        match_thought = re.search(r'PENSIERO DI PARTENZA:\s*"([^"]+)"', request.thought)
+        if match_thought:
+            target_text = match_thought.group(1)
+
+        channel, vak_kw = PNLEngine.detect_vak_channel(target_text)
+        meta = PNLEngine.analyze_meta_model(target_text)
 
         if not self.api_key:
-            resp = PNLEngine.generate_heuristic_reframes(request.thought, channel, meta)
+            resp = PNLEngine.generate_heuristic_reframes(target_text, channel, meta)
             resp.vak_keywords = vak_kw
             return resp
 
@@ -213,7 +215,7 @@ class GeminiPNLClient:
             prompt += f"CONTESTO: {request.context}\n"
         if request.preferred_channel:
             prompt += f"CANALE PREFERITO FORZATO: {request.preferred_channel}\n"
-        prompt += "\nDIRETTIVA CRUCIALE: Calati al 100% nella materia e nel lessico esatto dell'utente (es. se parla di Bridge usa termini come licita, atout, piano di gioco; se parla di sessuologia/intimità/urologia usa termini precisi come 'Spectatoring', sistema parasimpatico, Tadalafil, Serenoa Repens, ri-associazione cinestesica). NON usare meta-gergo PNL nel contenuto: fornisci soluzioni mentali pratiche, specifiche e chirurgiche.\n"
+        prompt += "\nDIRETTIVA CRUCIALE: Calati al 100% nella materia e nel lessico esatto dell'utente (es. se parla di Bridge usa termini come licita, atout, piano di gioco; se parla di guida/traffico usa termini come volante, strada, precedenza, calma regale; se parla di sessuologia/intimità usa termini precisi come 'Spectatoring', sistema parasimpatico; se parla di salute/sport usa termini come sarcopenia, allenamento). Focalizzati rigorosamente SOLO sul tema in esame. NON usare meta-gergo PNL nel contenuto: fornisci soluzioni mentali pratiche, specifiche e chirurgiche.\n"
 
         models_to_try = [self.preferred_model] + [m for m in CANDIDATE_MODELS if m != self.preferred_model]
         last_error = None
@@ -302,7 +304,7 @@ class GeminiPNLClient:
                 continue
 
         logger.error(f"Tutti i modelli Gemini hanno fallito ({last_error}). Attivo PNL Master Heuristic Protocol v4.0.")
-        resp = PNLEngine.generate_heuristic_reframes(request.thought, channel, meta)
+        resp = PNLEngine.generate_heuristic_reframes(target_text, channel, meta)
         resp.vak_keywords = vak_kw
         resp.engine_used = "PNL Master Heuristic Protocol v4.0 (Multi-Domain Fallback)"
         return resp
