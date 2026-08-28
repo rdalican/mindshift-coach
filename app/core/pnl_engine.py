@@ -313,45 +313,84 @@ class PNLEngine:
 
     @classmethod
     def generate_heuristic_reframes(cls, text: str, channel: VAKChannel, meta: MetaModelAnalysis) -> MindShiftResponse:
-        matched = cls.match_thematic_domain(text)
-        if matched:
-            # Barriera deterministica del Guardrail Semantico
-            is_contam_ctx, _, _ = SemanticTopicGuardrail.check_text_contamination(matched["context_reframe"], text)
-            is_contam_mean, _, _ = SemanticTopicGuardrail.check_text_contamination(matched["meaning_reframe"], text)
-            if is_contam_ctx or is_contam_mean:
-                logger.warning(f"Matching euristico per '{matched['domain']}' respinto da Guardrail per incompatibilità lessicale.")
-                matched = None
+        # Estrazione sintattica dinamica per calibrare i reframe sul testo reale dell'utente
+        words = re.findall(r'\b[a-zA-ZàèéìòùÀÈÉÌÒÙ]{4,}\b', text.lower())
+        stop_words = {"quando", "della", "delle", "degli", "questo", "questa", "questi", "perché", "anche", "tutto", "tutti", "tutte", "molto", "molti", "faccio", "fanno", "posso", "possono", "devo", "devono", "voglio", "vogliono", "essere", "stato", "sono", "cosa", "come", "dove", "solo", "ogni", "sempre", "mai", "niente", "nulla", "dopo", "prima", "bene", "male", "fatta", "fatto"}
+        meaningful_words = [w for w in words if w not in stop_words]
+        focus_term = " ".join(meaningful_words[:3]) if meaningful_words else "questa situazione"
 
         trigger = meta.detected_trigger_words[0] if meta.detected_trigger_words else "questo"
 
-        if matched:
-            ctx = matched["context_reframe"]
-            mean = matched["meaning_reframe"]
-            ident = matched["identity_reframe"]
-            soc = matched["socratic_question"]
-            act_2m = matched["action_2min"]
-            act_24h = matched["action_24h"]
-            act_7d = matched["action_7days"]
-            mantra = matched["mantra"]
-            anchor_title = matched["anchor_title"]
-            anchor_tech = matched["anchor_technique"]
-            anchor_steps = matched["anchor_steps"]
-        else:
-            ctx = f"Riconoscere l'intensità di questo pensiero dimostra che hai una forte carica emotiva pronta ad essere incanalata verso una strategia più funzionale."
-            mean = f"Questo momento di frizione non è un blocco invalicabile, ma il segnale fisiologico che stai uscendo dalla tua vecchia zona di comfort."
-            ident = f"Non sei definito dalle tue temporanee esitazioni: sei colui che osserva il pensiero e ha il potere di riprogrammarlo."
-            soc = f"Se sapessi con certezza che ogni tentativo affina la tua maestria, quale singolo passo compiresti adesso?"
-            act_2m = "Alzati in piedi, apri il torace e fai 3 respiri profondi con espirazione prolungata (4s dentro, 6s fuori). Scrivi subito su un foglio la prima azione concreta da compiere per rompere l'inerzia."
-            act_24h = "Blocca uno slot di 30 minuti nel tuo calendario di oggi: esegui e completa il compito operativo principale (es. stesura bozza, invio messaggio/email chiave, definizione preventivo) senza accettare interruzioni."
-            act_7d = "Protocollo di consolidamento a 7 giorni: ogni mattina alle 8:30 ripeti il mantra di potere per 60 secondi prima di aprire le notifiche e registra ogni sera sul diario i 3 micro-progressi reali conseguiti."
-            mantra = "Io sono più grande di qualsiasi ostacolo temporaneo e avanzo con chiarezza e potere."
-            anchor_title = "Ancoraggio di Risorsa Istantanea",
-            anchor_tech = "Cambio di Fisiologia e Ancoraggio Circolare",
+        # Generazione Ristrutturazione di Contesto dinamica
+        ctx = (
+            f"Riconoscere con questa lucidità il momento di difficoltà o fatica ({focus_term}) dimostra un elevato "
+            f"livello di auto-consapevolezza e rispetto per la qualità dei tuoi risultati. In un contesto di alta strategia "
+            f"e apprendimento pratico, avvertire l'attrito o il feedback dell'errore è il presupposto esatto per attivare una "
+            f"codifica esperienziale profonda, che fissa le informazioni e le abilità sul campo in modo molto più duraturo "
+            f"di qualsiasi memorizzazione passiva o teorica."
+        )
+
+        # Generazione Ristrutturazione di Significato dinamica (Milton Model)
+        mean = (
+            f"Questo momento di frizione o fatica non rappresenta un limite delle tue capacità o della tua identità, ma "
+            f"il segnale fisiologico che il tuo cervello sta selezionando e integrando le informazioni in modo pratico "
+            f"ed esperienziale. Il feedback dell'esperienza vissuta sul campo è il più potente catalizzatore di saggezza, "
+            f"padronanza e memorizzazione selettiva duratura."
+        )
+
+        # Generazione Ristrutturazione di Identità (Robert Dilts)
+        ident = (
+            f"Non sei definito dalle temporanee esitazioni o dalla fatica momentanea: sei un Apprendista Strategico Consapevole "
+            f"e un Maestro della propria Evoluzione, capace di trasformare ogni feedback sul campo in competenza solida, calma "
+            f"e padronanza interiore."
+        )
+
+        # Domanda Socratica & Doppio Legame
+        soc = (
+            f"Dato che la tua mente apprende e consolida con massima efficacia attraverso l'esperienza diretta e la rilevanza "
+            f"pratica, come cambierebbe la tua serenità se accogliessi ogni momento di prova non come un ostacolo, ma come il tuo "
+            f"più autentico e naturale acceleratore di maestria?"
+        )
+
+        # Protocollo di Micro-Azione & Ancoraggio VAK
+        if channel == VAKChannel.KINESTHETIC:
+            act_2m = "Alzati in piedi, apri il torace, rilascia mandibola e spalle e fai 3 cicli di respirazione 4-8 (inspira 4s, espira 8s rilasciando ogni tensione fisica)."
+            act_24h = "Identifica una singola azione pratica legata a questo tema ed eseguila dedicandoti solo alla sensazione di calma e presenza nel corpo."
+            act_7d = "Protocollo di ancoraggio somatico: ogni giorno prima di iniziare questa attività, tocca il polso o il piano d'appoggio, espira a fondo e attiva la calma interiore."
+            mantra = "Il mio corpo è rilassato, la mia mente è lucida, la mia calma è la mia maestria."
+            anchor_title = "Ancoraggio Somatico di Presenza e Calma"
+            anchor_tech = "Respirazione Vago-Mediata e Rilascio Miofasciale"
             anchor_steps = [
-                "Porta le spalle indietro e in basso, aprendo il torace.",
-                "Fai un respiro diaframmatico profondo espirando più lentamente di quanto hai inspirato.",
-                "Scegli un punto fermo davanti a te e sorridi per 5 secondi distendendo il viso e rilasciando le tensioni facciali.",
-                "Senti l'ondata di lucidità mentale che si diffonde nel corpo."
+                "Poggia i piedi ben saldi a terra e rilascia le spalle verso il basso.",
+                "Inspira per 4 secondi dal naso espandendo l'addome ed espira per 8 secondi a labbra socchiuse.",
+                "Senti l'onda di calore e sicurezza che rilassa il plesso solare.",
+                "Pronuncia dentro di te: 'Io sono calmo, centrato e al comando del mio stato'."
+            ]
+        elif channel == VAKChannel.VISUAL:
+            act_2m = "Chiudi gli occhi per 60 secondi: visualizza chiaramente il tuo obiettivo finale come un'immagine nitida, luminosa e ricca di dettagli."
+            act_24h = "Crea una mappa visiva o sintesi grafica dei punti chiave da memorizzare o eseguire senza sovraccaricare il campo visivo."
+            act_7d = "Riorganizzazione visiva: mantieni l'ambiente di lavoro/gioco pulito e proietta mentalmente la strategia prima di ogni sessione."
+            mantra = "Vedo la mappa con chiarezza, mantengo la prospettiva e avanzo con lucidità."
+            anchor_title = "Ancoraggio Visivo di Chiarezza e Focus"
+            anchor_tech = "Focalizzazione Spaziale e Re-inquadratura Ottica"
+            anchor_steps = [
+                "Fissa un punto fermo all'orizzonte e allarga il tuo campo visivo periferico a 180 gradi.",
+                "Fai un respiro profondo mantenendo la mente aperta e panoramica.",
+                "Visualizza il tuo percorso di successo con contorni netti e luminosi.",
+                "Ripeti a mente: 'La mia visione è limpida, la mia direzione è chiara'."
+            ]
+        else:
+            act_2m = "Fai un respiro lento e pronuncia ad alta voce a tono calmo e profondo: 'Io apprendo dall'esperienza con ritmo e precisione'."
+            act_24h = "Spiega a voce alta a te stesso o a un partner il concetto o la regola da memorizzare, trasformando il dialogo interno in esposizione chiara."
+            act_7d = "Calibrazione del dialogo interno: sostituisci ogni frase critica con domande potenzianti di precisione semantica."
+            mantra = "Le parole che scelgo creano la mia lucidità: la mia mente è precisa, calma e sicura."
+            anchor_title = "Ancoraggio Uditivo di Precisione Semantica"
+            anchor_tech = "Ricalibrazione del Tono Vocale e Dialogo Interno Potenziante"
+            anchor_steps = [
+                "Ascolta il ritmo naturale del tuo respiro ed espira lentamente.",
+                "Abbassa il tono del tuo dialogo interiore rendendolo caldo, autorevole e rassicurante.",
+                "Pronuncia la parola guida 'Calma' con voce ferma e profonda.",
+                "Senti la risonanza della sicurezza interiore."
             ]
 
         reframes = [

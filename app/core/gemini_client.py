@@ -139,10 +139,10 @@ OUTPUT OBBLIGATORIO: Rispondi ESCLUSIVAMENTE con un JSON valido (senza testo o m
 """
 
 CANDIDATE_MODELS = [
-    "gemini-1.5-flash",
-    "gemini-2.0-flash",
-    "gemini-2.5-flash",
-    "gemini-1.5-pro"
+    "gemini-3.5-flash",
+    "gemini-3.1-flash-lite",
+    "gemini-3-flash-preview",
+    "gemini-flash-latest"
 ]
 
 class GeminiPNLClient:
@@ -153,6 +153,7 @@ class GeminiPNLClient:
         self.preferred_model = settings.GEMINI_MODEL
 
     def _call_gemini_rest_sync(self, prompt: str, model_name: str, system_instruction: Optional[str] = None) -> dict:
+        import time
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={self.api_key}"
         headers = {
             "Content-Type": "application/json",
@@ -182,18 +183,28 @@ class GeminiPNLClient:
             headers=headers,
             method="POST"
         )
-        with urllib.request.urlopen(req, timeout=25) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            raw_text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
-            
-            if raw_text.startswith("```json"):
-                raw_text = re.sub(r"^```json\s*", "", raw_text)
-                raw_text = re.sub(r"\s*```$", "", raw_text)
-            elif raw_text.startswith("```"):
-                raw_text = re.sub(r"^```\s*", "", raw_text)
-                raw_text = re.sub(r"\s*```$", "", raw_text)
+        
+        # Retry con backoff per rate limit temporaneo
+        max_attempts = 2
+        for attempt in range(max_attempts):
+            try:
+                with urllib.request.urlopen(req, timeout=25) as resp:
+                    data = json.loads(resp.read().decode("utf-8"))
+                    raw_text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
+                    
+                    if raw_text.startswith("```json"):
+                        raw_text = re.sub(r"^```json\s*", "", raw_text)
+                        raw_text = re.sub(r"\s*```$", "", raw_text)
+                    elif raw_text.startswith("```"):
+                        raw_text = re.sub(r"^```\s*", "", raw_text)
+                        raw_text = re.sub(r"\s*```$", "", raw_text)
 
-            return json.loads(raw_text)
+                    return json.loads(raw_text)
+            except urllib.error.HTTPError as he:
+                if he.code == 429 and attempt < max_attempts - 1:
+                    time.sleep(2.0)
+                    continue
+                raise he
 
     async def generate_shift(self, request: MindShiftRequest) -> MindShiftResponse:
         target_text = request.thought
