@@ -231,3 +231,22 @@ class AudioTrackInfo(BaseModel):
     voice_name: str
     audio_url: str
 
+# --- MODELLI PROFILO ESPERIENZIALE EVOLUTIVO (MEMORIA CLINICA ACCOUNT) ---
+class ExperientialProfile(BaseModel):
+    sync_key: str
+    total_episodes_analyzed: int = 0
+    primary_vak_channel: str = "Cinestesico (K)"
+    vak_distribution: Dict[str, int] = Field(default_factory=dict)
+    core_limiting_structures: List[str] = Field(default_factory=list)
+    unlocked_mastery_archetypes: List[str] = Field(default_factory=list)
+    high_resonance_mantras: List[str] = Field(default_factory=list)
+    clinical_synthesis_narrative: str = ""
+    preferred_reframe_style: str = "Identità (Robert Dilts) & Milton Model"
+    last_profile_update: Optional[str] = None
+
+class AccountMemoryResponse(BaseModel):
+    sync_key: str
+    profile: Optional[ExperientialProfile] = None
+    total_saved_shifts: int = 0
+    message: str = "Profilo esperienziale caricato con successo"
+

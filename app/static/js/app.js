@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initForm();
   await initSyncKey();
   loadSavedShifts();
+  loadExperientialMemory();
   loadAnalytics();
   loadRoadmap();
   loadMasterAudioTracks();
@@ -1079,6 +1080,7 @@ async function loadSavedShifts() {
         cachedShifts = data.shifts || [];
         if (countBadge) countBadge.textContent = data.count;
         renderFilteredShifts(cachedShifts);
+        loadExperientialMemory();
       }
     }
   } catch (e) {
@@ -1483,4 +1485,114 @@ function copyToClipboard(text) {
 function escapeJs(str) {
   if (!str) return '';
   return str.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ');
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// --- EXPERIENTIAL MEMORY CLIENT ---
+async function loadExperientialMemory() {
+  const card = document.getElementById('experiential-memory-card');
+  if (!card || !currentSyncKey) return;
+
+  try {
+    const res = await fetch(`/api/account/memory?sync_key=${encodeURIComponent(currentSyncKey)}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    const profile = data.profile;
+    if (!profile) return;
+
+    // Update Badge
+    const badge = document.getElementById('memory-episodes-badge');
+    if (badge) badge.textContent = `${profile.total_episodes_analyzed} Episodi Mappati`;
+
+    // Dominant VAK
+    const vakEl = document.getElementById('memory-dominant-vak');
+    if (vakEl) vakEl.textContent = profile.primary_vak_channel || 'Cinestesico (K)';
+
+    const vakDesc = document.getElementById('memory-vak-desc');
+    if (vakDesc) {
+      if ((profile.primary_vak_channel || '').includes('Cinestesico')) {
+        vakDesc.textContent = 'Elaborazione somatica, tattile e centratura emotiva.';
+      } else if ((profile.primary_vak_channel || '').includes('Visivo')) {
+        vakDesc.textContent = 'Proiezioni visive, chiarezza mentale e prospettiva spaziale.';
+      } else {
+        vakDesc.textContent = 'Dialogo interno analitico e precisione semantica.';
+      }
+    }
+
+    // Limiting Patterns
+    const patternsList = document.getElementById('memory-limiting-patterns');
+    if (patternsList) {
+      if (profile.core_limiting_structures && profile.core_limiting_structures.length > 0) {
+        patternsList.innerHTML = profile.core_limiting_structures.map(p => `
+          <li class="flex items-center gap-1.5 text-slate-300">
+            <span class="text-amber-400">⚡</span> ${escapeHtml(p)}
+          </li>
+        `).join('');
+      } else {
+        patternsList.innerHTML = '<li class="text-slate-400 italic">Nessun pattern limitante rilevato.</li>';
+      }
+    }
+
+    // Unlocked Archetypes
+    const archetypesBox = document.getElementById('memory-unlocked-archetypes');
+    if (archetypesBox) {
+      if (profile.unlocked_mastery_archetypes && profile.unlocked_mastery_archetypes.length > 0) {
+        archetypesBox.innerHTML = profile.unlocked_mastery_archetypes.map(a => `
+          <span class="text-[10px] px-2 py-0.5 rounded bg-teal-950 text-teal-300 border border-teal-800 font-semibold shadow-sm">👑 ${escapeHtml(a)}</span>
+        `).join('');
+      } else {
+        archetypesBox.innerHTML = '<span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">In elaborazione</span>';
+      }
+    }
+
+    // Clinical Narrative
+    const narrativeEl = document.getElementById('memory-clinical-narrative');
+    if (narrativeEl) {
+      narrativeEl.textContent = profile.clinical_synthesis_narrative || 'In attesa di sessioni registrate per la sintesi.';
+    }
+
+    const updatedLabel = document.getElementById('memory-updated-label');
+    if (updatedLabel && profile.last_profile_update) {
+      updatedLabel.textContent = `Aggiornato: ${new Date(profile.last_profile_update).toLocaleTimeString('it-IT', {hour: '2-digit', minute: '2-digit'})}`;
+    }
+  } catch (err) {
+    console.warn('Errore caricamento memoria esperienziale:', err);
+  }
+}
+
+async function rebuildAccountMemory() {
+  if (!currentSyncKey) {
+    alert('Nessuna Sync Key collegata.');
+    return;
+  }
+
+  const btn = document.getElementById('rebuild-memory-btn');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span>⏳</span> Ricalcolo...';
+  }
+
+  try {
+    const res = await fetch('/api/account/memory/rebuild', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sync_key: currentSyncKey })
+    });
+
+    if (res.ok) {
+      await loadExperientialMemory();
+      alert('🧠 Memoria Esperienziale del Coach PNL ricalibrata con successo su tutte le tue sessioni!');
+    }
+  } catch (err) {
+    alert('Errore nel ricalcolo della memoria esperienziale.');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<span>🔄</span> Ricalibra Memoria';
+    }
+  }
 }

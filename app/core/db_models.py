@@ -21,6 +21,8 @@ class UserSyncProfile(Base):
     preferred_vak = Column(String(50), nullable=True)
     plan_status = Column(String(50), default="trial")
     trial_ends_at = Column(DateTime, nullable=True)
+    experiential_profile_json = Column(Text, nullable=True)
+    memory_updated_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=utc_now)
     last_sync_at = Column(DateTime, default=utc_now, onupdate=utc_now)
 

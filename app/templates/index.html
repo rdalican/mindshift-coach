@@ -586,6 +586,73 @@
         </div>
       </div>
 
+      <!-- EXPERIENTIAL MEMORY & CLINICAL PROFILE CARD -->
+      <div id="experiential-memory-card" class="glass-panel p-5 rounded-2xl mb-6 border border-teal-500/40 bg-gradient-to-br from-slate-900/90 via-slate-900/60 to-teal-950/30 shadow-2xl">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4 border-b border-slate-800 pb-3">
+          <div class="flex items-center gap-2.5">
+            <span class="text-2xl">🧠</span>
+            <div>
+              <h3 class="text-base font-bold text-teal-300 flex items-center gap-2">
+                Memoria Esperienziale Evolutiva del Coach PNL
+                <span id="memory-episodes-badge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-teal-900/80 text-teal-200 border border-teal-700">0 Episodi Mappati</span>
+              </h3>
+              <p class="text-[11px] text-slate-400">Il Coach PNL integra i tuoi blocchi e successi storici per calibrare le future sedute in modo iper-personalizzato sul tuo profilo.</p>
+            </div>
+          </div>
+          <button 
+            onclick="rebuildAccountMemory()" 
+            id="rebuild-memory-btn"
+            class="px-3 py-1.5 rounded-lg text-xs font-bold bg-teal-900/60 hover:bg-teal-800 text-teal-200 border border-teal-700 transition flex items-center gap-1.5 cursor-pointer"
+          >
+            <span>🔄</span> Ricalibra Memoria
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <!-- Dominant VAK & Perception -->
+          <div class="bg-slate-950/60 p-3.5 rounded-xl border border-slate-800">
+            <span class="text-[11px] font-semibold text-slate-400 block mb-1 flex items-center gap-1">
+              <span>🎯</span> Canale Sensoriale Prevalente:
+            </span>
+            <span id="memory-dominant-vak" class="text-sm font-bold text-cyan-300">Cinestesico (K)</span>
+            <p id="memory-vak-desc" class="text-[10px] text-slate-400 mt-1">Elaborazione somatica ed emotiva profonda.</p>
+          </div>
+
+          <!-- Limiting Patterns -->
+          <div class="bg-slate-950/60 p-3.5 rounded-xl border border-slate-800">
+            <span class="text-[11px] font-semibold text-slate-400 block mb-1 flex items-center gap-1">
+              <span>🔍</span> Pattern & Bias Ricorrenti:
+            </span>
+            <ul id="memory-limiting-patterns" class="text-xs text-slate-200 space-y-1 font-medium">
+              <li class="text-slate-400 italic">In attesa di sessioni...</li>
+            </ul>
+          </div>
+
+          <!-- Unlocked Archetypes -->
+          <div class="bg-slate-950/60 p-3.5 rounded-xl border border-slate-800">
+            <span class="text-[11px] font-semibold text-slate-400 block mb-1 flex items-center gap-1">
+              <span>👑</span> Archetipi di Risorsa Sbloccati:
+            </span>
+            <div id="memory-unlocked-archetypes" class="flex flex-wrap gap-1.5">
+              <span class="text-[10px] px-2 py-0.5 rounded bg-teal-950 text-teal-300 border border-teal-800">Osservatore Consapevole</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clinical Narrative Synthesis -->
+        <div class="bg-teal-950/30 p-4 rounded-xl border border-teal-800/50">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-bold text-teal-300 flex items-center gap-1.5">
+              <span>📋</span> Sintesi Psico-Esperienziale dell'Account (IA Master PNL):
+            </span>
+            <span id="memory-updated-label" class="text-[10px] font-mono text-slate-400">Aggiornato di recente</span>
+          </div>
+          <p id="memory-clinical-narrative" class="text-xs text-slate-200 leading-relaxed font-normal whitespace-pre-line">
+            Caricamento memoria esperienziale in corso...
+          </p>
+        </div>
+      </div>
+
       <!-- SEARCH & FILTER BAR -->
       <div class="glass-panel p-3 rounded-xl mb-4 border border-slate-800 flex flex-wrap items-center gap-3">
         <input 

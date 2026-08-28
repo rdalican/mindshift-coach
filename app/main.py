@@ -45,12 +45,15 @@ from app.core.models import (
     SessionStepRequest,
     SessionStepResponse,
     TTSSynthesizeRequest,
-    AudioTrackInfo
+    AudioTrackInfo,
+    ExperientialProfile,
+    AccountMemoryResponse
 )
 from app.core.gemini_client import gemini_pnl_client
 from app.core.stripe_client import stripe_manager
 from app.core.roadmap_tracker import roadmap_tracker
 from app.core.monitoring import system_monitor
+from app.core.experiential_memory import ExperientialMemoryEngine
 
 # Inizializza le tabelle all'import
 init_db()
@@ -196,6 +199,12 @@ async def perform_reframe(req: MindShiftRequest, db: Session = Depends(get_db)):
                     ))
                 db.commit()
 
+                # Aggiorna la memoria esperienziale evolutiva dell'account
+                try:
+                    ExperientialMemoryEngine.synthesize_profile(sync_key, db)
+                except Exception as mem_err:
+                    pass
+
         return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Errore durante l'elaborazione PNL: {str(e)}")
@@ -273,6 +282,12 @@ async def perform_session_step(req: SessionStepRequest, db: Session = Depends(ge
                         plan_status="trial"
                     ))
                 db.commit()
+
+            # Aggiorna la memoria esperienziale evolutiva dell'account
+            try:
+                ExperientialMemoryEngine.synthesize_profile(sync_key, db)
+            except Exception as mem_err:
+                pass
 
         return response
     except Exception as e:
@@ -423,6 +438,43 @@ async def get_vak_analytics(sync_key: str, db: Session = Depends(get_db)):
         total_shifts=total_shifts,
         average_resonance_score=avg_rating,
         empowerment_index=empowerment_index
+    )
+
+# ==========================================
+# EXPERIENTIAL MEMORY & COGNITIVE PROFILE API
+# ==========================================
+@app.get("/api/account/memory", response_model=AccountMemoryResponse)
+async def get_account_experiential_memory(sync_key: str, db: Session = Depends(get_db)):
+    """Restituisce il profilo esperienziale evolutivo dell'account derivato dai blocchi storici."""
+    if not sync_key:
+        raise HTTPException(status_code=400, detail="sync_key obbligatoria.")
+
+    clean_key = sync_key.strip().upper()
+    total_saved = db.query(SavedMindShift).filter(SavedMindShift.sync_key == clean_key).count()
+    profile = ExperientialMemoryEngine.get_or_build_profile(clean_key, db)
+
+    return AccountMemoryResponse(
+        sync_key=clean_key,
+        profile=profile,
+        total_saved_shifts=total_saved,
+        message="Profilo esperienziale dell'account caricato con successo."
+    )
+
+@app.post("/api/account/memory/rebuild", response_model=AccountMemoryResponse)
+async def rebuild_account_experiential_memory(req: DevicePairRequest, db: Session = Depends(get_db)):
+    """Ricalcola e risintetizza la memoria clinica dell'account basandosi su tutti gli episodi registrati."""
+    if not req.sync_key:
+        raise HTTPException(status_code=400, detail="sync_key obbligatoria.")
+
+    clean_key = req.sync_key.strip().upper()
+    total_saved = db.query(SavedMindShift).filter(SavedMindShift.sync_key == clean_key).count()
+    profile = ExperientialMemoryEngine.synthesize_profile(clean_key, db)
+
+    return AccountMemoryResponse(
+        sync_key=clean_key,
+        profile=profile,
+        total_saved_shifts=total_saved,
+        message="Memoria esperienziale ricalibrata e aggiornata con successo."
     )
 
 # ==========================================

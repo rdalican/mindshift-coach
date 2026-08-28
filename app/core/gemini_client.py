@@ -214,6 +214,20 @@ class GeminiPNLClient:
             prompt += f"CONTESTO: {request.context}\n"
         if request.preferred_channel:
             prompt += f"CANALE PREFERITO FORZATO: {request.preferred_channel}\n"
+
+        # Iniezione Memoria Esperienziale Evolutiva dell'Account
+        if request.sync_key:
+            try:
+                from app.core.database import SessionLocal
+                from app.core.experiential_memory import ExperientialMemoryEngine
+                with SessionLocal() as db:
+                    profile = ExperientialMemoryEngine.get_or_build_profile(request.sync_key, db)
+                    if profile and profile.total_episodes_analyzed > 0:
+                        profile_block = ExperientialMemoryEngine.format_profile_for_prompt(profile)
+                        prompt += f"\n{profile_block}\n"
+            except Exception as e:
+                logger.warning(f"Impossibile iniettare profilo esperienziale: {e}")
+
         prompt += "\nDIRETTIVA CRUCIALE: Calati al 100% nella materia e nel lessico esatto dell'utente (es. se parla di Bridge usa termini come licita, atout, piano di gioco; se parla di guida/traffico usa termini come volante, strada, precedenza, calma regale; se parla di sessuologia/intimità usa termini precisi come 'Spectatoring', sistema parasimpatico; se parla di salute/sport usa termini come sarcopenia, allenamento). Focalizzati rigorosamente SOLO sul tema in esame. NON usare meta-gergo PNL nel contenuto: fornisci soluzioni mentali pratiche, specifiche e chirurgiche.\n"
 
         models_to_try = [self.preferred_model] + [m for m in CANDIDATE_MODELS if m != self.preferred_model]
@@ -325,12 +339,26 @@ class GeminiPNLClient:
             return PNLEngine.generate_heuristic_session_step(req)
 
         step = req.current_step
+
+        # Iniezione Memoria Esperienziale Evolutiva per calibrare le domande della seduta
+        profile_block = ""
+        if req.sync_key:
+            try:
+                from app.core.database import SessionLocal
+                from app.core.experiential_memory import ExperientialMemoryEngine
+                with SessionLocal() as db:
+                    profile = ExperientialMemoryEngine.get_or_build_profile(req.sync_key, db)
+                    if profile and profile.total_episodes_analyzed > 0:
+                        profile_block = f"\n{ExperientialMemoryEngine.format_profile_for_prompt(profile)}\n"
+            except Exception as e:
+                logger.warning(f"Impossibile caricare profilo esperienziale per session step: {e}")
         
         # Costruzione del prompt per la fase specifica
         if step == 1:
             instruction = """SEI: Un Master Coach PNL & Psicoterapeuta Ericksoniano empatico e caloroso.
 L'utente sta iniziando una seduta e ha espresso questo pensiero/blocco iniziale:
 "{initial_thought}" (Contesto: {context})
+{profile_block}
 
 OBIETTIVO FASE 1 (Accoglienza Empatica & Chiarimento del Contesto):
 1. Formula una risposta empatica di ascolto attivo (in 'coach_message') per validare l'esperienza senza giudizio e senza dare soluzioni premature.
@@ -344,12 +372,13 @@ OUTPUT JSON OBBLIGATORIO (senza markdown o testo prima/dopo):
   "investigation_questions": ["domanda 1", "domanda 2"],
   "clinical_insight": "..."
 }"""
-            prompt = instruction.replace("{initial_thought}", req.initial_thought).replace("{context}", req.context or "Generale")
+            prompt = instruction.replace("{initial_thought}", req.initial_thought).replace("{context}", req.context or "Generale").replace("{profile_block}", profile_block)
 
         elif step == 2:
             history_text = "\n".join([f"- {m.role.upper()}: {m.content}" for m in req.history])
             instruction = """SEI: Un Master Coach PNL & Psicoterapeuta Ericksoniano.
 Pensiero iniziale: "{initial_thought}"
+{profile_block}
 Cronologia seduta finora:
 {history_text}
 Ultima risposta dell'utente sul contesto: "{user_resp}"
@@ -366,12 +395,13 @@ OUTPUT JSON OBBLIGATORIO:
   "investigation_questions": ["domanda 1", "domanda 2"],
   "clinical_insight": "..."
 }"""
-            prompt = instruction.replace("{initial_thought}", req.initial_thought).replace("{history_text}", history_text).replace("{user_resp}", req.latest_user_response or "")
+            prompt = instruction.replace("{initial_thought}", req.initial_thought).replace("{history_text}", history_text).replace("{user_resp}", req.latest_user_response or "").replace("{profile_block}", profile_block)
 
         elif step == 3:
             history_text = "\n".join([f"- {m.role.upper()}: {m.content}" for m in req.history])
             instruction = """SEI: Un Master Coach PNL & Psicoterapeuta Ericksoniano.
 Pensiero iniziale: "{initial_thought}"
+{profile_block}
 Cronologia seduta finora:
 {history_text}
 Ultima risposta dell'utente sulla storia passata: "{user_resp}"
@@ -388,7 +418,7 @@ OUTPUT JSON OBBLIGATORIO:
   "investigation_questions": ["domanda 1", "domanda 2"],
   "clinical_insight": "..."
 }"""
-            prompt = instruction.replace("{initial_thought}", req.initial_thought).replace("{history_text}", history_text).replace("{user_resp}", req.latest_user_response or "")
+            prompt = instruction.replace("{initial_thought}", req.initial_thought).replace("{history_text}", history_text).replace("{user_resp}", req.latest_user_response or "").replace("{profile_block}", profile_block)
 
         else:
             # Fase 4: Sintesi finale terapeutica completa

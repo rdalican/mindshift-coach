@@ -40,9 +40,23 @@ def get_db():
         db.close()
 
 def init_db():
-    """Crea le tabelle del database se non esistono già."""
+    """Crea le tabelle del database se non esistono già e applica migrazioni automatiche."""
     try:
         from app.core import db_models  # Importa i modelli prima del create_all
         Base.metadata.create_all(bind=engine)
+
+        # Migrazione automatica colonne per compatibilità con database esistenti
+        with engine.connect() as conn:
+            from sqlalchemy import text
+            try:
+                conn.execute(text("ALTER TABLE user_sync_profiles ADD COLUMN experiential_profile_json TEXT"))
+                conn.commit()
+            except Exception:
+                pass
+            try:
+                conn.execute(text("ALTER TABLE user_sync_profiles ADD COLUMN memory_updated_at TIMESTAMP"))
+                conn.commit()
+            except Exception:
+                pass
     except Exception as e:
         logger.warning(f"Attenzione: init_db ritardato o fallback: {e}")
