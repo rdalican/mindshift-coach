@@ -95,7 +95,7 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 @app.get("/", response_class=HTMLResponse)
 async def serve_home(request: Request):
     roadmap_data = roadmap_tracker.get_roadmap_summary()
-    return templates.TemplateResponse(
+    response = templates.TemplateResponse(
         request=request,
         name="index.html",
         context={
@@ -105,6 +105,11 @@ async def serve_home(request: Request):
             "stripe_publishable_key": settings.STRIPE_PUBLISHABLE_KEY or ""
         }
     )
+    # Disabilita completamente il caching dell'HTML per garantire aggiornamenti live istantanei
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
 
 @app.get("/health")
 async def healthcheck():
@@ -342,21 +347,39 @@ async def get_master_audio_tracks():
 
 @app.post("/api/tts/synthesize")
 async def synthesize_neural_speech(req: TTSSynthesizeRequest):
-    """Sintetizza qualsiasi testo in tempo reale con voci neurali studio ad alta definizione."""
+    """Sintetizza qualsiasi testo in tempo reale con voci neurali calde, profonde e rilassanti."""
     try:
         import edge_tts
-        communicate = edge_tts.Communicate(
-            req.text,
-            voice=req.voice or "it-IT-DiegoNeural",
-            rate=req.rate or "-10%",
-            pitch=req.pitch or "+0Hz"
-        )
-        audio_chunks = []
-        async for chunk in communicate.stream():
-            if chunk["type"] == "audio":
-                audio_chunks.append(chunk["data"])
+        chosen_voice = req.voice or "it-IT-GiuseppeMultilingualNeural"
+        chosen_rate = req.rate or "-8%"
+        chosen_pitch = req.pitch or "-5Hz"
         
-        audio_bytes = b"".join(audio_chunks)
+        try:
+            communicate = edge_tts.Communicate(
+                req.text,
+                voice=chosen_voice,
+                rate=chosen_rate,
+                pitch=chosen_pitch
+            )
+            audio_chunks = []
+            async for chunk in communicate.stream():
+                if chunk["type"] == "audio":
+                    audio_chunks.append(chunk["data"])
+            audio_bytes = b"".join(audio_chunks)
+        except Exception as voice_err:
+            logger.warning(f"Fallback su Diego per TTS: {voice_err}")
+            communicate = edge_tts.Communicate(
+                req.text,
+                voice="it-IT-DiegoNeural",
+                rate="-10%",
+                pitch="-6Hz"
+            )
+            audio_chunks = []
+            async for chunk in communicate.stream():
+                if chunk["type"] == "audio":
+                    audio_chunks.append(chunk["data"])
+            audio_bytes = b"".join(audio_chunks)
+            
         return Response(content=audio_bytes, media_type="audio/mpeg", headers={
             "Content-Disposition": "inline; filename=speech.mp3",
             "Cache-Control": "public, max-age=3600"
@@ -867,5 +890,13 @@ async def get_manifest():
 async def get_service_worker():
     sw_path = os.path.join(STATIC_DIR, "js", "service-worker.js")
     if os.path.exists(sw_path):
-        return FileResponse(sw_path, media_type="application/javascript")
+        return FileResponse(
+            sw_path, 
+            media_type="application/javascript",
+            headers={
+                "Cache-Control": "no-cache, no-store, must-revalidate, max-age=0",
+                "Pragma": "no-cache",
+                "Expires": "0"
+            }
+        )
     return Response(content="", media_type="application/javascript")

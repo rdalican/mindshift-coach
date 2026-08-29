@@ -121,13 +121,19 @@ def test_master_audio_tracks_endpoint():
 def test_tts_synthesize_endpoint():
     payload = {
         "text": "Respira profondamente e ascolta questa guida.",
-        "voice": "it-IT-DiegoNeural",
-        "rate": "-10%",
-        "pitch": "+0Hz"
+        "voice": "it-IT-GiuseppeMultilingualNeural",
+        "rate": "-8%",
+        "pitch": "-5Hz"
     }
     response = client.post("/api/tts/synthesize", json=payload)
     assert response.status_code == 200
     assert response.headers["content-type"] == "audio/mpeg"
     assert len(response.content) > 100
+
+    # Test con parametri di default
+    response_default = client.post("/api/tts/synthesize", json={"text": "Calma profonda e maestria."})
+    assert response_default.status_code == 200
+    assert response_default.headers["content-type"] == "audio/mpeg"
+    assert len(response_default.content) > 100
 
 

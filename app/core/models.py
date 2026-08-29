@@ -218,9 +218,9 @@ class SessionStepResponse(BaseModel):
 # --- MODELLI TTS NEURALE MASTER & AUDIO COACH ---
 class TTSSynthesizeRequest(BaseModel):
     text: str = Field(..., min_length=1, max_length=5000, description="Testo da sintetizzare con voce neurale")
-    voice: Optional[str] = Field("it-IT-DiegoNeural", description="Voce neurale italiana (es. it-IT-DiegoNeural, it-IT-ElsaNeural)")
-    rate: Optional[str] = Field("-10%", description="Velocità audio")
-    pitch: Optional[str] = Field("+0Hz", description="Tonalità audio")
+    voice: Optional[str] = Field("it-IT-GiuseppeMultilingualNeural", description="Voce neurale italiana calda e bassa (es. it-IT-GiuseppeMultilingualNeural, it-IT-DiegoNeural, it-IT-ElsaNeural)")
+    rate: Optional[str] = Field("-8%", description="Velocità audio pacata")
+    pitch: Optional[str] = Field("-5Hz", description="Tonalità audio calda e bassa")
 
 class AudioTrackInfo(BaseModel):
     id: str

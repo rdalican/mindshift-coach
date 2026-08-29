@@ -25,8 +25,32 @@ document.addEventListener('DOMContentLoaded', async () => {
 function initPWA() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/service-worker.js')
-      .then(() => console.log('Service Worker registrato.'))
+      .then((reg) => {
+        console.log('Service Worker registrato v3.0.');
+        // Forza controllo aggiornamenti ad ogni apertura
+        reg.update();
+        reg.onupdatefound = () => {
+          const installingWorker = reg.installing;
+          if (installingWorker) {
+            installingWorker.onstatechange = () => {
+              if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                console.log('Nuova versione dell\'app installata. Attivazione immediata...');
+                installingWorker.postMessage({ type: 'SKIP_WAITING' });
+              }
+            };
+          }
+        };
+      })
       .catch((err) => console.log('Errore Service Worker:', err));
+
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!refreshing) {
+        refreshing = true;
+        console.log('Controller Service Worker aggiornato. Ricarico pagina per ultima versione...');
+        window.location.reload();
+      }
+    });
   }
 
   const installBtn = document.getElementById('pwa-install-btn');
@@ -916,9 +940,9 @@ async function toggleNeuralOrWebAudioCoach() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         text: fullHypnoticText,
-        voice: "it-IT-DiegoNeural",
-        rate: "-10%",
-        pitch: "+0Hz"
+        voice: "it-IT-GiuseppeMultilingualNeural",
+        rate: "-8%",
+        pitch: "-5Hz"
       })
     });
 
