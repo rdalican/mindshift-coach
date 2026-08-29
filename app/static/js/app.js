@@ -1164,10 +1164,10 @@ function renderFilteredShifts(shifts) {
       <!-- AUDIO COACH VOCALE PLAYER & ANCORAGGIO -->
       <div class="p-3.5 rounded-xl bg-slate-800/60 border border-teal-800/30 mb-4 flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-2">
-          <button onclick="playSavedAudioCoach('${item.id}')" class="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs flex items-center gap-1.5 transition">
-            <span>🎧</span> <span>Ascolta Audio Coach</span>
+          <button id="saved-audio-btn-${item.id}" onclick="playSavedAudioCoach('${item.id}')" class="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs flex items-center gap-1.5 transition">
+            <span id="saved-audio-icon-${item.id}">🎙️</span> <span id="saved-audio-text-${item.id}">Ascolta Voce Neurale Calda</span>
           </button>
-          <span class="text-xs text-slate-400">Guida vocale e riprogrammazione ipnotica</span>
+          <span class="text-xs text-slate-400">Guida vocale neurale Studio HQ (Tono Basso e Caldo)</span>
         </div>
         ${item.anchoring_protocol && item.anchoring_protocol.breath_pace ? `
           <div class="text-xs text-teal-300 font-mono bg-slate-900/80 px-2.5 py-1 rounded border border-teal-900">
@@ -1261,11 +1261,97 @@ function reloadSavedShiftIntoMainView(shiftId) {
   }
 }
 
-function playSavedAudioCoach(shiftId) {
+let savedNeuralAudioStream = null;
+let currentPlayingSavedShiftId = null;
+
+async function playSavedAudioCoach(shiftId) {
   const shift = cachedShifts.find(s => s.id === shiftId);
   if (!shift) return;
 
-  playChunkedHypnoticSession(shift);
+  const btnText = document.getElementById(`saved-audio-text-${shiftId}`);
+  const icon = document.getElementById(`saved-audio-icon-${shiftId}`);
+
+  // Se l'audio di questo elemento è già in esecuzione, lo mettiamo in pausa
+  if (savedNeuralAudioStream && currentPlayingSavedShiftId === shiftId && !savedNeuralAudioStream.paused) {
+    savedNeuralAudioStream.pause();
+    savedNeuralAudioStream = null;
+    currentPlayingSavedShiftId = null;
+    if (btnText) btnText.textContent = "Ascolta Voce Neurale Calda";
+    if (icon) icon.textContent = "🎙️";
+    return;
+  }
+
+  // Interrompi altri flussi audio attivi
+  if (savedNeuralAudioStream) {
+    savedNeuralAudioStream.pause();
+    if (currentPlayingSavedShiftId) {
+      const prevBtnText = document.getElementById(`saved-audio-text-${currentPlayingSavedShiftId}`);
+      const prevIcon = document.getElementById(`saved-audio-icon-${currentPlayingSavedShiftId}`);
+      if (prevBtnText) prevBtnText.textContent = "Ascolta Voce Neurale Calda";
+      if (prevIcon) prevIcon.textContent = "🎙️";
+    }
+    savedNeuralAudioStream = null;
+    currentPlayingSavedShiftId = null;
+  }
+  if (neuralAudioStream) {
+    neuralAudioStream.pause();
+    neuralAudioStream = null;
+    const mainBtnText = document.getElementById('audio-btn-text');
+    const mainIcon = document.getElementById('audio-icon');
+    if (mainBtnText) mainBtnText.textContent = "Ascolta Voce Neurale Studio HQ";
+    if (mainIcon) mainIcon.textContent = "🎙️";
+  }
+  stopAudioCoach();
+
+  const meaning = shift.meaning_reframe || shift.context_reframe || "";
+  const identity = shift.identity_reframe || "";
+  const mantra = shift.anchoring_mantra || "";
+  const socratic = shift.socratic_question || "";
+
+  const fullHypnoticText = `Fai un respiro lento e profondo, e rilassa le spalle. Ascolta questa nuova prospettiva: ${meaning}. A livello della tua identità profonda, ricorda: ${identity}. Ora chiediti: ${socratic}. Ripeti dentro di te la tua formula di potere: ${mantra}. Senti questa sicurezza e chiarezza stabilizzarsi in tutto il tuo corpo.`;
+
+  if (btnText) btnText.textContent = "Caricamento Voce...";
+  if (icon) icon.textContent = "⏳";
+
+  try {
+    const res = await fetch('/api/tts/synthesize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: fullHypnoticText,
+        voice: "it-IT-GiuseppeMultilingualNeural",
+        rate: "-8%",
+        pitch: "-5Hz"
+      })
+    });
+
+    if (!res.ok) throw new Error("TTS endpoint fallback");
+
+    const blob = await res.blob();
+    const audioUrl = URL.createObjectURL(blob);
+
+    savedNeuralAudioStream = new Audio(audioUrl);
+    currentPlayingSavedShiftId = shiftId;
+
+    if (btnText) btnText.textContent = "Ferma Voce Neurale";
+    if (icon) icon.textContent = "⏹️";
+
+    savedNeuralAudioStream.play();
+    savedNeuralAudioStream.onended = () => {
+      savedNeuralAudioStream = null;
+      currentPlayingSavedShiftId = null;
+      if (btnText) btnText.textContent = "Ascolta Voce Neurale Calda";
+      if (icon) icon.textContent = "🎙️";
+    };
+  } catch (err) {
+    console.warn("Fallback su WebSpeech per Diario:", err);
+    if (btnText) btnText.textContent = "Ascolta Sessione Guidata";
+    if (icon) icon.textContent = "🎧";
+    playChunkedHypnoticSession(shift, () => {
+      if (btnText) btnText.textContent = "Ascolta Voce Neurale Calda";
+      if (icon) icon.textContent = "🎙️";
+    });
+  }
 }
 
 function filterJournalEntries() {
