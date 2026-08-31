@@ -12,6 +12,8 @@ Include:
 import os
 import json
 import uuid
+import hashlib
+from datetime import datetime, timezone
 from typing import Optional, List
 from contextlib import asynccontextmanager
 
@@ -25,7 +27,7 @@ from sqlalchemy import func
 
 from app.config import settings
 from app.core.database import get_db, init_db
-from app.core.db_models import UserSyncProfile, SavedMindShift, SubscriptionRecord, ReframeFeedback
+from app.core.db_models import UserSyncProfile, SavedMindShift, SubscriptionRecord, ReframeFeedback, AppAccessLog
 from app.core.models import (
     MindShiftRequest,
     MindShiftResponse,
@@ -47,7 +49,11 @@ from app.core.models import (
     TTSSynthesizeRequest,
     AudioTrackInfo,
     ExperientialProfile,
-    AccountMemoryResponse
+    AccountMemoryResponse,
+    TrackAccessRequest,
+    TrackAccessResponse,
+    AdminVisitorAnalyticsResponse,
+    VisitorItem
 )
 from app.core.gemini_client import gemini_pnl_client
 from app.core.stripe_client import stripe_manager
@@ -813,6 +819,148 @@ async def get_plan_status(sync_key: str, db: Session = Depends(get_db)):
     return {"plan_status": profile.plan_status, "sync_key": clean_key}
 
 # ==========================================
+# TRACCIAMENTO ACCESSI & ANALYTICS VISITATORI
+# ==========================================
+@app.post("/api/track/access", response_model=TrackAccessResponse)
+async def track_access(req: TrackAccessRequest, request: Request, db: Session = Depends(get_db)):
+    """Registra la visita/accesso per tracciamento visitatori unici e frequenza di ritorno."""
+    try:
+        client_ip = request.client.host if request.client else "unknown"
+        ip_hash = hashlib.sha256(client_ip.encode()).hexdigest()[:16]
+        user_agent = request.headers.get("user-agent", "")[:250]
+        
+        # Determina tipo dispositivo
+        device_type = req.device_type or "Desktop (Web)"
+        clean_key = req.sync_key.strip().upper() if req.sync_key else None
+        now = datetime.now(timezone.utc)
+        
+        # Salva log di accesso
+        access_log = AppAccessLog(
+            sync_key=clean_key,
+            session_fingerprint=req.session_fingerprint,
+            ip_hash=ip_hash,
+            user_agent=user_agent,
+            device_type=device_type,
+            path=req.path or "/",
+            accessed_at=now
+        )
+        db.add(access_log)
+        
+        visit_count = 1
+        is_returning = False
+        
+        if clean_key:
+            profile = db.query(UserSyncProfile).filter(UserSyncProfile.sync_key == clean_key).first()
+            if not profile:
+                profile = UserSyncProfile(
+                    sync_key=clean_key,
+                    device_name=device_type,
+                    visit_count=1,
+                    last_visit_at=now,
+                    plan_status="trial"
+                )
+                db.add(profile)
+                visit_count = 1
+                is_returning = False
+            else:
+                profile.visit_count = (profile.visit_count or 0) + 1
+                profile.last_visit_at = now
+                if req.device_type and (not profile.device_name or profile.device_name == "Primary Device"):
+                    profile.device_name = req.device_type
+                visit_count = profile.visit_count
+                is_returning = visit_count > 1
+        elif req.session_fingerprint:
+            # Conta visite per questo fingerprint
+            fp_visits = db.query(AppAccessLog).filter(AppAccessLog.session_fingerprint == req.session_fingerprint).count()
+            visit_count = fp_visits
+            is_returning = fp_visits > 1
+            
+        db.commit()
+        return TrackAccessResponse(status="ok", visit_count=visit_count, is_returning=is_returning)
+    except Exception as e:
+        logger.warning(f"Errore track access: {e}")
+        return TrackAccessResponse(status="error", visit_count=1, is_returning=False)
+
+@app.get("/api/admin/analytics/visitors", response_model=AdminVisitorAnalyticsResponse)
+async def get_admin_visitor_analytics(db: Session = Depends(get_db)):
+    """Restituisce le metriche complete di traffico, utenti unici, frequenza di ritorno e dettaglio per la Dashboard Amministratore."""
+    profiles = db.query(UserSyncProfile).order_by(UserSyncProfile.last_visit_at.desc()).all()
+    access_logs = db.query(AppAccessLog).all()
+    
+    total_unique_users = len(profiles)
+    
+    # Fingerprints unici nei log
+    unique_fingerprints = set(log.session_fingerprint for log in access_logs if log.session_fingerprint)
+    total_unique_fingerprints = max(len(unique_fingerprints), total_unique_users)
+    
+    total_visits = max(len(access_logs), sum((p.visit_count or 1) for p in profiles))
+    
+    # Utenti di ritorno (hanno visitato più di 1 volta)
+    returning_users = [p for p in profiles if (p.visit_count or 1) > 1]
+    returning_count = len(returning_users)
+    retention_rate = round((returning_count / max(total_unique_users, 1)) * 100, 1)
+    
+    # Ripartizione frequenza
+    freq = {
+        "1 Accesso (Nuovi Visitatori)": 0,
+        "2-3 Accessi (Di Ritorno)": 0,
+        "4-10 Accessi (Abituali)": 0,
+        "Oltre 10 Accessi (Power Users)": 0
+    }
+    for p in profiles:
+        c = p.visit_count or 1
+        if c == 1:
+            freq["1 Accesso (Nuovi Visitatori)"] += 1
+        elif 2 <= c <= 3:
+            freq["2-3 Accessi (Di Ritorno)"] += 1
+        elif 4 <= c <= 10:
+            freq["4-10 Accessi (Abituali)"] += 1
+        else:
+            freq["Oltre 10 Accessi (Power Users)"] += 1
+            
+    # Ripartizione dispositivi
+    devices = {"Desktop (Windows)": 0, "Mobile (Android)": 0, "Mobile (iOS)": 0, "Desktop (Mac/Altro)": 0}
+    for p in profiles:
+        dev = (p.device_name or "").lower()
+        if "android" in dev:
+            devices["Mobile (Android)"] += 1
+        elif "ios" in dev or "iphone" in dev or "ipad" in dev:
+            devices["Mobile (iOS)"] += 1
+        elif "win" in dev or "desktop" in dev or "primary" in dev:
+            devices["Desktop (Windows)"] += 1
+        else:
+            devices["Desktop (Mac/Altro)"] += 1
+            
+    # Dettaglio utenti
+    users_list = []
+    for p in profiles:
+        shift_count = db.query(SavedMindShift).filter(SavedMindShift.sync_key == p.sync_key).count()
+        users_list.append(VisitorItem(
+            sync_key=p.sync_key,
+            email=p.email,
+            device_name=p.device_name or "Dispositivo Web",
+            device_type=p.device_name or "Desktop",
+            visit_count=p.visit_count or 1,
+            saved_shifts_count=shift_count,
+            primary_vak=p.preferred_vak or "Non determinato",
+            plan_status=p.plan_status or "trial",
+            created_at=p.created_at.strftime("%d/%m/%Y %H:%M") if p.created_at else None,
+            last_visit_at=p.last_visit_at.strftime("%d/%m/%Y %H:%M") if p.last_visit_at else (p.created_at.strftime("%d/%m/%Y %H:%M") if p.created_at else None)
+        ))
+        
+    return AdminVisitorAnalyticsResponse(
+        total_unique_users=total_unique_users,
+        total_unique_fingerprints=total_unique_fingerprints,
+        total_visits=total_visits,
+        returning_users_count=returning_count,
+        retention_rate_pct=retention_rate,
+        frequency_breakdown=freq,
+        device_distribution=devices,
+        daily_access_trend=[],
+        users=users_list
+    )
+
+# ==========================================
 # ADMIN & TESTER FEEDBACK OVERVIEW API
 # ==========================================
 @app.get("/api/admin/overview")
@@ -831,7 +979,9 @@ async def get_admin_overview(db: Session = Depends(get_db)):
             "plan_status": p.plan_status,
             "preferred_vak": p.preferred_vak,
             "total_saved_sessions": user_shifts_count,
-            "created_at": p.created_at.strftime("%Y-%m-%d %H:%M:%S") if p.created_at else None
+            "visit_count": p.visit_count or 1,
+            "created_at": p.created_at.strftime("%Y-%m-%d %H:%M:%S") if p.created_at else None,
+            "last_visit_at": p.last_visit_at.strftime("%Y-%m-%d %H:%M:%S") if p.last_visit_at else None
         })
 
     return {
@@ -854,6 +1004,22 @@ async def get_admin_overview(db: Session = Depends(get_db)):
         ],
         "recent_sessions": [s.to_dict() for s in shifts[:50]]
     }
+
+@app.get("/admin", response_class=HTMLResponse)
+async def serve_admin_dashboard(request: Request):
+    """Serve la Dashboard Amministratore privata con metriche di traffico e retention."""
+    response = templates.TemplateResponse(
+        request=request,
+        name="admin.html",
+        context={
+            "app_name": settings.APP_NAME,
+            "app_env": settings.APP_ENV
+        }
+    )
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
 
 # ==========================================
 # ROADMAP API & PWA STATIC

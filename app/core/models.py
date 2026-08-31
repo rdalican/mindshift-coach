@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Any
 from enum import Enum
 
 class VAKChannel(str, Enum):
@@ -249,4 +249,39 @@ class AccountMemoryResponse(BaseModel):
     profile: Optional[ExperientialProfile] = None
     total_saved_shifts: int = 0
     message: str = "Profilo esperienziale caricato con successo"
+
+# --- MODELLI ANALYTICS ACCESSI & VISITATORI (DASHBOARD AMMINISTRATORE RISERVATA) ---
+class TrackAccessRequest(BaseModel):
+    sync_key: Optional[str] = None
+    session_fingerprint: Optional[str] = None
+    device_type: Optional[str] = None
+    path: Optional[str] = "/"
+
+class TrackAccessResponse(BaseModel):
+    status: str = "ok"
+    visit_count: int = 1
+    is_returning: bool = False
+
+class VisitorItem(BaseModel):
+    sync_key: str
+    email: Optional[str] = None
+    device_name: Optional[str] = None
+    device_type: Optional[str] = None
+    visit_count: int = 1
+    saved_shifts_count: int = 0
+    primary_vak: Optional[str] = None
+    plan_status: str = "trial"
+    created_at: Optional[str] = None
+    last_visit_at: Optional[str] = None
+
+class AdminVisitorAnalyticsResponse(BaseModel):
+    total_unique_users: int = 0
+    total_unique_fingerprints: int = 0
+    total_visits: int = 0
+    returning_users_count: int = 0
+    retention_rate_pct: float = 0.0
+    frequency_breakdown: Dict[str, int] = Field(default_factory=dict)
+    device_distribution: Dict[str, int] = Field(default_factory=dict)
+    daily_access_trend: List[Dict[str, Any]] = Field(default_factory=list)
+    users: List[VisitorItem] = Field(default_factory=list)
 

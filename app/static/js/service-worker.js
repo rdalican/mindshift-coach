@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mindshift-cache-v3.1';
+const CACHE_NAME = 'mindshift-cache-v4.0';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json'

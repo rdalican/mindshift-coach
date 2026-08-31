@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initTabs();
   initForm();
   await initSyncKey();
+  trackAppAccess();
   loadSavedShifts();
   loadExperientialMemory();
   loadAnalytics();
@@ -20,6 +21,41 @@ document.addEventListener('DOMContentLoaded', async () => {
   loadMasterAudioTracks();
   checkPaymentStatus();
 });
+
+// --- TRACCIAMENTO ACCESSI & RETENTION PRIVATO ---
+async function trackAppAccess() {
+  try {
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isWin = /Windows/i.test(navigator.userAgent);
+    const isMac = /Macintosh|Mac OS X/i.test(navigator.userAgent);
+
+    let devType = "Desktop (Web)";
+    if (isAndroid) devType = "Mobile (Android)";
+    else if (isIOS) devType = "Mobile (iOS)";
+    else if (isWin) devType = "Desktop (Windows)";
+    else if (isMac) devType = "Desktop (Mac)";
+
+    let fingerprint = localStorage.getItem('mindshift_device_fp');
+    if (!fingerprint) {
+      fingerprint = 'fp_' + Math.random().toString(36).substring(2, 10) + '_' + Date.now().toString(36);
+      localStorage.setItem('mindshift_device_fp', fingerprint);
+    }
+
+    await fetch('/api/track/access', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sync_key: currentSyncKey || null,
+        session_fingerprint: fingerprint,
+        device_type: devType,
+        path: window.location.pathname || '/'
+      })
+    });
+  } catch (err) {
+    console.debug('Access tracking non-blocking:', err);
+  }
+}
 
 // --- PWA INSTALLATION LOGIC ---
 function initPWA() {

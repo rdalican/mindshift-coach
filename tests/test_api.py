@@ -136,4 +136,44 @@ def test_tts_synthesize_endpoint():
     assert response_default.headers["content-type"] == "audio/mpeg"
     assert len(response_default.content) > 100
 
+def test_track_access_endpoint():
+    # 1. Registra primo accesso
+    payload = {
+        "sync_key": "MIND-TEST-ACC1",
+        "session_fingerprint": "fp_test_device_1",
+        "device_type": "Desktop (Windows)",
+        "path": "/"
+    }
+    r1 = client.post("/api/track/access", json=payload)
+    assert r1.status_code == 200
+    data1 = r1.json()
+    assert data1["status"] == "ok"
+    assert data1["visit_count"] >= 1
+
+    # 2. Registra secondo accesso (ritorno)
+    r2 = client.post("/api/track/access", json=payload)
+    assert r2.status_code == 200
+    data2 = r2.json()
+    assert data2["visit_count"] >= 2
+    assert data2["is_returning"] is True
+
+def test_admin_visitor_analytics_endpoint():
+    response = client.get("/api/admin/analytics/visitors")
+    assert response.status_code == 200
+    data = response.json()
+    assert "total_unique_users" in data
+    assert "total_visits" in data
+    assert "returning_users_count" in data
+    assert "retention_rate_pct" in data
+    assert "frequency_breakdown" in data
+    assert "device_distribution" in data
+    assert "users" in data
+
+def test_admin_page_serve():
+    response = client.get("/admin")
+    assert response.status_code == 200
+    assert "Dashboard Amministratore" in response.text
+    assert response.headers["cache-control"] == "no-cache, no-store, must-revalidate, max-age=0"
+
+
 

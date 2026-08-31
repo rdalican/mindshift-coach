@@ -4,7 +4,7 @@ Supporta nativamente sia SQLite (in locale) che PostgreSQL (su Railway Cloud).
 
 import os
 import logging
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import declarative_base, sessionmaker
 from app.config import settings
 
@@ -47,7 +47,6 @@ def init_db():
 
         # Migrazione automatica colonne per compatibilità con database esistenti
         with engine.connect() as conn:
-            from sqlalchemy import text
             try:
                 conn.execute(text("ALTER TABLE user_sync_profiles ADD COLUMN experiential_profile_json TEXT"))
                 conn.commit()
@@ -55,6 +54,16 @@ def init_db():
                 pass
             try:
                 conn.execute(text("ALTER TABLE user_sync_profiles ADD COLUMN memory_updated_at TIMESTAMP"))
+                conn.commit()
+            except Exception:
+                pass
+            try:
+                conn.execute(text("ALTER TABLE user_sync_profiles ADD COLUMN visit_count INTEGER DEFAULT 1"))
+                conn.commit()
+            except Exception:
+                pass
+            try:
+                conn.execute(text("ALTER TABLE user_sync_profiles ADD COLUMN last_visit_at TIMESTAMP"))
                 conn.commit()
             except Exception:
                 pass

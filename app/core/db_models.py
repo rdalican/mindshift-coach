@@ -23,8 +23,23 @@ class UserSyncProfile(Base):
     trial_ends_at = Column(DateTime, nullable=True)
     experiential_profile_json = Column(Text, nullable=True)
     memory_updated_at = Column(DateTime, nullable=True)
+    visit_count = Column(Integer, default=1)
+    last_visit_at = Column(DateTime, default=utc_now)
     created_at = Column(DateTime, default=utc_now)
     last_sync_at = Column(DateTime, default=utc_now, onupdate=utc_now)
+
+class AppAccessLog(Base):
+    """Log degli accessi e ritorni all'applicazione per analisi retention e visitatori unici."""
+    __tablename__ = "app_access_logs"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    sync_key = Column(String(64), index=True, nullable=True)
+    session_fingerprint = Column(String(128), index=True, nullable=True)
+    ip_hash = Column(String(64), nullable=True)
+    user_agent = Column(String(255), nullable=True)
+    device_type = Column(String(50), nullable=True)
+    path = Column(String(100), default="/")
+    accessed_at = Column(DateTime, default=utc_now, index=True)
 
 class SavedMindShift(Base):
     """Sessione di Coaching Master PNL salvata e sincronizzata sul Cloud."""

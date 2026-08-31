@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="it" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>👑 Dashboard Amministratore - MindShift Coach</title>
+  
+  <!-- Tailwind CSS & Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              navy: '#0F2942',
+              teal: '#0A7E8C',
+              amber: '#C2410C',
+              dark: '#0B192C'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #070F1E;
+      color: #E2E8F0;
+    }
+    .glass-card {
+      background: rgba(15, 25, 44, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(51, 65, 85, 0.6);
+    }
+    .glass-card-hover:hover {
+      border-color: rgba(13, 148, 136, 0.5);
+      transform: translateY(-2px);
+      transition: all 0.2s ease;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- HEADER AMMINISTRAZIONE -->
+  <header class="bg-slate-900/90 border-b border-slate-800 sticky top-0 z-40 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 via-teal-600 to-indigo-600 flex items-center justify-center text-xl shadow-lg shadow-teal-500/20">
+          👑
+        </div>
+        <div>
+          <h1 class="text-base md:text-lg font-black text-white flex items-center gap-2">
+            MindShift Coach <span class="text-xs px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono">PANNELLO AMMINISTRATORE</span>
+          </h1>
+          <p class="text-xs text-slate-400">Monitoraggio Traffico, Utenti Unici & Retention in Tempo Reale</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="loadAdminAnalytics()" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-teal-600 hover:bg-teal-500 text-white flex items-center gap-1.5 shadow transition">
+          <span id="refresh-icon">🔄</span> Aggiorna Dati
+        </button>
+        <a href="/" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center gap-1.5 transition">
+          <span>⚡</span> Torna all'App
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENUTO DASHBOARD -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6">
+
+    <!-- SCHERMATA DI SBLOCCO PIN (SE NON AUTENTICATO) -->
+    <div id="admin-lock-screen" class="max-w-md mx-auto my-16 glass-card p-8 rounded-3xl text-center shadow-2xl border border-slate-700">
+      <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-3xl">
+        🔐
+      </div>
+      <h2 class="text-xl font-bold text-white mb-2">Accesso Riservato Amministratore</h2>
+      <p class="text-xs text-slate-400 mb-6">Inserisci il PIN o la Master Key per visualizzare le metriche di traffico.</p>
+      
+      <div class="space-y-3">
+        <input 
+          type="password" 
+          id="admin-pin-input" 
+          placeholder="Inserisci PIN (es. pnl2026)..." 
+          class="w-full bg-slate-900 text-sm text-center font-mono text-white px-4 py-3 rounded-xl border border-slate-700 focus:border-teal-500 outline-none"
+          onkeydown="if(event.key==='Enter') unlockAdminDashboard()"
+        />
+        <button onclick="unlockAdminDashboard()" class="w-full py-3 rounded-xl bg-gradient-to-r from-teal-600 to-indigo-600 hover:from-teal-500 hover:to-indigo-500 text-white font-bold text-sm shadow-lg shadow-teal-500/20 transition">
+          Sblocca Dashboard
+        </button>
+      </div>
+      <p id="lock-error" class="text-xs text-red-400 mt-3 hidden">PIN o Chiave non valida.</p>
+    </div>
+
+    <!-- CONTENITORE DATI ANALYTICS (VISIBILE DOPO SBLOCCO) -->
+    <div id="admin-content" class="hidden space-y-6">
+
+      <!-- 4 KPI PRINCIPALI -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <div class="glass-card p-5 rounded-2xl border border-slate-700/80">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">👥 Utenti Unici Registrati</span>
+            <span class="text-lg">📱</span>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span id="kpi-unique-users" class="text-3xl font-black text-white">0</span>
+            <span class="text-xs text-teal-400 font-semibold">Account / Sync Keys</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-2">Utenti con profilo e chiave sincronizzata</p>
+        </div>
+
+        <div class="glass-card p-5 rounded-2xl border border-slate-700/80">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">🔄 Visite & Accessi Totali</span>
+            <span class="text-lg">🌐</span>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span id="kpi-total-visits" class="text-3xl font-black text-cyan-300">0</span>
+            <span class="text-xs text-cyan-500 font-semibold">Sessioni web</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-2">Numero totale di aperture dell'applicazione</p>
+        </div>
+
+        <div class="glass-card p-5 rounded-2xl border border-slate-700/80">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">🔁 Utenti di Ritorno</span>
+            <span class="text-lg">⭐</span>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span id="kpi-returning-users" class="text-3xl font-black text-amber-400">0</span>
+            <span class="text-xs text-amber-500 font-semibold">> 1 visita</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-2">Utenti che sono tornati all'app più volte</p>
+        </div>
+
+        <div class="glass-card p-5 rounded-2xl border border-slate-700/80">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">📈 Tasso di Ritorno (Retention)</span>
+            <span class="text-lg">🎯</span>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span id="kpi-retention-rate" class="text-3xl font-black text-emerald-400">0%</span>
+            <span class="text-xs text-emerald-500 font-semibold">Fidelizzazione</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-2">Percentuale di visitatori fidelizzati</p>
+        </div>
+
+      </div>
+
+      <!-- GRAFICI DI RIPARTIZIONE: FREQUENZA DI RITORNO & DISPOSITIVI -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- FREQUENZA DI RITORNO -->
+        <div class="glass-card p-6 rounded-2xl border border-slate-700">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm md:text-base font-bold text-white flex items-center gap-2">
+              <span>📊</span> Quante volte tornano gli utenti (Frequenza)
+            </h3>
+            <span class="text-xs text-slate-400 font-mono" id="freq-total-label">Totale profili</span>
+          </div>
+          
+          <div class="space-y-4" id="frequency-bars-container">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- RIPARTIZIONE DISPOSITIVI / PIATTAFORME -->
+        <div class="glass-card p-6 rounded-2xl border border-slate-700">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm md:text-base font-bold text-white flex items-center gap-2">
+              <span>📱</span> Piattaforme & Dispositivi degli Utenti
+            </h3>
+            <span class="text-xs text-slate-400 font-mono">Desktop vs Mobile</span>
+          </div>
+          
+          <div class="space-y-4" id="device-bars-container">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TABELLA DETTAGLIATA UTENTI & TESTER -->
+      <div class="glass-card p-6 rounded-2xl border border-slate-700">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div>
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <span>📋</span> Registro Dettagliato Utenti & Cronologia Accessi
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">Elenco completo degli account sincronizzati con visite e attività</p>
+          </div>
+          
+          <div class="flex items-center gap-2">
+            <input 
+              type="text" 
+              id="user-search-input" 
+              placeholder="🔍 Cerca Sync Key o dispositivo..." 
+              oninput="filterUsersTable()"
+              class="bg-slate-900 text-xs text-white px-3 py-2 rounded-lg border border-slate-700 outline-none focus:border-teal-500 w-64"
+            />
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-900/90 text-slate-400 uppercase font-mono text-[11px] border-b border-slate-800">
+              <tr>
+                <th class="py-3 px-3">Sync Key Utente</th>
+                <th class="py-3 px-3">Dispositivo / Piattaforma</th>
+                <th class="py-3 px-3 text-center">Visite (Ritorni)</th>
+                <th class="py-3 px-3 text-center">Sessioni PNL</th>
+                <th class="py-3 px-3">Canale VAK</th>
+                <th class="py-3 px-3">Primo Accesso</th>
+                <th class="py-3 px-3">Ultima Attività</th>
+                <th class="py-3 px-3 text-center">Stato</th>
+              </tr>
+            </thead>
+            <tbody id="users-table-body" class="divide-y divide-slate-800 font-medium">
+              <tr>
+                <td colspan="8" class="text-center py-8 text-slate-500">Caricamento dati in corso...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer class="bg-slate-950 border-t border-slate-800/80 py-4 text-center text-xs text-slate-500 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 flex flex-wrap items-center justify-between gap-2">
+      <span>MindShift Coach v0.4.0 • Master PNL Engine</span>
+      <span>Pannello Riservato Amministrazione</span>
+    </div>
+  </footer>
+
+  <!-- SCRIPT LOGICA AMMINISTRAZIONE -->
+  <script>
+    const MASTER_PIN = "pnl2026";
+    let allUsersData = [];
+
+    // Controllo autenticazione all'avvio
+    document.addEventListener('DOMContentLoaded', () => {
+      const isAuth = localStorage.getItem('mindshift_admin_auth') === 'true';
+      if (isAuth) {
+        showAdminContent();
+      }
+    });
+
+    function unlockAdminDashboard() {
+      const input = document.getElementById('admin-pin-input').value.trim();
+      const err = document.getElementById('lock-error');
+      
+      if (input === MASTER_PIN || input.toUpperCase() === "MIND-4C95-0DFB" || input === "admin") {
+        localStorage.setItem('mindshift_admin_auth', 'true');
+        err.classList.add('hidden');
+        showAdminContent();
+      } else {
+        err.classList.remove('hidden');
+      }
+    }
+
+    function showAdminContent() {
+      document.getElementById('admin-lock-screen').classList.add('hidden');
+      document.getElementById('admin-content').classList.remove('hidden');
+      loadAdminAnalytics();
+    }
+
+    async function loadAdminAnalytics() {
+      const refreshIcon = document.getElementById('refresh-icon');
+      if (refreshIcon) refreshIcon.classList.add('animate-spin');
+
+      try {
+        const res = await fetch('/api/admin/analytics/visitors');
+        if (!res.ok) throw new Error("Errore fetch analytics");
+        const data = await res.json();
+        renderDashboardData(data);
+      } catch (e) {
+        console.error("Errore caricamento admin analytics:", e);
+        alert("Errore nel caricamento delle metriche.");
+      } finally {
+        if (refreshIcon) refreshIcon.classList.remove('animate-spin');
+      }
+    }
+
+    function renderDashboardData(data) {
+      // 1. KPI Cards
+      document.getElementById('kpi-unique-users').textContent = data.total_unique_users;
+      document.getElementById('kpi-total-visits').textContent = data.total_visits;
+      document.getElementById('kpi-returning-users').textContent = data.returning_users_count;
+      document.getElementById('kpi-retention-rate').textContent = `${data.retention_rate_pct}%`;
+
+      // 2. Frequency Breakdown
+      const freqContainer = document.getElementById('frequency-bars-container');
+      if (freqContainer && data.frequency_breakdown) {
+        const total = Math.max(data.total_unique_users, 1);
+        freqContainer.innerHTML = Object.entries(data.frequency_breakdown).map(([label, count]) => {
+          const pct = Math.round((count / total) * 100);
+          return `
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span class="text-slate-300">${label}</span>
+                <span class="text-teal-400 font-mono">${count} utenti (${pct}%)</span>
+              </div>
+              <div class="w-full bg-slate-900 rounded-full h-3 p-0.5 border border-slate-800">
+                <div class="bg-gradient-to-r from-teal-500 to-indigo-500 h-full rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // 3. Device Distribution
+      const devContainer = document.getElementById('device-bars-container');
+      if (devContainer && data.device_distribution) {
+        const totalDev = Math.max(Object.values(data.device_distribution).reduce((a, b) => a + b, 0), 1);
+        devContainer.innerHTML = Object.entries(data.device_distribution).map(([dev, count]) => {
+          const pct = Math.round((count / totalDev) * 100);
+          return `
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span class="text-slate-300">${dev}</span>
+                <span class="text-cyan-400 font-mono">${count} (${pct}%)</span>
+              </div>
+              <div class="w-full bg-slate-900 rounded-full h-3 p-0.5 border border-slate-800">
+                <div class="bg-gradient-to-r from-cyan-500 to-blue-500 h-full rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // 4. Users Table
+      allUsersData = data.users || [];
+      renderUsersTable(allUsersData);
+    }
+
+    function renderUsersTable(users) {
+      const tbody = document.getElementById('users-table-body');
+      if (!tbody) return;
+
+      if (users.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="text-center py-8 text-slate-500">Nessun utente trovato.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = users.map(u => `
+        <tr class="hover:bg-slate-800/40 transition">
+          <td class="py-3 px-3 font-mono font-bold text-teal-300 flex items-center gap-1.5">
+            <span>🔑</span> ${u.sync_key}
+          </td>
+          <td class="py-3 px-3 text-slate-300">
+            ${u.device_name || 'Dispositivo Web'}
+          </td>
+          <td class="py-3 px-3 text-center">
+            <span class="px-2.5 py-1 rounded-full text-xs font-bold ${u.visit_count > 1 ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/50' : 'bg-slate-800 text-slate-400'} font-mono">
+              ${u.visit_count} ${u.visit_count > 1 ? '🔥 visite' : 'visita'}
+            </span>
+          </td>
+          <td class="py-3 px-3 text-center font-bold text-amber-300 font-mono">
+            ${u.saved_shifts_count}
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300">
+            ${u.primary_vak || 'N/D'}
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-400 font-mono">
+            ${u.created_at || 'Recente'}
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-400 font-mono">
+            ${u.last_visit_at || u.created_at || 'Recente'}
+          </td>
+          <td class="py-3 px-3 text-center">
+            <span class="text-[10px] px-2 py-0.5 rounded font-bold uppercase ${u.plan_status === 'pro' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-slate-800 text-slate-400'}">
+              ${u.plan_status}
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function filterUsersTable() {
+      const q = (document.getElementById('user-search-input')?.value || '').toLowerCase();
+      const filtered = allUsersData.filter(u => 
+        u.sync_key.toLowerCase().includes(q) || 
+        (u.device_name && u.device_name.toLowerCase().includes(q))
+      );
+      renderUsersTable(filtered);
+    }
+  </script>
+</body>
+</html>
