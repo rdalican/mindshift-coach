@@ -884,81 +884,99 @@ async def track_access(req: TrackAccessRequest, request: Request, db: Session = 
 @app.get("/api/admin/analytics/visitors", response_model=AdminVisitorAnalyticsResponse)
 async def get_admin_visitor_analytics(db: Session = Depends(get_db)):
     """Restituisce le metriche complete di traffico, utenti unici, frequenza di ritorno e dettaglio per la Dashboard Amministratore."""
-    profiles = db.query(UserSyncProfile).order_by(UserSyncProfile.last_visit_at.desc()).all()
-    access_logs = db.query(AppAccessLog).all()
-    
-    total_unique_users = len(profiles)
-    
-    # Fingerprints unici nei log
-    unique_fingerprints = set(log.session_fingerprint for log in access_logs if log.session_fingerprint)
-    total_unique_fingerprints = max(len(unique_fingerprints), total_unique_users)
-    
-    total_visits = max(len(access_logs), sum((p.visit_count or 1) for p in profiles))
-    
-    # Utenti di ritorno (hanno visitato più di 1 volta)
-    returning_users = [p for p in profiles if (p.visit_count or 1) > 1]
-    returning_count = len(returning_users)
-    retention_rate = round((returning_count / max(total_unique_users, 1)) * 100, 1)
-    
-    # Ripartizione frequenza
-    freq = {
-        "1 Accesso (Nuovi Visitatori)": 0,
-        "2-3 Accessi (Di Ritorno)": 0,
-        "4-10 Accessi (Abituali)": 0,
-        "Oltre 10 Accessi (Power Users)": 0
-    }
-    for p in profiles:
-        c = p.visit_count or 1
-        if c == 1:
-            freq["1 Accesso (Nuovi Visitatori)"] += 1
-        elif 2 <= c <= 3:
-            freq["2-3 Accessi (Di Ritorno)"] += 1
-        elif 4 <= c <= 10:
-            freq["4-10 Accessi (Abituali)"] += 1
-        else:
-            freq["Oltre 10 Accessi (Power Users)"] += 1
-            
-    # Ripartizione dispositivi
-    devices = {"Desktop (Windows)": 0, "Mobile (Android)": 0, "Mobile (iOS)": 0, "Desktop (Mac/Altro)": 0}
-    for p in profiles:
-        dev = (p.device_name or "").lower()
-        if "android" in dev:
-            devices["Mobile (Android)"] += 1
-        elif "ios" in dev or "iphone" in dev or "ipad" in dev:
-            devices["Mobile (iOS)"] += 1
-        elif "win" in dev or "desktop" in dev or "primary" in dev:
-            devices["Desktop (Windows)"] += 1
-        else:
-            devices["Desktop (Mac/Altro)"] += 1
-            
-    # Dettaglio utenti
-    users_list = []
-    for p in profiles:
-        shift_count = db.query(SavedMindShift).filter(SavedMindShift.sync_key == p.sync_key).count()
-        users_list.append(VisitorItem(
-            sync_key=p.sync_key,
-            email=p.email,
-            device_name=p.device_name or "Dispositivo Web",
-            device_type=p.device_name or "Desktop",
-            visit_count=p.visit_count or 1,
-            saved_shifts_count=shift_count,
-            primary_vak=p.preferred_vak or "Non determinato",
-            plan_status=p.plan_status or "trial",
-            created_at=p.created_at.strftime("%d/%m/%Y %H:%M") if p.created_at else None,
-            last_visit_at=p.last_visit_at.strftime("%d/%m/%Y %H:%M") if p.last_visit_at else (p.created_at.strftime("%d/%m/%Y %H:%M") if p.created_at else None)
-        ))
+    try:
+        profiles = db.query(UserSyncProfile).order_by(UserSyncProfile.created_at.desc()).all()
+        try:
+            access_logs = db.query(AppAccessLog).all()
+        except Exception:
+            access_logs = []
         
-    return AdminVisitorAnalyticsResponse(
-        total_unique_users=total_unique_users,
-        total_unique_fingerprints=total_unique_fingerprints,
-        total_visits=total_visits,
-        returning_users_count=returning_count,
-        retention_rate_pct=retention_rate,
-        frequency_breakdown=freq,
-        device_distribution=devices,
-        daily_access_trend=[],
-        users=users_list
-    )
+        total_unique_users = len(profiles)
+        
+        # Fingerprints unici nei log
+        unique_fingerprints = set(log.session_fingerprint for log in access_logs if getattr(log, 'session_fingerprint', None))
+        total_unique_fingerprints = max(len(unique_fingerprints), total_unique_users)
+        
+        total_visits = max(len(access_logs), sum((getattr(p, 'visit_count', 1) or 1) for p in profiles))
+        
+        # Utenti di ritorno (hanno visitato più di 1 volta)
+        returning_users = [p for p in profiles if (getattr(p, 'visit_count', 1) or 1) > 1]
+        returning_count = len(returning_users)
+        retention_rate = round((returning_count / max(total_unique_users, 1)) * 100, 1)
+        
+        # Ripartizione frequenza
+        freq = {
+            "1 Accesso (Nuovi Visitatori)": 0,
+            "2-3 Accessi (Di Ritorno)": 0,
+            "4-10 Accessi (Abituali)": 0,
+            "Oltre 10 Accessi (Power Users)": 0
+        }
+        for p in profiles:
+            c = getattr(p, 'visit_count', 1) or 1
+            if c == 1:
+                freq["1 Accesso (Nuovi Visitatori)"] += 1
+            elif 2 <= c <= 3:
+                freq["2-3 Accessi (Di Ritorno)"] += 1
+            elif 4 <= c <= 10:
+                freq["4-10 Accessi (Abituali)"] += 1
+            else:
+                freq["Oltre 10 Accessi (Power Users)"] += 1
+                
+        # Ripartizione dispositivi
+        devices = {"Desktop (Windows)": 0, "Mobile (Android)": 0, "Mobile (iOS)": 0, "Desktop (Mac/Altro)": 0}
+        for p in profiles:
+            dev = (p.device_name or "").lower()
+            if "android" in dev:
+                devices["Mobile (Android)"] += 1
+            elif "ios" in dev or "iphone" in dev or "ipad" in dev:
+                devices["Mobile (iOS)"] += 1
+            elif "win" in dev or "desktop" in dev or "primary" in dev:
+                devices["Desktop (Windows)"] += 1
+            else:
+                devices["Desktop (Mac/Altro)"] += 1
+                
+        # Dettaglio utenti
+        users_list = []
+        for p in profiles:
+            shift_count = db.query(SavedMindShift).filter(SavedMindShift.sync_key == p.sync_key).count()
+            last_v = getattr(p, 'last_visit_at', None) or p.created_at
+            users_list.append(VisitorItem(
+                sync_key=p.sync_key,
+                email=p.email,
+                device_name=p.device_name or "Dispositivo Web",
+                device_type=p.device_name or "Desktop",
+                visit_count=getattr(p, 'visit_count', 1) or 1,
+                saved_shifts_count=shift_count,
+                primary_vak=p.preferred_vak or "Non determinato",
+                plan_status=p.plan_status or "trial",
+                created_at=p.created_at.strftime("%d/%m/%Y %H:%M") if p.created_at else None,
+                last_visit_at=last_v.strftime("%d/%m/%Y %H:%M") if last_v else None
+            ))
+            
+        return AdminVisitorAnalyticsResponse(
+            total_unique_users=total_unique_users,
+            total_unique_fingerprints=total_unique_fingerprints,
+            total_visits=total_visits,
+            returning_users_count=returning_count,
+            retention_rate_pct=retention_rate,
+            frequency_breakdown=freq,
+            device_distribution=devices,
+            daily_access_trend=[],
+            users=users_list
+        )
+    except Exception as e:
+        logger.error(f"Errore get_admin_visitor_analytics: {e}", exc_info=True)
+        return AdminVisitorAnalyticsResponse(
+            total_unique_users=0,
+            total_unique_fingerprints=0,
+            total_visits=0,
+            returning_users_count=0,
+            retention_rate_pct=0.0,
+            frequency_breakdown={},
+            device_distribution={},
+            daily_access_trend=[],
+            users=[]
+        )
 
 # ==========================================
 # ADMIN & TESTER FEEDBACK OVERVIEW API

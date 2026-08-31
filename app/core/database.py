@@ -46,25 +46,16 @@ def init_db():
         Base.metadata.create_all(bind=engine)
 
         # Migrazione automatica colonne per compatibilità con database esistenti
-        with engine.connect() as conn:
+        migrations = [
+            "ALTER TABLE user_sync_profiles ADD COLUMN experiential_profile_json TEXT",
+            "ALTER TABLE user_sync_profiles ADD COLUMN memory_updated_at TIMESTAMP",
+            "ALTER TABLE user_sync_profiles ADD COLUMN visit_count INTEGER DEFAULT 1",
+            "ALTER TABLE user_sync_profiles ADD COLUMN last_visit_at TIMESTAMP"
+        ]
+        for stmt in migrations:
             try:
-                conn.execute(text("ALTER TABLE user_sync_profiles ADD COLUMN experiential_profile_json TEXT"))
-                conn.commit()
-            except Exception:
-                pass
-            try:
-                conn.execute(text("ALTER TABLE user_sync_profiles ADD COLUMN memory_updated_at TIMESTAMP"))
-                conn.commit()
-            except Exception:
-                pass
-            try:
-                conn.execute(text("ALTER TABLE user_sync_profiles ADD COLUMN visit_count INTEGER DEFAULT 1"))
-                conn.commit()
-            except Exception:
-                pass
-            try:
-                conn.execute(text("ALTER TABLE user_sync_profiles ADD COLUMN last_visit_at TIMESTAMP"))
-                conn.commit()
+                with engine.begin() as conn:
+                    conn.execute(text(stmt))
             except Exception:
                 pass
     except Exception as e:
