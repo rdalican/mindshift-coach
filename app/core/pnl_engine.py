@@ -561,8 +561,8 @@ class PNLEngine:
                 current_step=4,
                 next_step=4,
                 is_final_step=True,
-                step_title="Fase 4: Sintesi Clinica & Ristrutturazione Profonda",
-                coach_message="Abbiamo completato l'anamnesi approfondita. Avendo ora chiaro il contesto attuale, le radici storiche e le dinamiche relazionali, ecco la tua Scheda Clinica di Trasformazione personalizzata.",
-                clinical_insight="Sintesi maieutica completata con successo: transizione verso l'ancoraggio e il piano operativo in 3 fasi.",
+                step_title="Fase 4: Sintesi Finale & Ristrutturazione Mentale Profonda",
+                coach_message="Abbiamo completato l'intervista di approfondimento. Avendo ora chiaro il contesto attuale, i fattori storici e le dinamiche relazionali, ecco la tua Scheda di Ristrutturazione Mentale personalizzata.",
+                clinical_insight="Sintesi di ristrutturazione completata con successo: transizione verso l'ancoraggio e il piano d'azione in 3 fasi.",
                 final_shift=shift
             )

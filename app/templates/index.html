@@ -99,14 +99,10 @@
         <button id="pwa-install-btn" class="hidden items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-teal-600 hover:bg-teal-500 text-white transition shadow-sm">
           📱 Installa
         </button>
-      </div>
-
-    </div>
-
-    <!-- NAVIGATION TABS (FLEX-WRAP PER VISIBILITA' TOTALE SU OGNI SCHERMO) -->
+         <!-- NAVIGATION TABS (FLEX-WRAP PER VISIBILITA' TOTALE SU OGNI SCHERMO) -->
     <div class="max-w-6xl mx-auto px-4 flex flex-wrap items-center gap-1.5 py-2 border-t border-slate-800/60">
       <button data-target="live-shift-section" class="nav-tab-btn flex-1 min-w-[140px] text-center px-3.5 py-2 text-xs md:text-sm font-bold rounded-xl bg-teal-700 text-white transition">
-        ⚡ Sessione Master PNL
+        ⚡ Ristrutturazione Mentale
       </button>
       <button data-target="saved-shifts-section" class="nav-tab-btn flex-1 min-w-[130px] text-center px-3.5 py-2 text-xs md:text-sm font-semibold rounded-xl text-slate-300 hover:bg-slate-800 transition">
         📖 Diario (<span id="saved-shifts-count">0</span>)
@@ -140,22 +136,22 @@
       <!-- HERO BANNER -->
       <div class="text-center max-w-3xl mx-auto mb-6 no-print">
         <h2 class="text-2xl md:text-4xl font-black text-white tracking-tight">
-          Sessione di Coaching <span class="bg-clip-text text-transparent bg-gradient-to-r from-teal-400 via-cyan-300 to-emerald-300">Master PNL</span>
+          Sessione di <span class="bg-clip-text text-transparent bg-gradient-to-r from-teal-400 via-cyan-300 to-emerald-300">Ristrutturazione Mentale</span>
         </h2>
         <p class="text-xs md:text-sm text-slate-300 mt-2">
-          Protocollo Clinico di Trasformazione Cognitiva a 5 Dimensioni: Diagnosi Submodalità, 4 Ristrutturazioni di Livello Dilts, Sessione Vocale Guidata, Ancoraggio Corporeo 90s e Piano di Azione in 3 Fasi.
+          Metodo di Ristrutturazione Cognitiva a 5 Dimensioni: Analisi Submodalità, 4 Ristrutturazioni di Livello Dilts, Guida Vocale, Ancoraggio Corporeo 90s e Piano di Azione in 3 Fasi.
         </p>
         <div class="mt-3.5 flex flex-wrap items-center justify-center gap-2">
           <button onclick="openManualSection('man-usage')" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-purple-950/80 hover:bg-purple-900 text-purple-200 border border-purple-700/80 transition shadow-sm">
             <span>📚</span> <strong>Guida all'Uso dell'App</strong>
           </button>
-          <button onclick="openManualSection('man-application')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800/90 hover:bg-slate-700 text-amber-300 border border-slate-700 transition shadow-sm">
+          <button onclick="openManualSection('man-application')" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-800/90 hover:bg-slate-700 text-amber-300 border border-slate-700 transition shadow-sm">
             <span>⏳</span> Come Usare le Risultanze
           </button>
-          <button onclick="openManualSection('man-literature')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800/90 hover:bg-slate-700 text-cyan-300 border border-slate-700 transition shadow-sm">
+          <button onclick="openManualSection('man-literature')" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-800/90 hover:bg-slate-700 text-cyan-300 border border-slate-700 transition shadow-sm">
             <span>🎓</span> Letteratura Scientifica PNL
           </button>
-          <button onclick="openManualSection('man-ethics')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800/90 hover:bg-slate-700 text-emerald-300 border border-emerald-800/80 transition shadow-sm">
+          <button onclick="openManualSection('man-ethics')" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-800/90 hover:bg-slate-700 text-emerald-300 border border-emerald-800/80 transition shadow-sm">
             <span>⚖️</span> Deontologia & Etica
           </button>
         </div>
@@ -187,7 +183,7 @@
         <div class="mb-4 p-2 rounded-xl bg-slate-900/90 border border-slate-700/80 flex flex-wrap items-center justify-center gap-3">
           <label class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-teal-950/80 border border-teal-500/50 cursor-pointer shadow-sm transition hover:bg-teal-900/80">
             <input type="radio" name="session-mode-radio" value="interactive" checked class="accent-teal-400" onchange="updateSessionModeUI()">
-            <span class="text-xs md:text-sm font-bold text-teal-300">🌿 Seduta Completa con Coach (Anamnesi in 4 Fasi)</span>
+            <span class="text-xs md:text-sm font-bold text-teal-300">🌿 Percorso Completo di Ristrutturazione Mentale (Intervista in 4 Fasi)</span>
           </label>
           <label class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700 cursor-pointer hover:border-slate-600 transition">
             <input type="radio" name="session-mode-radio" value="fast" class="accent-amber-400" onchange="updateSessionModeUI()">
@@ -249,7 +245,7 @@
               id="main-submit-btn"
               class="w-full sm:w-auto px-8 py-3.5 rounded-xl font-black text-sm bg-gradient-to-r from-teal-500 via-cyan-500 to-emerald-400 hover:from-teal-400 hover:to-cyan-300 text-slate-950 shadow-lg shadow-teal-500/25 transition transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
             >
-              <span>🌿</span> <span id="main-submit-btn-text">Inizia Seduta con Psicologo/Coach (Anamnesi)</span>
+              <span>🌿</span> <span id="main-submit-btn-text">Inizia il percorso di Ristrutturazione della Tua Mente (Intervista di Approfondimento)</span>
             </button>
           </div>
         </form>
@@ -281,7 +277,7 @@
           <div class="flex-grow">
             <div class="flex items-center justify-between gap-2 mb-2">
               <h4 class="text-sm font-bold text-teal-300 flex items-center gap-1.5">
-                Master Coach PNL & Psicoterapeuta
+                Guida di Ristrutturazione Mentale PNL
               </h4>
               <span id="session-step-tag" class="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-teal-950 text-teal-300 border border-teal-800">Fase 1</span>
             </div>
@@ -291,7 +287,7 @@
             
             <!-- CLINICAL INSIGHT -->
             <div id="clinical-insight-box" class="p-3 rounded-xl bg-slate-800/80 border-l-4 border-amber-500 text-xs text-amber-200 mb-3">
-              <span class="font-bold">🔎 Osservazione Clinica:</span> <span id="clinical-insight-text">...</span>
+              <span class="font-bold">🔎 Osservazione Cognitiva:</span> <span id="clinical-insight-text">...</span>
             </div>
 
             <!-- QUESTIONS CONTAINER -->
@@ -337,9 +333,9 @@
       <!-- LOADING STATE -->
       <div id="loading-state" class="hidden py-16 text-center no-print">
         <div class="inline-block w-14 h-14 rounded-full border-4 border-teal-500/20 border-t-teal-400 animate-spin mb-4"></div>
-        <h3 id="loading-title" class="text-lg font-bold text-white">Analisi Clinica in corso...</h3>
+        <h3 id="loading-title" class="text-lg font-bold text-white">Ristrutturazione Mentale in corso...</h3>
         <p id="loading-desc" class="text-xs text-slate-400 mt-1.5 max-w-md mx-auto">
-          Il Master Coach PNL sta calibrando le domande di chiarimento e la mappa sensoriale dell'esperienza.
+          Il sistema di Ristrutturazione Mentale sta elaborando le domande di approfondimento e la mappa sensoriale dell'esperienza.
         </p>
       </div>
 
@@ -353,7 +349,7 @@
               <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Sessione Completata</span>
               <span class="text-xs text-slate-400">Valore Sessione: <strong class="text-amber-400 font-bold">120,00€</strong> (Incluso nel tuo Piano)</span>
             </div>
-            <h3 class="text-lg md:text-xl font-extrabold text-white">Cartella Clinica di Riprogrammazione Cognitiva</h3>
+            <h3 class="text-lg md:text-xl font-extrabold text-white">Scheda di Ristrutturazione Mentale & Cognitiva</h3>
           </div>
 
           <!-- AUDIO COACH & PRINT BUTTONS -->
@@ -593,10 +589,10 @@
             <span class="text-2xl">🧠</span>
             <div>
               <h3 class="text-base font-bold text-teal-300 flex items-center gap-2">
-                Memoria Esperienziale Evolutiva del Coach PNL
+                Memoria Esperienziale & Diario di Ristrutturazione Mentale
                 <span id="memory-episodes-badge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-teal-900/80 text-teal-200 border border-teal-700">0 Episodi Mappati</span>
               </h3>
-              <p class="text-[11px] text-slate-400">Il Coach PNL integra i tuoi blocchi e successi storici per calibrare le future sedute in modo iper-personalizzato sul tuo profilo.</p>
+              <p class="text-[11px] text-slate-400">Il sistema integra i tuoi blocchi e progressi per calibrare i futuri percorsi di ristrutturazione in modo iper-personalizzato sul tuo profilo.</p>
             </div>
           </div>
           <button 
@@ -643,7 +639,7 @@
         <div class="bg-teal-950/30 p-4 rounded-xl border border-teal-800/50">
           <div class="flex items-center justify-between mb-1.5">
             <span class="text-xs font-bold text-teal-300 flex items-center gap-1.5">
-              <span>📋</span> Sintesi Psico-Esperienziale dell'Account (IA Master PNL):
+              <span>📋</span> Sintesi Evolutiva dell'Account (IA Ristrutturazione Mentale):
             </span>
             <span id="memory-updated-label" class="text-[10px] font-mono text-slate-400">Aggiornato di recente</span>
           </div>
@@ -855,7 +851,7 @@
               <span>📱</span> Guida Operativa alle Funzionalità di MindShift Coach
             </h3>
             <p class="text-xs text-slate-300 leading-relaxed">
-              MindShift Coach è una piattaforma di <strong>Psico-Coaching Cognitivo e Riprogrammazione Neuro-Linguistica</strong> progettata per guidare l'utente dalla decostruzione di un blocco mentale fino all'installazione di uno stato di risorsa corporeo e comportamentale.
+              MindShift Coach è una piattaforma di <strong>Ristrutturazione Mentale Cognitiva e Riprogrammazione Neuro-Linguistica</strong> progettata per guidare l'utente dalla decostruzione di un blocco mentale fino all'installazione di uno stato di risorsa corporeo e comportamentale.
             </p>
           </div>
 
@@ -886,16 +882,16 @@
                 Puoi scegliere tra due percorsi prima di avviare:
               </p>
               <ul class="text-xs text-slate-300 space-y-1.5">
-                <li>• 🌿 <strong>Seduta Completa con Coach (Anamnesi in 4 Fasi)</strong>: <em>Consigliata per problemi complessi.</em> Il Coach ti pone 2 domande per esplorare il contesto, la storia passata e le relazioni prima di generare la soluzione.</li>
+                <li>• 🌿 <strong>Percorso Completo di Ristrutturazione Mentale (Intervista in 4 Fasi)</strong>: <em>Consigliato per blocchi complessi.</em> Il sistema ti pone 2 domande per esplorare il contesto, la storia passata e le relazioni prima di generare la ristrutturazione.</li>
                 <li>• ⚡ <strong>Sblocco Rapido SOS (90s)</strong>: <em>Per urgenze sul campo.</em> Genera all'istante le ristrutturazioni e l'ancoraggio in un click.</li>
               </ul>
             </div>
 
-            <!-- Passo 3: La Cartella Clinica a 5 Moduli -->
+            <!-- Passo 3: La Scheda di Ristrutturazione Mentale a 5 Moduli -->
             <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3">
               <div class="flex items-center gap-2">
                 <span class="w-7 h-7 rounded-full bg-teal-600/30 text-teal-400 font-black text-xs flex items-center justify-center border border-teal-500/40">3</span>
-                <h4 class="text-sm font-bold text-white">La Cartella Clinica a 5 Moduli</h4>
+                <h4 class="text-sm font-bold text-white">La Scheda di Ristrutturazione Mentale a 5 Moduli</h4>
               </div>
               <ul class="text-xs text-slate-300 space-y-1.5">
                 <li>• <strong>1. Shift Neuro-Biologico</strong>: Mappatura del canale VAK (Visivo, Uditivo, Cinestesico) e transizione dallo stato di allarme a quello di risorsa.</li>
@@ -906,14 +902,14 @@
               </ul>
             </div>
 
-            <!-- Passo 4: Audio Coach & Sincronizzazione -->
+            <!-- Passo 4: Guida Vocale & Sincronizzazione -->
             <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3">
               <div class="flex items-center gap-2">
                 <span class="w-7 h-7 rounded-full bg-teal-600/30 text-teal-400 font-black text-xs flex items-center justify-center border border-teal-500/40">4</span>
-                <h4 class="text-sm font-bold text-white">Audio Neurale Studio & Sync Cloud</h4>
+                <h4 class="text-sm font-bold text-white">Guida Vocale Neurale Studio & Sync Cloud</h4>
               </div>
               <ul class="text-xs text-slate-300 space-y-1.5">
-                <li>• 🎙️ <strong>Audio Coach Neurale</strong>: Ascolta la lettura personalizzata della tua seduta con voci studio ad alta definizione (Diego/Elsa).</li>
+                <li>• 🎙️ <strong>Guida Vocale Neurale</strong>: Ascolta la lettura personalizzata della tua sessione con voce calda e pacata ad alta definizione.</li>
                 <li>• 🎧 <strong>Master Audio Room</strong>: Accedi in ogni momento alle 4 tracce master di meditazione e rilassamento somatico.</li>
                 <li>• ☁️ <strong>Sync Windows ↔ Android</strong>: Con la tua <em>Sync Key</em> personale, tutte le sessioni e i progressi sono istantaneamente sincronizzati su tutti i tuoi dispositivi.</li>
               </ul>
@@ -1100,7 +1096,7 @@
               <span>⚖️</span> Codice Deontologico & Rispetto Etico della Disciplina PNL
             </h3>
             <p class="text-xs text-slate-300 leading-relaxed">
-              Il sistema MindShift Coach opera in conformità con i codici etici e deontologici internazionali stabiliti dalle principali associazioni professionali di PNL e Coaching (AIPNL, ICF, ANP):
+              Il sistema MindShift Coach opera in conformità con i principi etici e deontologici internazionali per lo sviluppo personale e la PNL:
             </p>
           </div>
 
@@ -1116,11 +1112,11 @@
                 </div>
                 <div class="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
                   <strong class="text-white block mb-1">2. Intenzione Positiva Inconscia</strong>
-                  <span>Ogni comportamento e ogni sintomo (anche l'ansia o l'esitazione) nasce come tentativo dell'inconscio di proteggere l'individuo da un dolore o rischio pregresso.</span>
+                  <span>Ogni comportamento e ogni schema reattivo (anche l'ansia o l'esitazione) nasce come tentativo dell'inconscio di proteggere l'individuo da un disagio pregresso.</span>
                 </div>
                 <div class="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
                   <strong class="text-white block mb-1">3. Le Risorse Risiedono nell'Individuo</strong>
-                  <span>Il Coach non "insegna" o impone verità, ma guida l'utente a risvegliare le risorse biologiche, cognitive ed emotive già presenti nel proprio sistema.</span>
+                  <span>Il sistema non "insegna" o impone verità, ma guida l'utente a risvegliare le risorse cognitive ed emotive già presenti nel proprio sistema.</span>
                 </div>
                 <div class="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
                   <strong class="text-white block mb-1">4. Non c'è Fallimento, solo Feedback</strong>
@@ -1136,7 +1132,7 @@
                 <h4 class="text-sm font-bold uppercase tracking-wider">Confini Deontologici & Dichiarazione di Non-Sostituzione Medica</h4>
               </div>
               <p class="text-xs text-slate-300 leading-relaxed">
-                MindShift Coach è uno strumento di <strong>Self-Help, Mental Training e Coaching Cognitivo-Comportamentale</strong>.
+                MindShift Coach è uno strumento digitale di <strong>Self-Help, Mental Training e Ristrutturazione Cognitivo-Comportamentale</strong>.
                 Non costituisce, non sostituisce e non intende surrogare la diagnosi medica, la psicoterapia clinica o il consulto con uno specialista medico o psichiatra. 
                 In presenza di patologie organiche o disturbi psichiatrici diagnosticati, l'utente è tenuto a fare sempre riferimento al proprio medico curante o specialista di fiducia.
               </p>
@@ -1248,60 +1244,118 @@
           </button>
           <button onclick="selectWizardVak('Cinestesico (K)')" class="p-3 text-left rounded-xl bg-slate-800/90 hover:bg-slate-700/90 border border-slate-700 hover:border-amber-500 transition">
             <span class="font-bold text-xs text-amber-300 block mb-0.5">🖐️ Cinestesico</span>
-            <span class="text-xs text-slate-300">Ragiono attraverso sensazioni corporee, impatti fisici e intuizioni emotive.</span>
+            <span class="text-xs text-slate-300">Ragiono attraverso sensazioni corporee, impatti emotivi e tatto.</span>
           </button>
         </div>
       </div>
 
-      <div id="wizard-step-2" class="wizard-step hidden space-y-4">
-        <h3 class="text-lg font-bold text-white">Qual è il tuo ostacolo principale oggi?</h3>
-        <div class="space-y-2">
-          <button onclick="selectWizardThought('Non riesco a trovare il coraggio di chiedere il giusto prezzo per la mia consulenza.')" class="w-full text-left p-2.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-200 border border-slate-700">
-            💶 "Chiedere il giusto prezzo per i miei servizi"
-          </button>
-          <button onclick="selectWizardThought('Non ho abbastanza tempo per lanciare questo progetto.')" class="w-full text-left p-2.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-200 border border-slate-700">
-            ⏱️ "Non ho abbastanza tempo per lanciare questo progetto"
-          </button>
-          <button onclick="selectWizardThought('Non sono abbastanza bravo rispetto alla concorrenza.')" class="w-full text-left p-2.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-200 border border-slate-700">
-            🏆 "Non sono abbastanza bravo rispetto alla concorrenza"
-          </button>
-        </div>
-      </div>
-
-      <div id="wizard-step-3" class="wizard-step hidden text-center py-4 space-y-3">
-        <span class="text-4xl block">✨</span>
-        <h3 class="text-lg font-bold text-white">Pronto per la tua Sessione Master PNL!</h3>
-        <p class="text-xs text-slate-300 leading-relaxed">
-          Il protocollo è calibrato sul tuo profilo. Clicca per generare la scheda completa a 5 livelli.
-        </p>
-        <button onclick="executeWizardShift()" class="w-full py-3.5 rounded-xl font-bold text-sm bg-gradient-to-r from-teal-500 to-cyan-400 text-slate-950 font-black shadow-lg transition">
-          🚀 Genera Protocollo Master
+      <div id="wizard-step-2" class="wizard-step space-y-4 hidden">
+        <h3 class="text-lg font-bold text-white">Inserisci il tuo primo pensiero limitante</h3>
+        <textarea 
+          id="wizard-thought-input"
+          rows="3"
+          placeholder="Es. 'Ho l'ansia che il mio nuovo progetto non trovi clienti e fallisca'..."
+          class="w-full bg-slate-800 text-white rounded-xl p-3 text-xs border border-slate-700 outline-none focus:border-teal-500"
+        ></textarea>
+        <button onclick="submitWizardStep2()" class="w-full py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs transition shadow-lg">
+          Procedi alla Ristrutturazione
         </button>
       </div>
 
+      <div id="wizard-step-3" class="wizard-step space-y-4 hidden text-center">
+        <div class="text-3xl mb-2">✨</div>
+        <h3 class="text-lg font-bold text-white">Profilo Inizializzato con Successo</h3>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Il tuo stile sensoriale dominante e il primo pensiero limitante sono stati configurati.
+        </p>
+        <button onclick="finishWizard()" class="w-full py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-400 text-slate-950 font-bold text-xs shadow-lg transition">
+          Inizia Subito la Trasformazione
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- MODAL: PRICING -->
-  <div id="pricing-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 no-print">
+  <!-- MODAL: CLOUD SYNC KEY -->
+  <div id="sync-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 no-print">
     <div class="glass-panel max-w-md w-full rounded-2xl p-6 border border-slate-700 bg-slate-900 relative">
-      <button onclick="closePricingModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">✕</button>
+      <button onclick="closeSyncModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">✕</button>
+      
       <div class="text-center mb-6">
-        <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-950 text-amber-300 border border-amber-800/80">PIANO MASTER COACHING</span>
-        <h3 class="text-2xl font-extrabold text-white mt-2">MindShift Coach Pro</h3>
-        <p class="text-xs text-slate-400 mt-1">Sessioni illimitate di Coaching Clinico PNL.</p>
-        <div class="mt-4 flex items-baseline justify-center gap-1">
-          <span class="text-4xl font-black text-white">€9,99</span>
-          <span class="text-xs text-slate-400">/ mese</span>
+        <div class="w-12 h-12 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center text-2xl mx-auto mb-3 border border-teal-500/40">
+          ☁️
         </div>
-        <p class="text-xs text-emerald-400 font-semibold mt-1">🎉 Include 3 Giorni di Prova Gratuita</p>
+        <h3 class="text-lg font-bold text-white">Sincronizzazione Cross-Device</h3>
+        <p class="text-xs text-slate-400 mt-1">Usa la tua Sync Key per sincronizzare Windows e Android in tempo reale.</p>
       </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">La tua Sync Key Attuale:</label>
+          <div class="flex items-center gap-2">
+            <input 
+              type="text" 
+              id="modal-sync-key-display" 
+              readonly 
+              class="flex-grow bg-slate-800 font-mono text-xs text-teal-300 p-2.5 rounded-lg border border-slate-700 outline-none text-center font-bold select-all"
+            />
+            <button onclick="copyModalSyncKey()" class="px-3 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 text-xs font-semibold transition">
+              📋 Copia
+            </button>
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-slate-800">
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Hai già una chiave da un altro dispositivo?</label>
+          <div class="flex items-center gap-2">
+            <input 
+              type="text" 
+              id="modal-sync-key-input" 
+              placeholder="Incolla qui (es. MIND-4C95-0DFB)..."
+              class="flex-grow bg-slate-800 font-mono text-xs text-white p-2.5 rounded-lg border border-slate-700 outline-none focus:border-teal-500 text-center uppercase"
+            />
+            <button onclick="applyModalSyncKey()" class="px-3.5 py-2.5 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-xs font-bold transition shadow-sm">
+              Accoppia
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PRICING & UPGRADE PRO -->
+  <div id="pricing-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 no-print">
+    <div class="glass-panel max-w-md w-full rounded-2xl p-6 border border-amber-500/50 bg-slate-900 relative shadow-2xl">
+      <button onclick="closePricingModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">✕</button>
+      
+      <div class="text-center mb-6">
+        <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40 inline-block mb-2">
+          Abbonamento Illimitato
+        </span>
+        <h3 class="text-xl font-black text-white">MindShift Coach Pro</h3>
+        <p class="text-xs text-slate-400 mt-1">Riprogrammazione cognitiva quotidiana senza limiti.</p>
+      </div>
+
+      <div class="p-4 rounded-xl bg-slate-800/80 border border-slate-700 text-center mb-6">
+        <span class="text-3xl font-black text-white">9,99€</span>
+        <span class="text-xs text-slate-400">/ al mese</span>
+        <p class="text-[11px] text-amber-300 mt-1">Include 3 Giorni di Prova Gratuita • Disdici quando vuoi</p>
+      </div>
+
       <ul class="text-xs text-slate-300 space-y-2.5 mb-6">
-        <li class="flex items-center gap-2">✅ Sessioni Cliniche a 5 Moduli (Valore 120€ a sessione)</li>
-        <li class="flex items-center gap-2">✅ Audio Coach Vocale con Ipnosi Milton Model</li>
-        <li class="flex items-center gap-2">✅ Riprogrammazione Identità (Dilts) & Ancoraggio Guidato</li>
-        <li class="flex items-center gap-2">✅ Sincronizzazione Realtime illimitata Windows & Android</li>
+        <li class="flex items-center gap-2">
+          <span class="text-emerald-400">✓</span> Ristrutturazioni e Sessioni Master Illimitate
+        </li>
+        <li class="flex items-center gap-2">
+          <span class="text-emerald-400">✓</span> Sintesi Vocale Neurale Studio HQ (Diego & Elsa)
+        </li>
+        <li class="flex items-center gap-2">
+          <span class="text-emerald-400">✓</span> Sincronizzazione Cloud Istantanea Windows & Android
+        </li>
+        <li class="flex items-center gap-2">
+          <span class="text-emerald-400">✓</span> Accesso alla Master Audio Room con Tracce Binaurali
+        </li>
       </ul>
+
       <button onclick="startStripeCheckout()" class="w-full py-3.5 rounded-xl font-black text-sm bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white shadow-lg shadow-orange-500/20 transition">
         Inizia Prova Gratuita di 3 Giorni
       </button>
@@ -1311,12 +1365,12 @@
   <!-- FOOTER -->
   <footer class="bg-slate-900/95 border-t border-slate-800 py-4 text-center text-xs text-slate-500 no-print">
     <div class="max-w-6xl mx-auto px-4 flex flex-wrap items-center justify-between gap-2">
-      <span>MindShift Coach v0.4.0 • Protocollo Clinico PNL Master</span>
+      <span>MindShift Coach v0.4.0 • Ristrutturazione Mentale PNL Master</span>
       <span>Sincronizzato in Cloud tra Windows & Android</span>
     </div>
   </footer>
 
   <!-- App Script with Cache Buster -->
-  <script src="/static/js/app.js?v=7.0"></script>
+  <script src="/static/js/app.js?v=8.0"></script>
 </body>
 </html>

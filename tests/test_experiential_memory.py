@@ -88,7 +88,7 @@ def test_experiential_memory_synthesis_with_shifts(db_session: Session):
 
     # Test Formattazione Prompt
     prompt_block = ExperientialMemoryEngine.format_profile_for_prompt(profile)
-    assert "PROFILO ESPERIENZIALE & MEMORIA CLINICA DELL'ACCOUNT" in prompt_block
+    assert "PROFILO ESPERIENZIALE & MEMORIA DI RISTRUTTURAZIONE DELL'ACCOUNT" in prompt_block
     assert "Cinestesico (K)" in prompt_block
 
 def test_api_account_memory_endpoints(db_session: Session):

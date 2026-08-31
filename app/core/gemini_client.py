@@ -1,8 +1,8 @@
 """Client asincrono per l'integrazione di Google Gemini (Gemini Master Protocol v4.0).
-Genera una sessione completa di Coaching PNL Master a 5 Livelli:
+Genera una sessione completa di Ristrutturazione Mentale PNL Master a 5 Livelli:
 1. Diagnosi Neuro-Linguistica e Submodalità
 2. 4 Ristrutturazioni Cognitive (Contesto, Significato, Identità Dilts, Domanda Socratica)
-3. Protocollo di Ancoraggio & Fisiologia Guidato (Auto-Coaching 90s)
+3. Protocollo di Ancoraggio & Fisiologia Guidato (Auto-Ristrutturazione 90s)
 4. Piano di Azione a 3 Fasi (2 min / 24 ore / 7 giorni)
 5. Mantra Ipnotico di Potere (Erickson)
 """
@@ -30,11 +30,11 @@ from app.core.guardrails import SemanticTopicGuardrail
 
 logger = logging.getLogger("mindshift.gemini")
 
-GEMINI_SYSTEM_INSTRUCTION_V4 = """SEI: Un Master Coach Internazionale di Programmazione Neuro-Linguistica (PNL) e Ipnosi Ericksoniana.
-OBIETTIVO: Eseguire una sessione di trasformazione cognitiva profonda del valore di oltre 100€ sul pensiero limitante dell'utente.
+GEMINI_SYSTEM_INSTRUCTION_V4 = """SEI: Un Master di Programmazione Neuro-Linguistica (PNL) ed esperto di Ristrutturazione Cognitiva ed Ipnosi Ericksoniana.
+OBIETTIVO: Eseguire una sessione di trasformazione cognitiva e ristrutturazione profonda del pensiero limitante dell'utente.
 
 METODO OPERATIVO PNL MASTER A 5 LIVELLI:
-1. DIAGNOSI NEURO-LINGUISTICA:
+1. ANALISI NEURO-LINGUISTICA:
    - Identifica il canale sensoriale dominante (VAK).
    - Analizza la violazione del Meta-Modello (Bandler & Grinder) e spiega come il cervello costruisce il blocco a livello percettivo (submodalità).
 2. LE 4 RISTRUTTURAZIONI COGNITIVE PROFONDE:
@@ -42,7 +42,7 @@ METODO OPERATIVO PNL MASTER A 5 LIVELLI:
    - Ristrutturazione di Significato (Milton Model): Presupposizioni positive e ridefinizione dello scopo.
    - Ristrutturazione di Identità (Robert Dilts): Elevazione del livello logico identitario (chi è veramente l'utente e quali sono i suoi valori guida).
    - Domanda Socratica & Doppio Legame: Domanda ipnotica di sblocco chirurgico sul tema esatto dell'utente.
-3. PROTOCOLLO DI ANCORAGGIO & FISIOLOGIA GUIDATO (AUTO-COACHING 90 SECONDI):
+3. PROTOCOLLO DI ANCORAGGIO & FISIOLOGIA GUIDATO (AUTONOMIA 90 SECONDI):
    - Una procedura in 4 passi pratici (respiro, postura, dissociazione o ancoraggio cinestesico) da svolgere all'istante per riprogrammare lo stato emotivo.
 4. PIANO DI AZIONE OPERATIVO IN 3 FASI (DETTAGLIATO, STRUTTURATO ED ESAUSTIVO IN OGNI FASE):
    - phase_immediate_2min (Fase 1 - Subito nei primi 120 secondi): Micro-azione fisica e corporea ultra-precisa (postura, respirazione diaframmatica, primo micro-gesto materiale o di scrittura) per interrompere il cortisolo, rompere l'inerzia e innescare la dopamina.
@@ -445,9 +445,9 @@ OUTPUT JSON OBBLIGATORIO:
                 current_step=4,
                 next_step=4,
                 is_final_step=True,
-                step_title="Fase 4: Sintesi Clinica & Ristrutturazione Profonda",
-                coach_message="Abbiamo completato l'anamnesi approfondita. Avendo ora chiaro il contesto attuale, le radici storiche e le dinamiche relazionali, ecco la tua Scheda Clinica di Trasformazione personalizzata.",
-                clinical_insight="Sintesi terapeutica completata con successo: transizione verso l'ancoraggio e il piano operativo in 3 fasi.",
+                step_title="Fase 4: Sintesi Finale & Ristrutturazione Mentale Profonda",
+                coach_message="Abbiamo completato l'intervista di approfondimento. Avendo ora chiaro il contesto attuale, i fattori storici e le dinamiche relazionali, ecco la tua Scheda di Ristrutturazione Mentale personalizzata.",
+                clinical_insight="Sintesi di ristrutturazione completata con successo: transizione verso l'ancoraggio e il piano d'azione in 3 fasi.",
                 final_shift=final_shift
             )
 

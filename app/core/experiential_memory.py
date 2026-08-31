@@ -42,7 +42,7 @@ class ExperientialMemoryEngine:
                 core_limiting_structures=["In attesa della prima sessione registrata"],
                 unlocked_mastery_archetypes=["Potenziale Inespresso"],
                 high_resonance_mantras=[],
-                clinical_synthesis_narrative="Account appena inizializzato. Il Coach PNL calibra le sessioni iniziali esplorando i diversi canali percettivi per mappare lo stile cognitivo dell'utente.",
+                clinical_synthesis_narrative="Account appena inizializzato. Il sistema calibra le sessioni iniziali esplorando i diversi canali percettivi per mappare lo stile cognitivo dell'utente.",
                 preferred_reframe_style="Identità (Robert Dilts) & Milton Model",
                 last_profile_update=utc_now().isoformat()
             )
@@ -194,14 +194,14 @@ class ExperientialMemoryEngine:
         mantra_str = f"\"{profile.high_resonance_mantras[0]}\"" if profile.high_resonance_mantras else "N/A"
 
         return f"""
-PROFILO ESPERIENZIALE & MEMORIA CLINICA DELL'ACCOUNT (Fattori Evolutivi Longitudinali):
-- Storico Sedute e Blocchi Integrati: {profile.total_episodes_analyzed} sessioni nel Diario.
+PROFILO ESPERIENZIALE & MEMORIA DI RISTRUTTURAZIONE DELL'ACCOUNT (Fattori Evolutivi Longitudinali):
+- Storico Sessioni e Blocchi Integrati: {profile.total_episodes_analyzed} sessioni nel Diario.
 - Canale Sensoriale Dominante: {profile.primary_vak_channel} (orienta metafore e verbi su questo canale).
 - Pattern & Bias Ricorrenti Noti: {limiting_str}
 - Risorse & Archetipi di Potere Sbloccati in passato: {archetypes_str}
 - Mantra ad Alta Risonanza consolidato: {mantra_str}
-- Sintesi Psico-Clinica dell'Individuo: {profile.clinical_synthesis_narrative}
+- Sintesi Evolutiva dell'Individuo: {profile.clinical_synthesis_narrative}
 
 DIRETTIVA DI PERSONALIZZAZIONE EVOLUTIVA:
-Usa questa memoria per rendere la seduta straordinariamente intima, empatica e cucita su misura per questo specifico individuo, capitalizzando sulle risorse già sbloccate ma mantenendo il focus terapeutico RIGOROSAMENTE sul nuovo blocco espresso (rispetta i Guardrail anti-contaminazione).
+Usa questa memoria per rendere la sessione straordinariamente empatica e cucita su misura per questo specifico individuo, capitalizzando sulle risorse già sbloccate ma mantenendo il focus di ristrutturazione RIGOROSAMENTE sul nuovo blocco espresso (rispetta i Guardrail anti-contaminazione).
 """

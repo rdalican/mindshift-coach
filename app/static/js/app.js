@@ -270,7 +270,7 @@ function updateSessionModeUI() {
   const submitBtn = document.getElementById('main-submit-btn');
   
   if (isInteractive) {
-    if (submitBtnText) submitBtnText.textContent = 'Inizia Seduta con Psicologo/Coach (Anamnesi)';
+    if (submitBtnText) submitBtnText.textContent = 'Inizia il percorso di Ristrutturazione della Tua Mente (Intervista di Approfondimento)';
     if (submitBtn) {
       submitBtn.querySelector('span').textContent = '🌿';
       submitBtn.className = 'w-full sm:w-auto px-8 py-3.5 rounded-xl font-black text-sm bg-gradient-to-r from-teal-500 via-cyan-500 to-emerald-400 hover:from-teal-400 hover:to-cyan-300 text-slate-950 shadow-lg shadow-teal-500/25 transition transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer';
@@ -370,13 +370,13 @@ async function executeSessionStep(step, userResponse) {
 
   if (loadingState) loadingState.classList.remove('hidden');
   if (loadingTitle) {
-    if (step === 1) loadingTitle.textContent = "Fase 1: Accoglienza Empatica & Calibrazione del Contesto...";
+    if (step === 1) loadingTitle.textContent = "Fase 1: Accoglienza & Calibrazione del Contesto...";
     else if (step === 2) loadingTitle.textContent = "Fase 2: Esplorazione Storica & Cause Passate...";
     else if (step === 3) loadingTitle.textContent = "Fase 3: Mappatura Influenze Esterne & Relazioni...";
-    else loadingTitle.textContent = "Fase 4: Sintesi Clinica Finale & Generazione Scheda Master...";
+    else loadingTitle.textContent = "Fase 4: Sintesi Finale & Generazione Ristrutturazione Mentale...";
   }
   if (loadingDesc) {
-    loadingDesc.textContent = "Il Master Coach PNL sta integrando l'anamnesi con ascolto empatico e domande socratiche mirate.";
+    loadingDesc.textContent = "Il sistema di Ristrutturazione Mentale sta integrando le tue risposte con domande socratiche mirate.";
   }
   if (loadingState) loadingState.scrollIntoView({ behavior: 'smooth' });
 
@@ -475,7 +475,7 @@ function renderSessionStepUI(data) {
 
   if (nextBtnText) {
     if (step === 3) {
-      nextBtnText.textContent = 'Completa Anamnesi & Genera Ristrutturazione Clinica (Fase 4)';
+      nextBtnText.textContent = 'Completa Intervista & Genera Ristrutturazione Mentale (Fase 4)';
     } else {
       nextBtnText.textContent = `Approfondisci (Passa a Fase ${step + 1})`;
     }
@@ -486,7 +486,7 @@ function submitSessionStepResponse() {
   const input = document.getElementById('session-user-response-input');
   const val = input ? input.value.trim() : '';
   if (!val) {
-    alert('Per favore, condividi qualche dettaglio in risposta alle domande del coach per proseguire l\'indagine clinica.');
+    alert('Per favore, condividi qualche dettaglio in risposta alle domande per proseguire l\'approfondimento.');
     if (input) input.focus();
     return;
   }
